@@ -49,21 +49,22 @@ import QrReader from '../../../utils/ReaderQR'
 function Supplying() {
     const [showScanner, setShowScanner] = useState(false)
     const [scannedResult, setScannedResult] = useState([])
-  const [visibleModalAdd, setVisibleModalAdd] = useState(false)
-  const [visibleModalScanner, setVisibleModalScanner] = useState(false)
-  const [formData, setFormData] = useState({
-    material_no: "",
-    material_desc: "",
-    plant: "",
-    uom: "",
-    qty: 0
-  })
-  const [defaultQty, setDefaultQty] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const { getSupplyQtyData} = useSupplyQtyDataService()
-  const { supplyingAndCreateHistory } = useHistoryDataService()
-  const [supplyQtyData, setSupplyQtyData] = useState([])
-  const [filteredData, setFilteredData] = useState([])
+    const [visibleModalAdd, setVisibleModalAdd] = useState(false)
+    const [visibleModalScanner, setVisibleModalScanner] = useState(false)
+    const [formData, setFormData] = useState({
+        material_no: "",
+        material_desc: "",
+        plant: "",
+        uom: "",
+        qty: 0,
+        supply_by: ""
+    })
+    const [defaultQty, setDefaultQty] = useState(0)
+    const [loading, setLoading] = useState(false)
+    const { getSupplyQtyData} = useSupplyQtyDataService()
+    const { supplyingAndCreateHistory } = useHistoryDataService()
+    const [supplyQtyData, setSupplyQtyData] = useState([])
+    const [filteredData, setFilteredData] = useState([])
 
   const getSupplyQty = async() => {
     try {
@@ -81,12 +82,16 @@ function Supplying() {
 
   const handleSupplyAndCreateHistory = async(data) => {
     try {
-        console.log("data form :", data)
+        if(data.supply_by === "" || data.supply_by === null) {
+            addToast(templateToast("Error", "Please insert your name!"))
+            return
+        }
         const response = await supplyingAndCreateHistory(data)
         addToast(templateToast("Success", response.data.message))
         setVisibleModalAdd(false)
         getSupplyQty()
     } catch (error) {
+        console.log(error)
         if(error.response){
             addToast(templateToast("Error", error.response.data.message))
         }
@@ -101,14 +106,6 @@ function Supplying() {
     const adjustedValue = Math.ceil(formData.qty / defaultQty) * defaultQty;
     setFormData({...formData, qty: adjustedValue});
   };
-
-  const handleBtnQty = (type, step) => {
-    if(type === "up"){
-        formData.qty += step
-    } else if(type === "down"){
-
-    }
-  }
   
   useEffect(()=>{
     // getMaterial()
@@ -164,7 +161,8 @@ function Supplying() {
         material_desc: data.material_desc,
         plant: data.plant,
         uom: data.uom,
-        qty: data.qty
+        qty: data.qty,
+        supply_by: ""
     })
     setDefaultQty(data.qty)
   }
@@ -175,6 +173,7 @@ function Supplying() {
         <CContainer>
             {/* Start of Modal Update */}
         <CModal
+            backdrop="static"
             visible={visibleModalAdd}
             onClose={() => setVisibleModalAdd(false)}
             aria-labelledby="AddQuantitySupply"
@@ -198,7 +197,7 @@ function Supplying() {
                 <CRow className='mb-3'>
                     <CFormLabel className="col-sm-4 col-form-label">Plant</CFormLabel>
                     <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                        <CDropdown variant="btn-group disabled-dropdown" style={{width: "100%"}}  direction="center">
+                        <CDropdown className="btn-group disabled-dropdown" style={{width: "100%"}}  direction="center">
                             <CDropdownToggle  width={400} disabled className='d-flex justify-content-between align-items-center dropdown-search'>{formData.plant}</CDropdownToggle>
                             <CDropdownMenu >
                                 <CDropdownItem onClick={()=>setFormData((prev)=>({ ...prev, plant: "P1 - PLANT 1"}))}>P1 - PLANT 1</CDropdownItem>
@@ -223,6 +222,12 @@ function Supplying() {
                                 <button className='btn-number down' onClick={()=>setFormData({...formData, qty: formData.qty - defaultQty < 0 ? 0 : formData.qty-defaultQty})}><CIcon icon={icon.cilCaretBottom}/></button>
                             </div>
                         </CInputGroup>
+                    </CCol>
+                </CRow>
+                <CRow className="mb-3">
+                    <CFormLabel htmlFor="supplyBy" className="col-sm-4 col-form-label">Supplier Name<span style={{color: "red"}}>*</span></CFormLabel>
+                    <CCol sm={8}>
+                        <CFormInput type="text" id="supplyBy" value={formData.supply_by || ""} onChange={(e)=>setFormData({...formData, supply_by: e.target.value})}/>
                     </CCol>
                 </CRow>
             </CModalBody>
@@ -262,7 +267,7 @@ function Supplying() {
     const toaster = useRef()
     const templateToast = (type, msg) => {
         return(
-            <CToast autohide={true}>
+            <CToast autohide={true} key={Date.now()}>
                 <CToastHeader closeButton>
                     <svg
                     className="rounded me-2 bg-black"

@@ -242,6 +242,7 @@ const Supply = () => {
                                 <CTableHeaderCell scope="col" className='text-center'>No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Supply By</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Supply Date</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Supply Time</CTableHeaderCell>
                             </CTableRow>
@@ -254,6 +255,7 @@ const Supply = () => {
                                         <CTableDataCell className='text-center'>{index+1}</CTableDataCell>
                                         <CTableDataCell>{supply.material_no}</CTableDataCell>
                                         <CTableDataCell>{supply.material_desc}</CTableDataCell>
+                                        <CTableDataCell>{supply.supply_by}</CTableDataCell>
                                         <CTableDataCell>{supply.supply_date}</CTableDataCell>
                                         <CTableDataCell>{time}</CTableDataCell>
                                     </CTableRow>
@@ -273,9 +275,6 @@ const Supply = () => {
                     <CDropdown>
                         <CDropdownToggle color="white">{itemPerPage}</CDropdownToggle>
                         <CDropdownMenu>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(1)}>1</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(2)}>2</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(3)}>3</CDropdownItem>
                             <CDropdownItem onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
                             <CDropdownItem onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
                             <CDropdownItem onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
