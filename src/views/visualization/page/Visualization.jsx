@@ -43,6 +43,11 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
+import ImageCar1Left from '../../../assets/images/visualization/car-1-left.png'
+import ImageCar2Left from '../../../assets/images/visualization/car-2-left.png'
+import ImageCar1Right from '../../../assets/images/visualization/car-1-right.png'
+import ImageCar2Right from '../../../assets/images/visualization/car-2-right.png'
+
 const Visualization = () => {
   const { getMaterialData } = useMaterialDataService()
   const { getSetupData } = useSetupDataService()  
@@ -221,9 +226,9 @@ const Visualization = () => {
   return (
     <div className='bg-andon overflow-hidden vh-100'>
       
-        <img className='bg-car left' src={`/src/assets/images/visualization/${activeIndex === 0 || activeIndex === 1 ? "car-1-left" : "car-2-left"}.png`}/>
-        <img className='bg-car right' src={`/src/assets/images/visualization/${activeIndex === 0 || activeIndex === 1 ? "car-1-right" : "car-2-right"}.png`}/>
-      
+        <img className='bg-car left' src={activeIndex === 0 || activeIndex === 1 ? ImageCar1Left : ImageCar2Left}/>
+        <img className='bg-car right' src={activeIndex === 0 || activeIndex === 1 ? ImageCar1Right : ImageCar2Right}/>
+  
       <CRow className='text-white p-4'>
         <CCol xs={3} className=''>
           <h1 className='' style={{color: "#FF1F1F"}}>TOYOTA</h1>

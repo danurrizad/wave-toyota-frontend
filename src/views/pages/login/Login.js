@@ -31,6 +31,11 @@ import { cilLockLocked, cilUser } from '@coreui/icons'
 
 import useAuthDataService from './../../../services/AuthDataService';
 import { useAuth } from '../../../utils/context/authContext'
+import ImageEtios from '../../../assets/images/login/etios.jpg'
+import ImageInnova from '../../../assets/images/login/innova.jpg'
+import ImageVios from '../../../assets/images/login/vios.jpg'
+import ImageYaris from '../../../assets/images/login/yaris.jpg'
+import ImageLogo from '../../../assets/images/logo/app-logo.png'
 
 const Login = () => {
   const { login } = useAuthDataService()
@@ -94,7 +99,7 @@ const Login = () => {
             <CImage
               className=""
               style={{ width: '30px' }}
-              src="src/assets/images/logo/app-logo.png"
+              src={ImageLogo}
             />
             <h1 className="" style={{ color: '#dd5a43' }}>
               ANDON VISUALIZATION
@@ -153,28 +158,28 @@ const Login = () => {
                     <CCarouselItem>
                       <CImage
                         className="d-block w-100"
-                        src="src/assets/images/login/vios.jpg"
+                        src={ImageVios}
                         alt="slide 1"
                       />
                     </CCarouselItem>
                     <CCarouselItem>
                       <CImage
                         className="d-block w-100"
-                        src="src/assets/images/login/etios.jpg"
+                        src={ImageEtios}
                         alt="slide 2"
                       />
                     </CCarouselItem>
                     <CCarouselItem>
                       <CImage
                         className="d-block w-100"
-                        src="src/assets/images/login/innova.jpg"
+                        src={ImageInnova}
                         alt="slide 2"
                       />
                     </CCarouselItem>
                     <CCarouselItem>
                       <CImage
                         className="d-block w-100"
-                        src="src/assets/images/login/yaris.jpg"
+                        src={ImageYaris}
                         alt="slide 2"
                       />
                     </CCarouselItem>

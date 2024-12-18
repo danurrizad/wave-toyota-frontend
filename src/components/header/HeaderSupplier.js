@@ -2,8 +2,7 @@
 import React, { useState } from 'react'
 import { CHeader, CContainer, CHeaderBrand, CHeaderToggler, CCollapse, CHeaderNav, CNavItem, CNavLink, CDropdown, CDropdownToggle, CDropdownMenu, CDropdownItem, CDropdownDivider, CForm, CFormInput, CButton, CImage, CHeaderText, CLink } from '@coreui/react'
 
-import CIcon from '@coreui/icons-react';
-import * as icon from "@coreui/icons";
+import ImageLogo from '../../assets/images/logo/app-logo.png'
 
 const HeaderSupplier = () => {
     const [visible, setVisible] = useState(false)
@@ -12,7 +11,7 @@ const HeaderSupplier = () => {
         <CHeader>
           <CContainer >
             <CHeaderBrand href="#" className='d-flex gap-2 align-items-center'>
-                <CImage src="src/assets/images/logo/app-logo.png" width={24}/>
+                <CImage src={ImageLogo} width={24}/>
                 <CHeaderText className='' style={{fontSize: "16px", fontWeight: "bold"}}>ANDON VISUALIZATION</CHeaderText>
             </CHeaderBrand>
           </CContainer>
