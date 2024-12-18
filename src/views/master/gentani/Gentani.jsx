@@ -280,7 +280,7 @@ const Gentani = () => {
     const toaster = useRef()
     const templateToast = (type, msg) => {
         return(
-            <CToast autohide={true}>
+            <CToast autohide={true} key={Date.now()}>
                 <CToastHeader closeButton>
                     <svg
                     className="rounded me-2 bg-black"
@@ -597,9 +597,6 @@ const Gentani = () => {
                     <CDropdown>
                         <CDropdownToggle color="white">{itemPerPage}</CDropdownToggle>
                         <CDropdownMenu>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(1)}>1</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(2)}>2</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(3)}>3</CDropdownItem>
                             <CDropdownItem onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
                             <CDropdownItem onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
                             <CDropdownItem onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>

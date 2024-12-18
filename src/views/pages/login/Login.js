@@ -66,7 +66,7 @@ const Login = () => {
     const toaster = useRef()
     const templateToast = (type, msg) => {
         return(
-            <CToast autohide={true}>
+            <CToast autohide={true} key={Date.now()}>
                 <CToastHeader closeButton>
                     <svg
                     className="rounded me-2 bg-black"
