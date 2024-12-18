@@ -1,0 +1,143 @@
+.bg-andon{
+    // background-color: #282E3C;
+    background: rgb(54,61,75);
+background: radial-gradient(circle, rgba(54,61,75,1) 0%, rgba(40,46,60,1) 100%);
+}
+
+.bg-car.left{
+    position: absolute;
+    bottom: 0;
+    opacity: 25%;
+    left: 0;
+}
+.bg-car.right{
+    position: absolute;
+    bottom: 0;
+    opacity: 25%;
+    right: 0;
+}
+
+.box-green{
+    background-color: #4FD7CD;
+    // size: 60px;
+    width: 40px;
+    height: 40px;
+}
+.box-yellow{
+    background-color:  #FBA21B;
+    // size: 60px;
+    width: 40px;
+    height: 40px;
+}
+.box-red{
+    background-color: #D6531C;
+    // size: 60px;
+    width: 40px;
+    height: 40px;
+}
+
+.box-indicator{
+    padding-top: 40px;
+    padding-bottom: 10px;
+}
+
+.text-indicator{
+    font-size: 24px;
+}
+
+.text-title{
+    font-size: 32px;
+    padding: 10px;
+    padding-bottom: 0;
+}
+
+.text-title.title{
+    padding-top: 40px;
+    text-align: center;
+}
+
+.highcharts-grid-line{
+    display: none;
+}
+
+.col-chart{
+    border: 2px solid white;
+}
+
+text.highcharts-credits{
+    display: none !important;
+}
+
+// .highcharts-legend.highcharts-no-tooltip{
+//     display: none;
+// }
+
+
+.blink-critical {
+    animation: blink-animation 0.75s  infinite;
+    -webkit-animation: blink-animation 0.75s infinite;
+  }
+
+.blink-supply-time{
+    animation: blink-animation 1s  infinite;
+    -webkit-animation: blink-animation 1s  infinite;
+}
+
+@keyframes blink-animation {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.swiper-pagination-bullet-active{
+    background-color: white !important;
+    color: white !important;
+}
+
+.swiper-pagination-bullet{
+    background-color: white !important;
+    color: white !important;
+}
+
+.swiper-button-next, .swiper-button-prev{
+    color: white !important;
+}
+
+// *{
+//     border: 2px solid red;
+// }
+
+.visualization-body{
+    height: calc(100vh - 50px - 80px) !important ;
+}
+
+.button-sound.off, .button-sound.off:active, .button-sound.off:focus{
+    // background-color: #DD6F4F;
+    color: #DD6F4F;
+    border: 1px solid #DD6F4F;
+    background-color: #282E3C;
+}
+.button-sound.on, .button-sound.on:active, .button-sound.on:focus{
+    // background-color: #31A093;
+    color: #31A093;
+    border: 1px solid #31A093;
+    background-color: #282E3C;
+}
+
+.button-sound:hover{
+    color: gray;
+    background-color: #282E3C;
+}
+
+.button-sound:active, .button-sound:focus{
+    color: gray;
+    border: 1 px gray;
+}

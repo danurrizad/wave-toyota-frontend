@@ -1,0 +1,43 @@
+.btn-login{
+    background-color: #428bca;
+    color: white;
+}
+
+.btn-login:hover{
+    background-color: #2f699c ;
+    color: white;
+}
+
+.btn-register{
+    background-color: #65a75b ;
+    color: white;
+}
+.btn-register:hover{
+    background-color: #55964b ;
+    color: white;
+}
+
+.btn-reset{
+    background-color: #d15b47  ;
+    color: white;
+}
+.btn-reset:hover{
+    background-color: #993928  ;
+    color: white;
+}
+
+.btn-show-password{
+    padding: 0;
+}
+
+.btn-show-password:active, .btn-show-password:focus, .btn-show-password:not(:focus){
+    border: 0;
+}
+
+
+// `sm` applies to x-small devices (portrait phones, less than 576px)
+@media (max-width: 575.98px) { 
+    .card-login.image-cover{
+        display: none;   
+    }
+ }

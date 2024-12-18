@@ -1,0 +1,44 @@
+// Here you can add other styles
+.text-table-small{
+    font-size: 11px;
+}
+
+.loading{
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+    background-color: rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.btn-logout{
+    padding: 0;
+}
+
+.btn-group-logout{
+    gap: 0.75rem;
+    border: 0;
+    background-color: transparent !important;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    padding: 0;
+    width: fit-content;
+}
+
+/* Hide spinner buttons in Chrome, Safari, Edge */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide spinner buttons in Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}

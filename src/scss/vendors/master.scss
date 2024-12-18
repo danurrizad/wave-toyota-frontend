@@ -1,0 +1,225 @@
+.page-item.active{
+    .page-link{
+        border-color: #212631;
+        background-color: #212631;
+    }
+}
+
+.page-item.active{
+    .page-link:hover{
+        color: white;
+    }
+}
+
+.page-link:hover{
+    color: #212631;
+    cursor: pointer;
+}
+
+.page-link{
+    color: #212631;
+}
+
+.btn-group{
+    border: 2px solid #dbdfe6;
+    background-color: white;
+}
+
+.dropdown-search{
+    width: inherit !important;
+    height: 40px;
+}
+
+.btn-search{
+    background-color: rgb(76, 116, 190);
+    color: white;
+}
+.btn-search:hover{
+    background-color: rgb(41, 81, 155);
+    color: white;
+}
+
+.btn-add-master, .btn-add-master:focus, .btn-add-master:active, .btn-add-master:visited{
+    background-color: rgb(46, 139, 46);
+    color: white;
+}
+
+.btn-add-master:hover{
+    background-color: rgb(39, 87, 39) ;
+    color: white;
+}
+
+input.form-control{
+    outline-color: gray;
+}
+
+.btn-download, .btn-upload{
+    background-color: rgb(76, 116, 190);
+    color: white;
+}
+
+.btn-download:hover, .btn-upload:hover{
+    background-color:  rgb(41, 81, 155);
+    color: white;
+}
+
+.react-datepicker__input-container{
+    input{
+        border: 2px solid #dbdfe6;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        border-radius: 5px;
+    }
+}
+
+.dropdown-menu{
+    --cui-dropdown-link-active-bg: gray;
+}
+
+.dropdown-toggle{
+    overflow: hidden;
+    cursor: pointer;
+}
+
+input:disabled, .disabled-dropdown, button:disabled{
+    cursor: not-allowed;
+    background-color: #e7eaee;
+    border: 0;
+    color: gray;
+}
+
+
+input.form-control:focus{
+    outline: black !important;
+}
+
+// .btn-close-red{
+//     background-color: red;
+// }
+// .btn-close-red:hover{
+//     background-color: rgb(170, 0, 0);
+// }
+
+.btn-icon-edit, .btn-icon-edit:focus{
+    color: white;
+    background-color: #428bca;
+    padding: 0.2rem 0.4rem;
+    // 0.75 0.375
+}
+.btn-icon-edit:hover{
+    color: white;
+    background-color: #29669b;
+}
+.btn-icon-delete, .btn-icon-delete:focus{
+    color: white;
+    background-color: #d15b47;
+    padding: 0.2rem 0.4rem;
+}
+.btn-icon-delete:hover{
+    color: white;
+    background-color: #9b3d2c;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+.btn-number{
+    background-color: transparent;
+    border: 1px solid #e7eaee;
+    transition-duration: 200ms;
+}
+.btn-number:hover{
+    background-color: #b4b7bb;
+}
+
+.btn-number.up{
+    border-bottom: 0.1px solid #e7eaee; 
+    border-radius: 0 5px 0 0;
+}
+
+.btn-number.down{
+    border-top: 0.1px solid #e7eaee;
+    border-radius: 0 0 5px 0;
+}
+
+
+
+// supplier
+
+@media only screen and (max-width: 600px) {
+    .container-qr-camera{
+        padding: 10px;
+    }
+    .qr-camera{
+        transform: translateY(-20%)!important;
+    }
+}
+
+.container-qr-scanner{
+    width: 100% !important;
+    height: 100% !important;
+    position: relative;
+}
+
+video.qr-scanner{
+    width: 100%;
+}
+
+
+  .scanner-border {
+    z-index: 99999999;
+    width: 100%; /* Adjust the size as needed */
+    height: 100%; /* Keep it square */
+    // border: 10px solid red; /* White border for scanner effect */
+    position: absolute;
+    // box-sizing: border-box;
+  }
+  
+  .scanner-border::before,
+  .scanner-border::after,
+  .scanner-border .corner-top-left,
+  .scanner-border .corner-top-right,
+  .scanner-border .corner-bottom-left,
+  .scanner-border .corner-bottom-right {
+    content: "";
+    position: absolute;
+    // padding: 20px;
+    width: 25px; /* Adjust corner size */
+    height: 25px;
+    // border: 3px solid white; /* Corner lines */
+    padding: 20px;
+  }
+  
+  .scanner-border .corner-top-left {
+    top: 10px;
+    left: 10px;
+    border-right: 0 !important; 
+    border-bottom: 0 !important; 
+    border: 3px solid white;
+  }
+  
+  .scanner-border .corner-top-right {
+    top: 10px;
+    right: 10px;
+    border-left: 0 !important;
+    border-bottom: 0 !important;
+    border: 3px solid white;
+  }
+  
+  .scanner-border .corner-bottom-left {
+    bottom: 10px;
+    left: 10px;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border: 3px solid white;
+  }
+  
+  .scanner-border .corner-bottom-right {
+    bottom: 10px;
+    right: 10px;
+    border-left: 0 !important;
+    border-top: 0 !important;
+    border: 3px solid white;
+  }
+  

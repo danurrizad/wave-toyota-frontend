@@ -1,0 +1,15 @@
+{
+  "short_name": "Andon Visualization",
+  "name": "Andon Visualization",
+  "icons": [
+    {
+      "src": "./assets/img/logo/app-logo.png",
+      "sizes": "100x100",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
