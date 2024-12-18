@@ -300,9 +300,9 @@ const Setup = () => {
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Plant</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Supply Line</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Standard Supply</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Minimal Supply</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Critical Stock</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Total</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Current Stock</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Created By</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Created Date</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Changed By</CTableHeaderCell>
