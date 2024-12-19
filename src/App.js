@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { Suspense, useEffect } from 'react'
 import { HashRouter, Route, Routes } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 
 import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
@@ -9,8 +8,6 @@ import './scss/style.scss'
 // We use those styles to show code examples, you should remove them in your application.
 import './scss/examples.scss'
 
-import { ToastProvider } from './utils/context/toastContext'
-// import { AuthProvider } from './utils/context/authContext'
 import AuthProvider from './utils/context/authContext'
 
 // Containers

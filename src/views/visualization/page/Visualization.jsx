@@ -10,31 +10,17 @@ import warningSoundSupply from '../../../assets/sounds/warning-1.mp3';
 
 
 import { 
-  CCard, 
   CCardBody, 
-  CCol, 
-  CCardHeader, 
+  CCol,  
   CRow,
-  CCarousel,
-  CCarouselItem, 
-  CNavLink,
   CButton,
   CButtonGroup
 } from '@coreui/react'
-import {
-  CChartBar,
-  CChartDoughnut,
-  CChartLine,
-  CChartPie,
-  CChartPolarArea,
-  CChartRadar,
-} from '@coreui/react-chartjs'
-import { DocsLink } from 'src/components'
 
 import CIcon from '@coreui/icons-react'
 import { cilVolumeOff, cilVolumeHigh } from '@coreui/icons'
 
-import Highcharts, { color } from 'highcharts';
+import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -54,11 +40,7 @@ const Visualization = () => {
   const { getMonitoringData } = useMonitoringDataService()
   const { createDataChartOptions, applyDataChartOptions} = useDataChartService()
 
-  const [ materialData, setMaterialData ] = useState([])
-  const [ setupData, setSetupData ] = useState([])
   const [ option, setOption ] = useState([])
-  const [ isSupplyTime, setIsSupplyTime ] = useState({})
-  const [ isCriticalTime, setIsCriticalTime ] = useState({})
   const [audioUnlocked, setAudioUnlocked] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0)
 

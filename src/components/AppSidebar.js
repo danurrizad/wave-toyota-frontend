@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-
 import {
   CButton,
   CButtonGroup,
@@ -16,15 +15,14 @@ import {
   CSidebarHeader,
   CSidebarNav,
   CSidebarToggler,
-} from '@coreui/react'
+} 
+from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import ImageLogo from '/src/assets/images/logo/app-logo.png'
 
 import { cilAccountLogout } from '@coreui/icons'
 
 import { AppSidebarNav } from './AppSidebarNav'
-
-import { logo } from 'src/assets/brand/logo'
-import { sygnet } from 'src/assets/brand/sygnet'
 
 // sidebar nav config
 import navigation from '../_nav'
@@ -54,7 +52,7 @@ const AppSidebar = () => {
     >
       <CSidebarHeader className="border-bottom">
         <CSidebarBrand href='/'>
-          <CImage className="sidebar-narrow" src="src/assets/images/logo/app-logo.png" style={{width: "24px"}}/>
+          <CImage className="sidebar-narrow" src={ImageLogo} style={{width: "24px"}}/>
           <CNavbarText className="sidebar-brand-full" style={{textDecoration: "none"}}>ANDON VISUALIZATION</CNavbarText>
           {/* <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} /> */}
           {/* <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} /> */}
