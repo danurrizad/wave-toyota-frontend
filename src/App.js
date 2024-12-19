@@ -27,27 +27,11 @@ const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
 
 const Visualization = React.lazy(() => import('./views/visualization/page/Visualization'))
 const Supplier = React.lazy(()=> import('./views/pages/supplier/Supplier'))
-// const Visualization1 = React.lazy(() => import('./views/visualization/1/Visualization1'))
-// const Visualization2 = React.lazy(() => import('./views/visualization/2/Visualization2'))
-// const Visualization3 = React.lazy(() => import('./views/visualization/3/Visualization3'))
-// const Visualization4 = React.lazy(() => import('./views/visualization/4/Visualization4'))
+
 const App = () => {
-  // const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
-  // const storedTheme = useSelector((state) => state.theme)
-
-  // useEffect(() => {
-  //   const urlParams = new URLSearchParams(window.location.href.split('?')[1])
-  //   const theme = urlParams.get('theme') && urlParams.get('theme').match(/^[A-Za-z0-9\s]+/)[0]
-  //   if (theme) {
-  //     setColorMode(theme)
-  //   }
-
-  //   if (isColorModeSet()) {
-  //     return
-  //   }
-
-  //   setColorMode(storedTheme)
-  // }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(()=>{
+    localStorage.setItem('coreui-free-react-admin-template-theme', 'light')
+  }, [])
 
   return (
     <HashRouter>
