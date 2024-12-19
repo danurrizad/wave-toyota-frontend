@@ -257,12 +257,12 @@ const Monitoring = () => {
             {renderModalUpdate()}
 
             <CRow>
-                <CCol xl={4} xs={12} >
+                <CCol xl={6} xs={12} >
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor="plant" className='col-form-label col-sm-2' >Plant</CFormLabel>
-                        <CCol className='d-flex align-items-center gap-2 col-sm-6 '>
-                            <CDropdown className='d-flex justify-content-between' style={{width: "100%"}}>
-                                <CDropdownToggle width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{searchQuery.visualization_name}</CDropdownToggle>
+                        <CFormLabel htmlFor="plant" className='col-form-label col-sm-2 col-xl-1' >Plant</CFormLabel>
+                        <CCol className='d-flex align-items-center gap-2 col-sm-8 col-xl-6'>
+                            <CDropdown className='dropdown-search d-flex justify-content-between'>
+                                <CDropdownToggle className='d-flex justify-content-between align-items-center dropdown-search'>{searchQuery.visualization_name}</CDropdownToggle>
                                 <CDropdownMenu className=''>
                                     <CDropdownItem onClick={()=>setSearchQuery({ visualization_name: "All"})}>All</CDropdownItem>
                                     <CDropdownItem onClick={()=>setSearchQuery({ visualization_name: "Visualization 1"})}>Visualization 1</CDropdownItem>
@@ -272,7 +272,7 @@ const Monitoring = () => {
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
-                        <CCol className="d-flex justify-content-end gap-2 col-sm-4">
+                        <CCol className="d-flex justify-content-end gap-2 col-sm-2 col-xl-2">
                             <CButton className="btn-search" onClick={()=>handleSearch()}>Search</CButton>
                             <CButton color="secondary" onClick={()=>handleClearSearch()}>Clear</CButton>
                         </CCol >
