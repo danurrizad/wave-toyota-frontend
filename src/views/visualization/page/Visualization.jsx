@@ -141,8 +141,8 @@ const Visualization = () => {
   const renderCharts1 = () =>
    option.map((opt, index) => (
     opt.visualization_name === "Visualization 1" &&
-      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 py-1 border-0" key={index}>
-          <CCardBody className={`${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray"}}>
+      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0" key={index}>
+          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray",  borderRadius: "10px"}}>
             <HighchartsReact
               highcharts={Highcharts}
               options={opt}
@@ -157,8 +157,8 @@ const Visualization = () => {
   const renderCharts2 = () =>
     option.map((opt, index) => (
       opt.visualization_name === "Visualization 2" && 
-      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 py-1 border-0" key={index}>
-          <CCardBody className={`${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray"}}>
+      <CCol xl={4} md={12} xs={12} className="col-chart px-4 pb-4 border-0" key={index}>
+          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
             <HighchartsReact
               highcharts={Highcharts}
               options={opt}
@@ -173,8 +173,8 @@ const Visualization = () => {
   const renderCharts3 = () =>
     option.map((opt, index) => (
       opt.visualization_name === "Visualization 3" && 
-      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 py-1 border-0" key={index}>
-          <CCardBody className={`${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray"}}>
+      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0" key={index}>
+          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
             <HighchartsReact
               highcharts={Highcharts}
               options={opt}
@@ -189,8 +189,8 @@ const Visualization = () => {
   const renderCharts4 = () =>
     option.map((opt, index) => (
       opt.visualization_name === "Visualization 4" && 
-      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 py-1 border-0 "  key={index}>
-          <CCardBody className={`${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray"}}>
+      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0 "  key={index}>
+          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
             <HighchartsReact
               highcharts={Highcharts}
               options={opt}
