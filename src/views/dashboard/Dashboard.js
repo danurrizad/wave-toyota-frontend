@@ -101,7 +101,7 @@ const Dashboard = () => {
     <CContainer fluid>
       <h1 className='mb-3'>MASTER</h1>
       <CRow>
-        <CCol xs={12} xl={4}>
+        <CCol xs={12} xl={2}>
           <CWidgetStatsD
             className="mb-3"
             icon={<CIcon className="my-4 text-black" icon={icon.cilSpreadsheet} height={52} />}
@@ -112,7 +112,7 @@ const Dashboard = () => {
             ]}
           />
         </CCol>
-        <CCol xs={12} xl={4}>
+        <CCol xs={12} xl={2}>
           <CWidgetStatsD
             className="mb-3"
             icon={<CIcon className="my-4 text-black" icon={icon.cilCart} height={52} />}
@@ -122,7 +122,7 @@ const Dashboard = () => {
             ]}
           />
         </CCol>
-        <CCol xs={12} xl={4}>
+        <CCol xs={12} xl={2}>
           <CWidgetStatsD
             className="mb-3"
             icon={<CIcon className="my-4 text-black" icon={icon.cilCog} height={52} />}
@@ -134,7 +134,7 @@ const Dashboard = () => {
         </CCol>
       </CRow>
       <CRow>
-        <CCol xs={12} xl={4}>
+        <CCol xs={12} xl={2}>
           <CWidgetStatsD
             className="mb-3"
             icon={<CIcon className="my-4 text-black" icon={icon.cilDataTransferUp} height={52} />}
@@ -145,7 +145,7 @@ const Dashboard = () => {
             ]}
           />
         </CCol>
-        <CCol xs={12} xl={4}>
+        <CCol xs={12} xl={2}>
           <CWidgetStatsD
             className="mb-3"
             icon={<CIcon className="my-4 text-black" icon={icon.cilChart} height={52} />}
