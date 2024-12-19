@@ -141,7 +141,7 @@ const Visualization = () => {
   const renderCharts1 = () =>
    option.map((opt, index) => (
     opt.visualization_name === "Visualization 1" &&
-      <CCol xs={4} className="col-chart d-flex px-4 py-1 border-0" key={index}>
+      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 py-1 border-0" key={index}>
           <CCardBody className={`${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray"}}>
             <HighchartsReact
               highcharts={Highcharts}
@@ -157,7 +157,7 @@ const Visualization = () => {
   const renderCharts2 = () =>
     option.map((opt, index) => (
       opt.visualization_name === "Visualization 2" && 
-      <CCol xs={4} className="col-chart d-flex px-4 py-1 border-0" key={index}>
+      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 py-1 border-0" key={index}>
           <CCardBody className={`${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray"}}>
             <HighchartsReact
               highcharts={Highcharts}
@@ -173,7 +173,7 @@ const Visualization = () => {
   const renderCharts3 = () =>
     option.map((opt, index) => (
       opt.visualization_name === "Visualization 3" && 
-      <CCol xs={4} className="col-chart d-flex px-4 py-1 border-0" key={index}>
+      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 py-1 border-0" key={index}>
           <CCardBody className={`${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray"}}>
             <HighchartsReact
               highcharts={Highcharts}
@@ -189,7 +189,7 @@ const Visualization = () => {
   const renderCharts4 = () =>
     option.map((opt, index) => (
       opt.visualization_name === "Visualization 4" && 
-      <CCol xs={4} className="col-chart d-flex px-4 py-1 border-0 "  key={index}>
+      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 py-1 border-0 "  key={index}>
           <CCardBody className={`${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray"}}>
             <HighchartsReact
               highcharts={Highcharts}
@@ -208,22 +208,22 @@ const Visualization = () => {
 
 
   return (
-    <div className='bg-andon overflow-hidden vh-100'>
+    <div className='bg-andon overflow-x-hidden'>
       
         <img className='bg-car left' src={activeIndex === 0 || activeIndex === 1 ? ImageCar1Left : ImageCar2Left}/>
         <img className='bg-car right' src={activeIndex === 0 || activeIndex === 1 ? ImageCar1Right : ImageCar2Right}/>
   
       <CRow className='text-white p-4'>
-        <CCol xs={3} className=''>
-          <h1 className='' style={{color: "#FF1F1F"}}>TOYOTA</h1>
+        <CCol xs={{ order: 1}} xl={{ order: 0 }}  className='col-6 col-xl-3'>
+          <h1 className='text-section' style={{color: "#FF1F1F"}}>TOYOTA</h1>
           <CCardBody xs={4}>
             <div className='d-flex flex-column align-items-start ' style={{color: "white"}}>
-                <h4 className="">
+                <h4 className="text-section">
                   {dateState.toLocaleString('en-US', {
                     dateStyle: 'full'
                   })} 
                 </h4>
-                <h4 className=''>
+                <h4 className='text-section'>
                   {dateState.toLocaleString('en-US', {
                     hour: 'numeric',
                     minute: 'numeric',
@@ -234,7 +234,7 @@ const Visualization = () => {
               </div>
           </CCardBody>
           <CCol className='d-flex align-items-end justify-content-start gap-2 pt-4'>
-            <h4 style={{color: "white", fontSize: "20px"}}>WARNING SOUND :</h4>
+            <h4 style={{color: "white", fontSize: "20px"}} className='text-section'>WARNING SOUND :</h4>
             <div className="thumbnail hidden" id="paparazzixxx">
               <CButtonGroup className="" onClick={()=> setAudioUnlocked(audioUnlocked ? false : true)} style={{border: 0}}>
                 <CButton className={`button-sound ${audioUnlocked ? "on" : "off"}`}>
@@ -250,27 +250,27 @@ const Visualization = () => {
             </div>
           </CCol>
         </CCol>
-        <CCol xs={6}>
+        <CCol xl={6} xs={12}>
           <CCardBody>
-            <h1 className='text-center ' style={{color: "white"}}>ANDON DIRECT MATERIAL SUPPLY</h1>
-            <h3 className='text-center' style={{color: "white"}}><span style={{color: "#FF1F1F"}}>TMMIN</span> {activeIndex === 0 || activeIndex === 1 ? <span style={{color: "#ADFFF9"}}>PLANT 1</span> : <span style={{color: "#FCAA37"}}>PLANT 2</span>}</h3>
+            <h1 className='text-center text-title' style={{color: "white"}}>ANDON DIRECT MATERIAL SUPPLY</h1>
+            <h3 className='text-center text-title' style={{color: "white"}}><span style={{color: "#FF1F1F"}}>TMMIN</span> {activeIndex === 0 || activeIndex === 1 ? <span style={{color: "#ADFFF9"}}>PLANT 1</span> : <span style={{color: "#FCAA37"}}>PLANT 2</span>}</h3>
           </CCardBody>
         </CCol>
-        <CCol xs={3}>
+        <CCol xl={{order:0}} xs={{order: 2}} className='col-xl-3 col-6'>
           <CCardBody>
-            <CCol className='d-flex flex-column align-items-end gap-2' >
+            <CCol className='d-flex flex-column align-items-end justify-content-end  gap-2' >
               <div className='d-flex align-items-center gap-2'>
-                <h4 className='' style={{color: "#4FD7CD"}}>STANDARD</h4>
+                <h4 className='text-section' style={{color: "#4FD7CD"}}>STANDARD</h4>
                 <div className='box-green'></div>
               </div>
 
               <div className='d-flex align-items-center gap-2'>
-                <h4 className='' style={{color: "#FBA21B"}}>TO BE SUPPLIED</h4>
+                <h4 className='text-section' style={{color: "#FBA21B"}}>TO BE SUPPLIED</h4>
                 <div className='box-yellow'></div>
               </div>
 
               <div className='d-flex align-items-center gap-2'>
-                <h4 className='' style={{color: "#D6531C"}}>CRITICAL</h4>
+                <h4 className='text-section' style={{color: "#D6531C"}}>CRITICAL</h4>
                 <div className='box-red'></div>
               </div>
             </CCol>

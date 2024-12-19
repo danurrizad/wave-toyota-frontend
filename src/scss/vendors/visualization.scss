@@ -1,17 +1,57 @@
 .bg-andon{
     // background-color: #282E3C;
+    min-height: 100vh;
     background: rgb(54,61,75);
 background: radial-gradient(circle, rgba(54,61,75,1) 0%, rgba(40,46,60,1) 100%);
 }
 
 .bg-car.left{
-    position: absolute;
+    position: fixed;
     bottom: 0;
     opacity: 25%;
     left: 0;
 }
+
+@media (max-width: 1180px)  {
+    .box-green, .box-yellow, .box-red{
+        width: 30px !important;
+        height: 30px !important;
+    }
+    .text-title{
+        font-size: 24px !important ;
+    }
+    .text-section{
+        font-size: 16px !important;
+    }
+    .bg-car.left, .bg-car.right{
+        width: 50%;
+    }
+}
+
+// @media (max-width: 768px)  {
+//     .bg-car.left, .bg-car.right{
+//         width: 50%;
+//     }
+// }
+
+@media (max-width: 576px)  {
+    .box-green, .box-yellow, .box-red{
+        width: 20px !important;
+        height: 20px !important;
+    }
+    .text-title{
+        font-size: 16px !important;
+    }
+    .text-section{
+        font-size: 10px !important;
+    }
+    .bg-car.left, .bg-car.right{
+        width: 40%;
+    }
+}
+
 .bg-car.right{
-    position: absolute;
+    position: fixed;
     bottom: 0;
     opacity: 25%;
     right: 0;
