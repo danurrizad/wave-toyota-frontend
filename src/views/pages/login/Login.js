@@ -112,7 +112,7 @@ const Login = () => {
           </CCol>
         </CRow>
         <CRow className="justify-content-center">
-          <CCol md={8}>
+          <CCol md={12} xl={8} >
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
