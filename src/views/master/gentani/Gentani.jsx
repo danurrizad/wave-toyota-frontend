@@ -46,8 +46,8 @@ import useMaterialDataService from './../../../services/MaterialDataService';
 import { useAuth } from '../../../utils/context/authContext';
 
 const Gentani = () => {
-    const {getGentaniData, createGentaniData, updateGentaniData, deleteGentaniData, setGentaniInMaterialData} = useGentaniDataService()
-    const {getMaterialData, getMaterialNoGentaniData, setMaterialNoGentaniData} = useMaterialDataService()
+    const {getGentaniData, createGentaniData, createGentaniDataByUpload, updateGentaniData, deleteGentaniData} = useGentaniDataService()
+    const {getMaterialData} = useMaterialDataService()
     const [ gentaniData, setGentaniData ] = useState([])
     const [ materialData, setMaterialData ] = useState([])
     const [ filteredData, setFilteredData ] = useState([])
@@ -55,6 +55,7 @@ const Gentani = () => {
     const auth = useAuth()
 
     const [visibleModalAdd, setVisibleModalAdd] = useState(false)
+    const [visibleModalUpload, setVisibleModalUpload] = useState(false)
     const [visibleModalUpdate, setVisibleModalUpdate] = useState(false)
     const [visibleModalDelete, setVisibleModalDelete] = useState(false)
 
@@ -63,10 +64,17 @@ const Gentani = () => {
         material_no: "Select",
         material_desc: "",
         plant: "",
+        plant2: "",
         quantity: "",
         created_by: auth.user,
         updated_by: ""
     })
+
+    const [file, setFile] = useState(null)
+
+    const handleChangeUpload = (e) => {
+        setFile(e.target.files[0])
+    }
 
     const [formUpdateData, setFormUpdateData] = useState({
         katashiki: "",
@@ -152,14 +160,45 @@ const Gentani = () => {
 
     const paginatedData = filteredData.slice((currentPage - 1) * itemPerPage, currentPage * itemPerPage)
     
+
+    
+    
+    const mergeMaterials = (data) => {
+        const grouped = {};
+      
+        Object.values(data).forEach((material) => {
+          const { material_no, plant } = material;
+      
+          if (!grouped[material_no]) {
+            grouped[material_no] = { ...material }; // Initialize with the first material data
+          } else {
+            // Add subsequent plants as new properties (e.g., plantSecond, plantThird, etc.)
+            const plantKeys = Object.keys(grouped[material_no]).filter((key) =>
+              key.startsWith("plant")
+            );
+            const nextPlantKey = `plant${plantKeys.length + 1}`;
+            grouped[material_no][nextPlantKey] = plant;
+          }
+        });
+      
+        // Convert the grouped object into an array
+        return Object.values(grouped);
+      };
+
     const getMaterial = async() => {
         try {
             setLoading(true)
             const response = await getMaterialData('material')
-            
-            setMaterialData(response.data)
+            const groupedMaterial = mergeMaterials(response.data)
+
+            setMaterialData(groupedMaterial)
+            // setMaterialData(response.data)
         } catch (error) {
-            addToast(templateToast("Error", error.message))
+            if(error.response){
+                addToast(templateToast("Error", error.response.data.message))
+            } else{
+                addToast(templateToast("Error", error.message))
+            }
         } finally{
             setLoading(false)
         }
@@ -170,16 +209,15 @@ const Gentani = () => {
             setLoading(true)
             const response = await getGentaniData('gentani')
 
-            // Preserve pagination
-            const startIndex = (currentPage - 1) * itemPerPage;
-            const endIndex = startIndex + itemPerPage;
-            const dataPaginated = response.data.slice(startIndex, endIndex);
-
             setGentaniData(response.data)
-            setFilteredData(dataPaginated)
+            setFilteredData(response.data)
             setTotalGentaniData(response.data.length)
         } catch (error) {
-            addToast(templateToast("Error", error.message))
+            if(error.response){
+                addToast(templateToast("Error", error.response.data.message))
+            } else{
+                addToast(templateToast("Error", error.message))
+            }
         } finally{
             setLoading(false)
         }
@@ -197,7 +235,7 @@ const Gentani = () => {
         //   const responseSet = await setGentaniInMaterialData("gentani-material", response.data.data.gentani_id, materialNumber)
           addToast(templateToast("Success", response.data.message));
           
-          setFormData((prev)=>({...prev, plant: "Select", material_no: "Select", material_desc: ""}))
+          setFormData((prev)=>({...prev, plant: "Select", plant2: "", material_no: "Select", material_desc: ""}))
           setVisibleModalAdd(false)
           getGentani()
       
@@ -216,6 +254,58 @@ const Gentani = () => {
         } finally{
             setLoading(false)
         }
+    };
+
+    const handleCreateByUpload = async () => {
+        if (!file) {
+            addToast(templateToast("Error", "Please provide a file!"));
+            return;
+        }
+    
+        const fileName = file.name;
+        const reader = new FileReader();
+    
+        reader.onload = async (e) => {
+            try {
+                // Read the file data and convert it to a workbook
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+    
+                // Convert the first worksheet to JSON
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    
+                // Prepare the body for the request
+                const bodyFile = {
+                    file_name: fileName,
+                    data: jsonData,
+                    created_by: auth.user,
+                };
+    
+                console.log("Body file prepared for upload:", bodyFile);
+    
+                // Example API call (ensure `createGentaniDataByUpload` is properly defined)
+                const response = await createGentaniDataByUpload('/gentani/upload', bodyFile);
+                console.log(response)
+                // Handle successful response
+                // console.log("Response from API:", response);
+                addToast(templateToast("Success", response.data.message));
+                if(response.data.errors.length !== 0){
+                    addToast(templateToast("Failed", `${response.data.errors.length} Gentani failed to create!`))
+                }
+                setVisibleModalUpdate(false)
+                getGentani()
+            } catch (error) {
+                console.error("Error processing file:", error);
+    
+                // Handle errors
+                const errorMessage = error.response?.data?.message || error.message;
+                addToast(templateToast("Error", errorMessage));
+            }
+        };
+    
+        // Read the file as an ArrayBuffer
+        reader.readAsArrayBuffer(file);
     };
 
     const handleUpdateGentani = async(gentaniId, qty) => {
@@ -376,7 +466,7 @@ const Gentani = () => {
                                         return(
                                             <CDropdownItem 
                                                 key={index}  
-                                                onClick={()=>setFormData((prev)=>({...prev, material_no: material.material_no, material_desc: material.material_desc, plant: material.plant}))}
+                                                onClick={()=>setFormData((prev)=>({...prev, material_no: material.material_no, material_desc: material.material_desc, plant: material.plant, plant2: material.plant2 ? material.plant2 : ""}))}
                                                 className='cursor-pointer dropdown-item'
                                                 >
                                                     {material.material_no} - {material.material_desc}
@@ -391,9 +481,10 @@ const Gentani = () => {
                         <CFormLabel className="col-sm-4 col-form-label">Plant<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <CDropdown variant="btn-group" style={{width: "100%"}} direction="center">
-                                <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formData.plant !="" ? formData.plant : "Select"}</CDropdownToggle>
+                                <CDropdownToggle  width={400} disabled={formData.material_no === "Select"} className='d-flex justify-content-between align-items-center dropdown-search'>{formData.plant !="" ? formData.plant : "Select"}</CDropdownToggle>
                                 <CDropdownMenu>
-                                    <CDropdownItem className='cursor-pointer'>{formData.plant !="" ? formData.plant : "P1 - PLANT 1"}</CDropdownItem>
+                                    <CDropdownItem className='cursor-pointer' onClick={()=>setFormData({...formData, plant: "P1 - PLANT 1"})}>P1 - PLANT 1</CDropdownItem>
+                                    {formData.plant2 !== "" && <CDropdownItem className='cursor-pointer' onClick={()=>setFormData({...formData, plant: "P2 - PLANT 2"})}>P2 - PLANT 2</CDropdownItem>}
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
@@ -434,7 +525,7 @@ const Gentani = () => {
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Material No</CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown disabled variant="btn-group disabled-dropdown" style={{width: "100%"}} direction="center">
+                            <CDropdown disabled className="btn-group disabled-dropdown" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} disabled className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.material_no}</CDropdownToggle>
                             </CDropdown>
                         </CCol>
@@ -442,7 +533,7 @@ const Gentani = () => {
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Plant</CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown disabled variant="btn-group disabled-dropdown" style={{width: "100%"}} direction="center">
+                            <CDropdown disabled className="btn-group disabled-dropdown" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} disabled className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.plant}</CDropdownToggle>
                             </CDropdown>
                         </CCol>
@@ -498,6 +589,33 @@ const Gentani = () => {
             </CModal>
             {/* End of Modal Delete */}
 
+            {/* Start of Modal Upload */}
+            <CModal
+                backdrop="static"
+                visible={visibleModalUpload}
+                onClose={() => setVisibleModalUpload(false)}
+                aria-labelledby="UploadGentaniData"
+                >
+                <CModalHeader>
+                    <CModalTitle id="UploadGentaniData">Upload Gentani Data</CModalTitle>
+                </CModalHeader>
+                <CModalBody>
+                    <CRow className="mb-3">
+                        <CFormLabel htmlFor="quantitiy" className="col-sm-4 col-form-label">File (.xlsx)<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CCol sm={8}>
+                            <CFormInput type="file" accept='.xlsx' id="upload" onChange={(e)=>handleChangeUpload(e)}/>
+                        </CCol>
+                    </CRow>
+                </CModalBody>
+                <CModalFooter>
+                    <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalUpload(false)}>
+                    Close
+                    </CButton>
+                    <CButton className='btn-add-master' onClick={()=>handleCreateByUpload()}>Upload data</CButton>
+                </CModalFooter>
+            </CModal>
+            {/* End of Modal Upload */}
+
             <CRow>
                 <CCol xs={12} xl={4}>
                     <CRow className='mb-3'>
@@ -539,7 +657,7 @@ const Gentani = () => {
                 <CCol xs={12} xl={4} className='mt-4'>
                     <CButton className='btn-add-master' onClick={()=>setVisibleModalAdd((prev) => ({ ...prev, state: true}))}>Add Gentani</CButton>
                     <CButton className='btn-download mx-2' onClick={()=>handleDownload(paginatedData)}>Download</CButton>
-                    {/* <CButton className='btn-upload'>Upload</CButton> */}
+                    <CButton className='btn-upload' onClick={()=>setVisibleModalUpload(true)}>Upload</CButton>
                 </CCol>
             </CRow>
             <CRow>

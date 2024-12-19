@@ -26,6 +26,15 @@ const useGentaniDataService = () => {
         }
     }
 
+    const createGentaniDataByUpload = async(api, bodyFile) => {
+        try {
+            const response = await axios.post(`${BACKEND_URL}/${api}`, bodyFile)
+            return response
+        } catch (error) {
+            throw error
+        }
+    }
+
     const updateGentaniData = async(api, paramsId, body) => {
         try {
             const response = await axios.put(`${BACKEND_URL}/${api}/${paramsId}`, body)
@@ -43,24 +52,14 @@ const useGentaniDataService = () => {
             throw error 
         }
     }
-
-    const setGentaniInMaterialData = async(api, paramsId, body) => {
-        try {
-            const response = await axios.put(`${BACKEND_URL}/${api}/${paramsId}`, body)
-            return response
-        } catch (error) {
-            throw error
-        }   
-    } 
-
     
 
   return {
     getGentaniData,
     createGentaniData,
+    createGentaniDataByUpload,
     updateGentaniData,
     deleteGentaniData,
-    setGentaniInMaterialData,
   }
 }
 
