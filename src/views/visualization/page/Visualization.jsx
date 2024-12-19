@@ -41,6 +41,8 @@ const Visualization = () => {
   const { createDataChartOptions, applyDataChartOptions} = useDataChartService()
 
   const [ option, setOption ] = useState([])
+  const [ isSupplyTime, setIsSupplyTime ] = useState({})
+  const [ isCriticalTime, setIsCriticalTime ] = useState({})
   const [audioUnlocked, setAudioUnlocked] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0)
 
