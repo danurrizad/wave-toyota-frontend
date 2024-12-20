@@ -267,6 +267,7 @@ const Gentani = () => {
     
         reader.onload = async (e) => {
             try {
+                setLoading(true)
                 // Read the file data and convert it to a workbook
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
@@ -293,15 +294,18 @@ const Gentani = () => {
                 if(response.data.errors.length !== 0){
                     addToast(templateToast("Failed", `${response.data.errors.length} Gentani failed to create!`))
                 }
-                setVisibleModalUpdate(false)
-                getGentani()
             } catch (error) {
                 console.error("Error processing file:", error);
     
                 // Handle errors
                 const errorMessage = error.response?.data?.message || error.message;
                 addToast(templateToast("Error", errorMessage));
+            } finally{
+                setLoading()
+                setVisibleModalUpload(false)
+                getGentani()
             }
+
         };
     
         // Read the file as an ArrayBuffer
@@ -318,8 +322,7 @@ const Gentani = () => {
             const response = await updateGentaniData("gentani", gentaniId, body)
 
             addToast(templateToast("Success", response.data.message))
-            getGentani()
-            setVisibleModalUpdate((prev)=>({...prev, state: false}))
+            
             
         } catch (error) {
             // If the error comes from Axios, check the error response
@@ -334,6 +337,8 @@ const Gentani = () => {
           }
         } finally{
             setLoading(false)
+            getGentani()
+            setVisibleModalUpdate((prev)=>({...prev, state: false}))
         }
     }
 
@@ -381,7 +386,7 @@ const Gentani = () => {
                     focusable="false"
                     role="img"
                     >
-                    <rect width="100%" height="100%" fill={`${type === 'Error' ? "#e85454" : "#29d93e"}`}></rect>
+                    <rect width="100%" height="100%" fill={`${type === 'Success' ? "#29d93e" : "#e85454"}`}></rect>
                     </svg>
                     <div className="fw-bold me-auto">{type}</div>
                     {/* <small>7 min ago</small> */}
