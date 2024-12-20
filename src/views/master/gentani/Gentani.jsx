@@ -323,7 +323,7 @@ const Gentani = () => {
                     created_by: auth.user,
                 };
                 const response = await createGentaniDataByUpload('/gentani/upload', bodyFile);
-                console.log(response)
+                // console.log(response)
                 addToast(templateToast("Success", response.data.message));
                 if(response.data.errors.length !== 0){
                     addToast(templateToast("Failed", `${response.data.errors.length} Gentani failed to create!`))
