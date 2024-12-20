@@ -328,6 +328,9 @@ const Gentani = () => {
                 if(response.data.errors.length !== 0){
                     addToast(templateToast("Failed", `${response.data.errors.length} Gentani failed to create!`))
                 }
+                if(response.data.created.length === 0){
+                    addToast(templateToast("Error", "All Gentani has already exist!"))
+                }
             } catch (error) {
                 console.error("Error processing file:", error);
     
