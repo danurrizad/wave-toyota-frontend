@@ -7,6 +7,7 @@ import {
   CCloseButton,
   CHeaderText,
   CImage,
+  CNavbarNav,
   CNavbarText,
   CNavItem,
   CSidebar,
@@ -51,9 +52,9 @@ const AppSidebar = () => {
       }}
     >
       <CSidebarHeader className="border-bottom">
-        <CSidebarBrand href='/'>
+        <CSidebarBrand href='/' style={{textDecoration: "none", textDecorationStyle: "none"}}>
           <CImage className="sidebar-narrow" src={ImageLogo} style={{width: "24px"}}/>
-          <CNavbarText className="sidebar-brand-full" style={{textDecoration: "none"}}>ANDON VISUALIZATION</CNavbarText>
+          <CHeaderText className="sidebar-brand-full">ANDON VISUALIZATION</CHeaderText>
           {/* <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} /> */}
           {/* <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} /> */}
           {/* <CIcon customClassName="sidebar-brand-narrow" src="src/assets/images/logo/app-logo.png" height={32} /> */}
