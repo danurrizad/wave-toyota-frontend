@@ -132,8 +132,6 @@ const Gentani = () => {
         value: uniqueKatashiki,
         label: uniqueKatashiki,
       }));
-
-    console.log("OPTIONS KATASHIKI :", optionsKatashiki)
       
     const optionsMaterialDesc = Array.from(
         new Set(materialData.map((material) => material.material_desc))
@@ -172,7 +170,7 @@ const Gentani = () => {
         const { katashiki, materialDescOrNo, plant } = searchQuery
 
         const filtered = gentaniData.filter( gentani => {
-            const matchesKatashiki = gentani.katashiki.toLowerCase() === katashiki.toLowerCase()
+            const matchesKatashiki = !katashiki || gentani.katashiki.toLowerCase() === katashiki.toLowerCase()
             const matchesDescOrNo = gentani.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase()) || gentani.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
             // const matchesNo = gentani.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
             const matchesPlant = plant === "All" || gentani.plant.toLowerCase().includes(plant.toLowerCase())
@@ -275,7 +273,6 @@ const Gentani = () => {
         try {
           setLoading(true)
           const response = await createGentaniData("gentani", form);
-        //   const responseSet = await setGentaniInMaterialData("gentani-material", response.data.data.gentani_id, materialNumber)
           addToast(templateToast("Success", response.data.message));
           
           setFormData((prev)=>({...prev, plant: "Select", plant2: "", material_no: "Select", material_desc: ""}))
@@ -325,14 +322,8 @@ const Gentani = () => {
                     data: jsonData,
                     created_by: auth.user,
                 };
-    
-                console.log("Body file prepared for upload:", bodyFile);
-    
-                // Example API call (ensure `createGentaniDataByUpload` is properly defined)
                 const response = await createGentaniDataByUpload('/gentani/upload', bodyFile);
                 console.log(response)
-                // Handle successful response
-                // console.log("Response from API:", response);
                 addToast(templateToast("Success", response.data.message));
                 if(response.data.errors.length !== 0){
                     addToast(templateToast("Failed", `${response.data.errors.length} Gentani failed to create!`))
