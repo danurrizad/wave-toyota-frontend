@@ -225,7 +225,7 @@ const Setup = () => {
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Plant</CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown variant="btn-group disabled-dropdown" style={{width: "100%"}}  direction="center">
+                            <CDropdown download="btn-group disabled-dropdown" style={{width: "100%"}}  direction="center">
                                 <CDropdownToggle  width={400} disabled className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.plant}</CDropdownToggle>
                                 <CDropdownMenu >
                                     <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, plant: "P1 - PLANT 1"}))}>P1 - PLANT 1</CDropdownItem>
@@ -270,20 +270,20 @@ const Setup = () => {
             {/* End of Modal Update */}
 
             <CRow>
-                <CCol xl={4} xs={12} >
+                <CCol xl={6} xs={12} >
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor="plant" className='col-form-label col-sm-2' >Plant</CFormLabel>
-                        <CCol className='d-flex align-items-center gap-2 col-sm-8'>
+                        <CFormLabel htmlFor="plant" className='col-form-label col-sm-2 col-xl-1' >Plant</CFormLabel>
+                        <CCol className='d-flex align-items-center gap-2 col-sm-8 col-xl-6'>
                             <CDropdown className='dropdown-search d-flex justify-content-between'>
                                 <CDropdownToggle width={400} className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
                                 <CDropdownMenu>
                                     <CDropdownItem onClick={()=>setSearchQuery({plant: "All"})}>All</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setSearchQuery({plant: "Plant 1"})}>P1 - Plant 1</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setSearchQuery({plant: "Plant 2"})}>P2 - Plant 2</CDropdownItem>
+                                    <CDropdownItem onClick={()=>setSearchQuery({plant: "P1 - Plant 1"})}>P1 - Plant 1</CDropdownItem>
+                                    <CDropdownItem onClick={()=>setSearchQuery({plant: "P2 - Plant 2"})}>P2 - Plant 2</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
-                        <CCol className="d-flex justify-content-end gap-3 col-sm-2">
+                        <CCol className="d-flex justify-content-end gap-3 col-sm-2 col-xl-2">
                             <CButton className="btn-search" onClick={()=>handleSearch()}>Search</CButton>
                             <CButton color="secondary" onClick={()=>handleClearSearch()}>Clear</CButton>
                         </CCol >

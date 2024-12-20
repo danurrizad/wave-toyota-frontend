@@ -202,7 +202,7 @@ const Monitoring = () => {
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Plant</CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown variant="btn-group disabled-dropdown" style={{width: "100%"}}  direction="center">
+                            <CDropdown className="btn-group disabled-dropdown" style={{width: "100%"}}  direction="center">
                                 <CDropdownToggle  width={400} disabled className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.plant}</CDropdownToggle>
                                 <CDropdownMenu >
                                     <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, plant: "P1 - PLANT 1"}))}>P1 - PLANT 1</CDropdownItem>
@@ -214,7 +214,7 @@ const Monitoring = () => {
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Visualization Name<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown variant="btn-group" style={{width: "100%"}}  direction="center">
+                            <CDropdown className="btn-group" style={{width: "100%"}}  direction="center">
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.visualization_name}</CDropdownToggle>
                                 <CDropdownMenu >
                                     <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 1"}))}>Visualization 1</CDropdownItem>
