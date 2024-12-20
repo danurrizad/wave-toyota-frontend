@@ -35,6 +35,7 @@ import dayjs from 'dayjs';
 import useMaterialDataService from '../../../services/MaterialDataService'
 import CIcon from '@coreui/icons-react';
 import * as icon from "@coreui/icons";
+import Select from 'react-select'
 
 import { useAuth } from '../../../utils/context/authContext';
 
@@ -109,7 +110,48 @@ const Material = () => {
     // const [paginatedData, setPaginatedData] = useState([])
 
     const [searchQuery, setSearchQuery] = useState({ materialDesc: "", supplyLine: "", plant: "All" })
+    
+    const optionsMaterialDesc = Array.from(
+        new Set(materialData.map((material) => material.material_desc))
+      ).map((uniqueMaterialDesc) => ({
+        value: uniqueMaterialDesc,
+        label: uniqueMaterialDesc,
+      }));
+      
+    const optionsSupplyLine = Array.from(
+        new Set(materialData.map((material) => material.supply_line))
+      ).map((uniqueSupplyLine) => ({
+        value: uniqueSupplyLine,
+        label: uniqueSupplyLine,
+      }));
+    
+    const colorStyles = {
+        control: (styles, { isFocused }) => ({
+            ...styles,
+            borderColor: isFocused ? 'black' : styles.borderColor, // Change border color when focused
+            boxShadow: isFocused ? '0 0 0 0.5px black' : styles.boxShadow, // Add blue outline
+            '&:hover': {
+                borderColor: isFocused ? 'black' : styles.borderColor, // Keeps focus border on hover
+            },
+            }),
+        option: (styles, { isFocused, isSelected, isDisabled  }) => ({
+            ...styles,
+            backgroundColor: isSelected
+            ? '#808080' // Background color when the option is selected
+            : isFocused
+            ? '#F3F4F7' // Background color when the option is focused
+            :  undefined, // Default background color
+            ':active': {
+                backgroundColor: !isDisabled
+                ? isSelected
+                    ? '#808080' // Background when selected and active
+                    : '#F3F4F7' // Background when focused and active
+                : undefined,
+            },
+        }),
+    };
 
+    
     useEffect(() => {
         getMaterial();
     }, [])
@@ -387,7 +429,7 @@ const Material = () => {
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Plant</CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown variant="btn-group" style={{width: "100%"}} direction="center">
+                            <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.plant}</CDropdownToggle>
                                 <CDropdownMenu>
                                     <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, plant: "P1 - PLANT 1"}))}>P1 - PLANT 1</CDropdownItem>
@@ -417,7 +459,7 @@ const Material = () => {
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Uom<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown variant="btn-group" style={{width: "100%"}} direction="center">
+                            <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.uom}</CDropdownToggle>
                                 <CDropdownMenu>
                                     <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({...prev, uom: "Gram"}))}>Gram</CDropdownItem>
@@ -471,7 +513,8 @@ const Material = () => {
                     <CRow className="mb-3">
                     <CFormLabel htmlFor="materialDesc" className='col-sm-4 col-form-label'>Material Description</CFormLabel>
                         <CCol className="d-flex align-items-center justify-content-start gap-2 col-xl-7" >
-                            <CFormInput type="text" id="materialDesc" value={searchQuery.materialDesc} onChange={(e) => setSearchQuery({ ...searchQuery, materialDesc: e.target.value })} />
+                            {/* <CFormInput type="text" id="materialDesc" value={searchQuery.materialDesc} onChange={(e) => setSearchQuery({ ...searchQuery, materialDesc: e.target.value })} /> */}
+                            <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDesc) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDesc: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol>
@@ -479,7 +522,7 @@ const Material = () => {
                     <CRow className="mb-3">
                         <CFormLabel htmlFor="supplyLine" className="col-sm-4 col-xl-3 col-form-label">Supply Line</CFormLabel>
                         <CCol className='d-flex align-items-center justify-content-end gap-2 col-xl-7'>
-                            <CFormInput type="text" id="supplyLine" value={searchQuery.supplyLine} onChange={(e) => setSearchQuery({ ...searchQuery, supplyLine: e.target.value })} />
+                            <Select options={optionsSupplyLine} placeholder="All" isClearable value={optionsSupplyLine.find((option) => option.value === searchQuery.supplyLine) || null} onChange={(e) => setSearchQuery({ ...searchQuery, supplyLine: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol>
@@ -488,7 +531,7 @@ const Material = () => {
                         <CFormLabel htmlFor="plant" className='col-sm-4 col-xl-2 col-form-label' >Plant</CFormLabel>
                         <CCol className='d-flex align-items-center gap-2 col-sm-6 col-xl-7'>
                             <CDropdown className='dropdown-search d-flex justify-content-between'>
-                                <CDropdownToggle width={400} className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
+                                <CDropdownToggle className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
                                 <CDropdownMenu className='cursor-pointer'>
                                     <CDropdownItem onClick={() => setSearchQuery({ ...searchQuery, plant: "All" })}>All</CDropdownItem>
                                     <CDropdownItem onClick={() => setSearchQuery({ ...searchQuery, plant: "P1 - PLANT 1" })}>P1 - PLANT 1</CDropdownItem>

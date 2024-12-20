@@ -40,6 +40,7 @@ import * as icon from "@coreui/icons";
 
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import Select from 'react-select'
 
 import useGentaniDataService from './../../../services/GentaniDataService';
 import useMaterialDataService from './../../../services/MaterialDataService';
@@ -125,11 +126,53 @@ const Gentani = () => {
         plant: "All"
     });
 
+    const optionsKatashiki = Array.from(
+        new Set(gentaniData.map((gentani) => gentani.katashiki))
+      ).map((uniqueKatashiki) => ({
+        value: uniqueKatashiki,
+        label: uniqueKatashiki,
+      }));
+
+    console.log("OPTIONS KATASHIKI :", optionsKatashiki)
+      
+    const optionsMaterialDesc = Array.from(
+        new Set(materialData.map((material) => material.material_desc))
+      ).map((uniqueMaterialDesc) => ({
+        value: uniqueMaterialDesc,
+        label: uniqueMaterialDesc,
+      }));
+    
+    const colorStyles = {
+        control: (styles, { isFocused }) => ({
+            ...styles,
+            borderColor: isFocused ? 'black' : styles.borderColor, // Change border color when focused
+            boxShadow: isFocused ? '0 0 0 0.5px black' : styles.boxShadow, // Add blue outline
+            '&:hover': {
+                borderColor: isFocused ? 'black' : styles.borderColor, // Keeps focus border on hover
+            },
+            }),
+        option: (styles, { isFocused, isSelected, isDisabled  }) => ({
+            ...styles,
+            backgroundColor: isSelected
+            ? '#808080' // Background color when the option is selected
+            : isFocused
+            ? '#F3F4F7' // Background color when the option is focused
+            :  undefined, // Default background color
+            ':active': {
+                backgroundColor: !isDisabled
+                ? isSelected
+                    ? '#808080' // Background when selected and active
+                    : '#F3F4F7' // Background when focused and active
+                : undefined,
+            },
+        }),
+    };
+
     const handleSearch = () => {
         const { katashiki, materialDescOrNo, plant } = searchQuery
 
         const filtered = gentaniData.filter( gentani => {
-            const matchesKatashiki = gentani.katashiki.toLowerCase().includes(katashiki.toLowerCase())
+            const matchesKatashiki = gentani.katashiki.toLowerCase() === katashiki.toLowerCase()
             const matchesDescOrNo = gentani.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase()) || gentani.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
             // const matchesNo = gentani.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
             const matchesPlant = plant === "All" || gentani.plant.toLowerCase().includes(plant.toLowerCase())
@@ -626,15 +669,18 @@ const Gentani = () => {
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor="materialDesc" className='col-sm-4 col-xl-2 col-form-label'>Katashiki</CFormLabel>
                         <CCol className="d-flex align-items-center justify-content-start gap-2 col-xl-7" >
-                            <CFormInput type="text" id="materialDesc" value={searchQuery.katashiki} onChange={(e) => setSearchQuery((prev)=>({...prev, katashiki: e.target.value}))}/> 
+                            {/* <CFormInput type="text" id="materialDesc" value={searchQuery.katashiki} onChange={(e) => setSearchQuery((prev)=>({...prev, katashiki: e.target.value}))}/>  */}
+                            <Select options={optionsKatashiki} placeholder="All" isClearable value={optionsKatashiki.find((option) => option.value === searchQuery.katashiki) || null} onChange={(e) => setSearchQuery({ ...searchQuery, katashiki: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol>
                 <CCol xs={12} xl={4}>
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor="supplyLine" className="col-sm-4 col-form-label">Material No/Desc</CFormLabel>
+                        <CFormLabel htmlFor="supplyLine" className="col-sm-4 col-form-label">Material Desc</CFormLabel>
                         <CCol className='d-flex align-items-center justify-content-start gap-2 col-xl-7'>
-                            <CFormInput type="text" id="supplyLine" value={searchQuery.materialDescOrNo} onChange={(e)=>setSearchQuery((prev)=>({ ...prev, materialDescOrNo: e.target.value}))}/>
+                            {/* <CFormInput type="text" id="supplyLine" value={searchQuery.materialDescOrNo} onChange={(e)=>setSearchQuery((prev)=>({ ...prev, materialDescOrNo: e.target.value}))}/> */}
+                            <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
+                            
                         </CCol>
                     </CRow>
                 </CCol>
