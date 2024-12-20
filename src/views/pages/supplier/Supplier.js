@@ -44,6 +44,7 @@ import {
 import CIcon from '@coreui/icons-react';
 import * as icon from "@coreui/icons";
 import QrReader from '../../../utils/ReaderQR'
+import Select from 'react-select'
 
 
 function Supplying() {
@@ -118,8 +119,52 @@ function Supplying() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState({
     materialDescOrNo: "",
+    materialNo:"",
     plant: "All"
   })
+
+  const optionsMaterialDesc = Array.from(
+    new Map(
+      supplyQtyData.map((material) => [material.material_desc, material]) // Use a Map to remove duplicates by material_desc
+    ).values()
+  ).map((material) => ({
+    value: material.material_no, // Use material_desc as the value
+    label: `${material.material_no} - ${material.material_desc}`, // Combine material_no and material_desc for the label
+  }));
+  
+  
+// const optionsSupplyLine = Array.from(
+//     new Set(materialData.map((material) => material.supply_line))
+//   ).map((uniqueSupplyLine) => ({
+//     value: uniqueSupplyLine,
+//     label: uniqueSupplyLine,
+//   }));
+
+const colorStyles = {
+    control: (styles, { isFocused }) => ({
+        ...styles,
+        borderColor: isFocused ? 'black' : styles.borderColor, // Change border color when focused
+        boxShadow: isFocused ? '0 0 0 0.5px black' : styles.boxShadow, // Add blue outline
+        '&:hover': {
+            borderColor: isFocused ? 'black' : styles.borderColor, // Keeps focus border on hover
+        },
+        }),
+    option: (styles, { isFocused, isSelected, isDisabled  }) => ({
+        ...styles,
+        backgroundColor: isSelected
+        ? '#808080' // Background color when the option is selected
+        : isFocused
+        ? '#F3F4F7' // Background color when the option is focused
+        :  undefined, // Default background color
+        ':active': {
+            backgroundColor: !isDisabled
+            ? isSelected
+                ? '#808080' // Background when selected and active
+                : '#F3F4F7' // Background when focused and active
+            : undefined,
+        },
+    }),
+};
 
   const handleSearch = () => {
     const {  materialDescOrNo, plant } = searchQuery 
@@ -136,7 +181,7 @@ function Supplying() {
 };
 
   const handleClearSearch = () => {
-    setSearchQuery({materialDescOrNo: "", plant: "All"})
+    setSearchQuery({materialDescOrNo: "", materialNo: "", plant: "All"})
     setFilteredData(supplyQtyData)
     setTotalPage(Math.ceil(supplyQtyData.length / itemPerPage))
     setCurrentPage(1)
@@ -170,7 +215,7 @@ function Supplying() {
 
   const renderModalUpdate = () =>{
     return(
-        <CContainer>
+        <CContainer >
             {/* Start of Modal Update */}
         <CModal
             backdrop="static"
@@ -296,7 +341,7 @@ function Supplying() {
   }, []);
   
   return (
-      <div className='text-sm' style={{backgroundColor: "#F3F4F7"}}>
+      <div className='text-sm' style={{backgroundColor: "#F3F4F7", minHeight: "100vh"}} >
         <HeaderSupplier/>
         <CContainer>
             
@@ -321,16 +366,17 @@ function Supplying() {
         </CRow>
         
         <CRow className='d-flex justify-between gap-xl-4 flex-column flex-xl-row'>
-            <CCol>
+            <CCol xl={4}>
                 <CRow className="mb-3">
-                    <CFormLabel htmlFor="materialDesc" className='col-xl-4 col-form-label col-md-3'>Material No/Description</CFormLabel>
+                    <CFormLabel htmlFor="materialDesc" className='col-xl-2 col-form-label col-md-3'>Material</CFormLabel>
                     <CCol className="d-flex align-items-center justify-content-start gap-2" >
-                        <CFormInput type="text" id="materialDesc" value={searchQuery.materialDescOrNo} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e.target.value })} />
+                        {/* <CFormInput type="text" id="materialDesc" value={searchQuery.materialDescOrNo} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e.target.value })} /> */}
+                        <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                     </CCol>
                 </CRow>
             </CCol>
             <CCol></CCol>
-            <CCol className="">
+            <CCol className="" xl={4}>
                 <CRow className="mb-3">
                     <CFormLabel htmlFor="plant" className='col-sm-2 col-form-label col-md-3' >Plant</CFormLabel>
                     <CCol className='d-flex align-items-center gap-2 col-sm-8 col-md-6'>
