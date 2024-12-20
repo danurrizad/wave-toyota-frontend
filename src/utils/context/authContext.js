@@ -14,13 +14,6 @@ const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const navigate = useNavigate();
 
-  // useEffect(()=>{
-  //  setInterval(()=>{
-  //   console.log("user in authprovider :", user)
-  //   // console.log("token in authProvider :", token)
-  //  }, 1000) 
-  // })
-
   const loginAction = async (form) => {
     try {
       const response = await login(form);
@@ -30,11 +23,9 @@ const AuthProvider = ({ children }) => {
 
         const responseToken = await verifyToken(response.data.token)
         if(responseToken.status === 200){
-          console.log("response login :", responseToken)
           setUser(responseToken.data.responseUser.username)
           localStorage.setItem("user", responseToken.data.responseUser.username)
           setIsAuthenticated(true)
-          console.log("here....")
           navigate("/");
         }
 

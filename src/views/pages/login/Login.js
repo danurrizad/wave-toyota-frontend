@@ -38,7 +38,7 @@ import ImageYaris from '../../../assets/images/login/yaris.jpg'
 import ImageLogo from '../../../assets/images/logo/app-logo.png'
 
 const Login = () => {
-  const { login } = useAuthDataService()
+  // const { login } = useAuthDataService()
   const auth = useAuth()
   const navigate = useNavigate()
   const [showPass, setShowPass] = useState(false)
