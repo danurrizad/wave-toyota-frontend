@@ -7,6 +7,7 @@ import './scss/style.scss'
 
 // We use those styles to show code examples, you should remove them in your application.
 import './scss/examples.scss'
+import 'rsuite/dist/rsuite.min.css';
 
 import AuthProvider from './utils/context/authContext'
 

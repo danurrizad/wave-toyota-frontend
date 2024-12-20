@@ -50,6 +50,7 @@
     "react-router-dom": "^6.28.0",
     "react-select": "^5.9.0",
     "redux": "5.0.1",
+    "rsuite": "^5.76.0",
     "simplebar-react": "^3.2.6",
     "swiper": "^11.1.15",
     "xlsx": "^0.18.5"

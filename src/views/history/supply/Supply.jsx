@@ -33,10 +33,13 @@ import { saveAs } from "file-saver";
 
 import useHistoryDataService from '../../../services/HistoryDataService';
 import useMaterialDataService from './../../../services/MaterialDataService';
+import { DateRangePicker } from 'rsuite'
 
 const Supply = () => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [toDate, setToDate] = useState(new Date());
+  const [period, setPeriod] = React.useState([
+    new Date(),
+    new Date()
+  ]);
 
   const { getSupplyHistory } = useHistoryDataService()
   const { getMaterialData } = useMaterialDataService()
@@ -74,13 +77,11 @@ const Supply = () => {
   const [searchQuery, setSearchQuery] = useState({
     material_no: "",
     material_desc: "",
-    period_from: "",
-    period_to: "",
     // plant: "All"
   })
 
   const handleSearch = () => {
-    const { material_no, period_from, period_to } = searchQuery;
+    const { material_no } = searchQuery;
   
     const filtered = supplyHistoryData.filter((supply) => {
       const matchesNo = supply.material_no.toLowerCase().includes(material_no.toLowerCase());
@@ -88,8 +89,8 @@ const Supply = () => {
   
       // Parse the consumption_date and filter by date range
       const supplyDate = parseISO(supply.supply_date);
-      const fromDate = period_from ? new Date(period_from) : null;
-      const toDate = period_to ? new Date(period_to) : null;
+      const fromDate = period ? new Date(period[0]) : null;
+      const toDate = period ? new Date(period[1]) : null;
   
       const withinDateRange =
         (!fromDate || supplyDate >= fromDate) &&
@@ -191,36 +192,20 @@ const Supply = () => {
                 </CRow>
             </CCol>
             <CCol xl={8} xs={12}>
-                <CRow className='mb-3'>
-                    <CCol xl={1} xs={12}>
-                        <CFormLabel className="col-xs-2 col-form-label">Period<span style={{color: "red"}}>*</span></CFormLabel>
+                <CRow className='mb-3 pt-xl-0 pt-3'>
+                    <CCol xl={1} xs={3} md={2} sm={3}>
+                        <CFormLabel className="col-xs-2 col-form-label">Period</CFormLabel>
                     </CCol>
-                    <CCol xl={3} xs={12} md={5} className='d-flex gap-1'>
-                        <CFormLabel htmlFor="from" className="col-3 col-xl-2 col-md-5 col-form-label ">From</CFormLabel>
-                        <DatePicker
-                            className='w-75'
-                            selected={startDate}
-                            onChange={(date) => {
-                                setStartDate(date);
-                                handlePeriodChange(date, toDate);
-                            }}
-                            />
+                    <CCol xl={8} xs={9} md={8} sm={5} className='d-flex gap-1'>
+                        <DateRangePicker 
+                            value={period}
+                            onChange={setPeriod}
+                            format="MMMM dd, yyyy" 
+                        />
                     </CCol>
-                
-                    <CCol xl={5} xs={12} md={5} className='d-flex gap-1 mt-3 mt-xl-0 mt-md-0'>
-                        <CFormLabel htmlFor="to" className="col-3 col-md-2 col-xl-1 col-form-label">To</CFormLabel>
-                        <DatePicker
-                            className='w-75'
-                            selected={toDate}
-                            onChange={(date) => {
-                                setToDate(date);
-                                handlePeriodChange(startDate, date);
-                            }}
-                            />
-                    </CCol>
-                    <CCol xl={3} xs={12} md={2}>
+                    <CCol xl={3} xs={12} md={2} sm={4}>
                         <CRow className='mb-xl-3 mb-md-3 mb-0 mt-xl-0 mt-md-0 mt-3'>
-                            <CCol className="d-flex justify-content-end gap-2 col-sm-2 col-xl-12 col-md-12">
+                            <CCol className="d-flex justify-content-end gap-2 col-sm-12 col-xl-12 col-md-12">
                                 <CButton className='btn-search' onClick={()=>handleSearch()}>Search</CButton>
                                 <CButton color="secondary" onClick={()=>handleClearSearch()}>Clear</CButton>
                             </CCol >
