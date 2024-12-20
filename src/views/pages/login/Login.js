@@ -123,7 +123,7 @@ const Login = () => {
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput placeholder="Username" autoComplete="username" onChange={(e)=>setFormData((prev)=>({ ...prev, username: e.target.value}))}/>
+                      <CFormInput placeholder="Username" autoComplete="username" onKeyDown={(e)=>{if(e.key==="Enter") handleLogin(formData)}} onChange={(e)=>setFormData((prev)=>({ ...prev, username: e.target.value}))} />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
@@ -134,6 +134,7 @@ const Login = () => {
                         placeholder="Password"
                         autoComplete="current-password"
                         style={{borderRight: "0"}}
+                        onKeyDown={(e)=>{if(e.key==="Enter") handleLogin(formData)}}
                         onChange={(e)=>setFormData((prev)=>({...prev, password: e.target.value}))}
                       />
                       <CInputGroupText style={{backgroundColor: "transparent", borderLeft: "0"}}>
