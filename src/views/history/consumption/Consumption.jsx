@@ -30,6 +30,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { DateRangePicker } from 'rsuite'
+import Select from 'react-select'
 
 import useHistoryDataService from './../../../services/HistoryDataService';
 import useSetupDataService from '../../../services/SetupDataService';
@@ -38,10 +39,8 @@ import useGentaniDataService from '../../../services/GentaniDataService';
 import { parseISO, isWithinInterval, format } from "date-fns";
 
 const Consumption = () => {
-  const [period, setPeriod] = React.useState([
-    new Date(),
-    new Date()
-  ]);
+  const [period, setPeriod] = useState(null);
+  const [loading, setLoading] = useState(false)
 
   const [consumptionData, setConsumptionData] = useState([])
   const [ setupData, setSetupData ] = useState([])
@@ -104,17 +103,53 @@ const Consumption = () => {
   const [totalPage, setTotalPage] = useState(0)
   const [filteredData, setFilteredData] = useState([])
   const [searchQuery, setSearchQuery] = useState({
-    material_no: "",
-    material_desc: "",
+    materialDescOrNo: "",
     plant: "All"
   })
+
+  const optionsMaterialDesc = Array.from(
+    new Map(
+      consumptionData.map((consumption) => [consumption.material_desc, consumption]) // Use a Map to remove duplicates by material_desc
+    ).values()
+  ).map((consumption) => ({
+    value: consumption.material_no, // Use material_desc as the value
+    label: `${consumption.material_no} - ${consumption.material_desc}`, // Combine material_no and material_desc for the label
+  }));
+  
+
+    const colorStyles = {
+        control: (styles, { isFocused }) => ({
+            ...styles,
+            borderColor: isFocused ? 'black' : styles.borderColor, // Change border color when focused
+            boxShadow: isFocused ? '0 0 0 0.5px black' : styles.boxShadow, // Add blue outline
+            '&:hover': {
+                borderColor: isFocused ? 'black' : styles.borderColor, // Keeps focus border on hover
+            },
+            }),
+        option: (styles, { isFocused, isSelected, isDisabled  }) => ({
+            ...styles,
+            backgroundColor: isSelected
+            ? '#808080' // Background color when the option is selected
+            : isFocused
+            ? '#F3F4F7' // Background color when the option is focused
+            :  undefined, // Default background color
+            ':active': {
+                backgroundColor: !isDisabled
+                ? isSelected
+                    ? '#808080' // Background when selected and active
+                    : '#F3F4F7' // Background when focused and active
+                : undefined,
+            },
+        }),
+    };
   
   const handleSearch = () => {
-    const { material_no } = searchQuery;
+    setLoading(true)
+    const { materialDescOrNo } = searchQuery;
   
     const filtered = consumptionData.filter((consumption) => {
-      const matchesNo = consumption.material_no.toLowerCase().includes(material_no.toLowerCase());
-    //   const matchesPlant = plant === "All" || consumption.plant.toLowerCase().includes(plant.toLowerCase());
+        const matchesDescorNo = consumption.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase()) || consumption.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
+        //   const matchesPlant = plant === "All" || consumption.plant.toLowerCase().includes(plant.toLowerCase());
   
       // Parse the consumption_date and filter by date range
       const consumptionDate = parseISO(consumption.consumption_date);
@@ -125,18 +160,18 @@ const Consumption = () => {
         (!fromDate || consumptionDate >= fromDate) &&
         (!toDate || consumptionDate <= toDate);
   
-      return matchesNo && withinDateRange;
+      return matchesDescorNo && withinDateRange;
     });
-  
     setFilteredData(filtered);
     setTotalPage(Math.ceil(filtered.length / itemPerPage));
     setCurrentPage(1);
-  };
-  
+    setLoading(false)
+};
   
 
   const handleClearSearch = () => {
-    setSearchQuery({ material_no: "", material_desc: "", plant: "All"})
+    setSearchQuery({ materialDescOrNo: "", plant: "All"})
+    setPeriod(null)
     setFilteredData(consumptionData)
     setTotalPage(Math.ceil(consumptionData.length / itemPerPage))
     setCurrentPage(1)
@@ -152,16 +187,6 @@ const Consumption = () => {
   }, [filteredData, itemPerPage])
 
   const paginatedData = filteredData.slice((currentPage - 1) * itemPerPage, currentPage * itemPerPage)
-
-
-    const handlePeriodChange = (from, to) => {
-    setSearchQuery((prev) => ({
-        ...prev,
-        period_from: from ? format(from, "yyyy-MM-dd") : "",
-        period_to: to ? format(to, "yyyy-MM-dd") : "",
-    }));
-    };
-
 
     const handleDownload = (data) => {
         const dateData = data.map((data)=>{
@@ -216,16 +241,7 @@ const Consumption = () => {
                     <CRow className=''>
                         <CFormLabel htmlFor="plant" className='col-form-label col-xl-2 col-md-2 col-3'>Material</CFormLabel>
                         <CCol className="d-flex align-items-center justify-content-start gap-2 col-xl-9 col-9 col-md-10">
-                            <CDropdown className='w-100 d-flex justify-content-between' >
-                                <CDropdownToggle className='d-flex align-items-center justify-content-between dropdown-toggle'>{searchQuery.material_no !== "" ? (`${searchQuery.material_no} - ${searchQuery.material_desc}`) : "Select" }</CDropdownToggle>
-                                <CDropdownMenu className=''>
-                                    {gentaniData.map((gentani, index)=>{
-                                        return(
-                                            <CDropdownItem className="cursor-pointer" key={index} onClick={()=>setSearchQuery({...searchQuery, material_no: gentani.material_no, material_desc: gentani.material_desc})}>{gentani.material_no} - {gentani.material_desc}</CDropdownItem>
-                                        )
-                                    })}
-                                </CDropdownMenu>
-                            </CDropdown>
+                            <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol>
@@ -236,6 +252,8 @@ const Consumption = () => {
                         </CCol>
                         <CCol xl={8} xs={9} md={8} sm={5} className='d-flex gap-1' >
                             <DateRangePicker 
+                                placeholder="Select date period"
+                                loading={loading}
                                 value={period}
                                 onChange={setPeriod}
                                 format="MMMM dd, yyyy" 

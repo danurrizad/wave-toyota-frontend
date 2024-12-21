@@ -34,12 +34,10 @@ import { saveAs } from "file-saver";
 import useHistoryDataService from '../../../services/HistoryDataService';
 import useMaterialDataService from './../../../services/MaterialDataService';
 import { DateRangePicker } from 'rsuite'
+import Select from 'react-select'
 
 const Supply = () => {
-  const [period, setPeriod] = React.useState([
-    new Date(),
-    new Date()
-  ]);
+  const [period, setPeriod] = useState(null);
 
   const { getSupplyHistory } = useHistoryDataService()
   const { getMaterialData } = useMaterialDataService()
@@ -75,16 +73,51 @@ const Supply = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPage, setTotalPage] = useState()
   const [searchQuery, setSearchQuery] = useState({
-    material_no: "",
-    material_desc: "",
-    // plant: "All"
+    materialDescOrNo: "",
+    plant: "All"
   })
 
+  const optionsMaterialDesc = Array.from(
+    new Map(
+      supplyHistoryData.map((supply) => [supply.material_desc, supply]) // Use a Map to remove duplicates by material_desc
+    ).values()
+  ).map((supply) => ({
+    value: supply.material_no, // Use material_desc as the value
+    label: `${supply.material_no} - ${supply.material_desc}`, // Combine material_no and material_desc for the label
+  }));
+  
+
+    const colorStyles = {
+        control: (styles, { isFocused }) => ({
+            ...styles,
+            borderColor: isFocused ? 'black' : styles.borderColor, // Change border color when focused
+            boxShadow: isFocused ? '0 0 0 0.5px black' : styles.boxShadow, // Add blue outline
+            '&:hover': {
+                borderColor: isFocused ? 'black' : styles.borderColor, // Keeps focus border on hover
+            },
+            }),
+        option: (styles, { isFocused, isSelected, isDisabled  }) => ({
+            ...styles,
+            backgroundColor: isSelected
+            ? '#808080' // Background color when the option is selected
+            : isFocused
+            ? '#F3F4F7' // Background color when the option is focused
+            :  undefined, // Default background color
+            ':active': {
+                backgroundColor: !isDisabled
+                ? isSelected
+                    ? '#808080' // Background when selected and active
+                    : '#F3F4F7' // Background when focused and active
+                : undefined,
+            },
+        }),
+    };
+
   const handleSearch = () => {
-    const { material_no } = searchQuery;
+    const { materialDescOrNo } = searchQuery;
   
     const filtered = supplyHistoryData.filter((supply) => {
-      const matchesNo = supply.material_no.toLowerCase().includes(material_no.toLowerCase());
+      const matchesDescorNo = supply.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase()) || supply.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase());
     //   const matchesPlant = plant === "All" || supply.plant.toLowerCase().includes(plant.toLowerCase());
   
       // Parse the consumption_date and filter by date range
@@ -96,7 +129,7 @@ const Supply = () => {
         (!fromDate || supplyDate >= fromDate) &&
         (!toDate || supplyDate <= toDate);
   
-      return matchesNo && withinDateRange;
+      return matchesDescorNo && withinDateRange;
     });
   
     setFilteredData(filtered);
@@ -105,7 +138,8 @@ const Supply = () => {
   };
 
   const handleClearSearch = () => {
-    setSearchQuery({ material_no: "", material_desc: ""})
+    setSearchQuery({ materialDescOrNo: "", plant: ""})
+    setPeriod(null)
     setFilteredData(supplyHistoryData)
     setTotalPage(Math.ceil(supplyHistoryData.length / itemPerPage))
     setCurrentPage(1)
@@ -122,14 +156,6 @@ const Supply = () => {
 
   const paginatedData = filteredData.slice((currentPage - 1) * itemPerPage, currentPage * itemPerPage)
 
-  const handlePeriodChange = (from, to) => {
-    setSearchQuery((prev) => ({
-        ...prev,
-        period_from: from ? format(from, "yyyy-MM-dd") : "",
-        period_to: to ? format(to, "yyyy-MM-dd") : "",
-    }));
-    };
-    
     const handleDownload = (data) => {
         const dateData = data.map((data)=>{
             const date = new Date(data.supply_date).toISOString().split('T')[0];
@@ -178,16 +204,7 @@ const Supply = () => {
                 <CRow className=''>
                     <CFormLabel htmlFor="plant" className='col-form-label col-xl-2 col-md-2 col-3' >Material</CFormLabel>
                     <CCol className="d-flex align-items-center justify-content-start gap-2 col-xl-9 col-9 col-md-10">
-                        <CDropdown className='w-100 d-flex justify-content-between'>
-                            <CDropdownToggle className='d-flex align-items-center justify-content-between dropdown-toggle '>{searchQuery.material_no !== "" ? (`${searchQuery.material_no} - ${searchQuery.material_desc}`) : "Select" }</CDropdownToggle>
-                                <CDropdownMenu>
-                                    {materialData.map((material, index)=>{
-                                        return(
-                                            <CDropdownItem className="cursor-pointer" key={index} onClick={()=>setSearchQuery({...searchQuery, material_no: material.material_no, material_desc: material.material_desc})}>{material.material_no} - {material.material_desc}</CDropdownItem>
-                                        )
-                                    })}
-                            </CDropdownMenu>
-                        </CDropdown>
+                        <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                     </CCol>
                 </CRow>
             </CCol>
@@ -196,15 +213,16 @@ const Supply = () => {
                     <CCol xl={1} xs={3} md={2} sm={3}>
                         <CFormLabel className="col-xs-2 col-form-label">Period</CFormLabel>
                     </CCol>
-                    <CCol xl={8} xs={9} md={8} sm={5} className='d-flex gap-1'>
+                    <CCol xl={8} xs={9} md={8} sm={5}>
                         <DateRangePicker 
+                            placeholder="Select date period"
                             value={period}
                             onChange={setPeriod}
                             format="MMMM dd, yyyy" 
                         />
                     </CCol>
                     <CCol xl={3} xs={12} md={2} sm={4}>
-                        <CRow className='mb-xl-3 mb-md-3 mb-0 mt-xl-0 mt-md-0 mt-3'>
+                        <CRow className='mb-xl-3 mb-md-3 mb-0 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-0 mt-3'>
                             <CCol className="d-flex justify-content-end gap-2 col-sm-12 col-xl-12 col-md-12">
                                 <CButton className='btn-search' onClick={()=>handleSearch()}>Search</CButton>
                                 <CButton color="secondary" onClick={()=>handleClearSearch()}>Clear</CButton>
