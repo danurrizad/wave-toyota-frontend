@@ -5,6 +5,7 @@ import autoprefixer from 'autoprefixer'
 
 export default defineConfig(() => {
   return {
+    assetsInclude: ['**/*.xlsx'],
     base: './',
     build: {
       outDir: 'build',
