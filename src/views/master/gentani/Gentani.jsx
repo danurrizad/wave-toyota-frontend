@@ -45,6 +45,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Select from 'react-select'
 import ImageGuide from '/src/assets/images/master/upload-guidance.png'
+import FileTemplateUpload from '/src/assets/files/template-upload-gentani.xlsx'
 
 import useGentaniDataService from './../../../services/GentaniDataService';
 import useMaterialDataService from './../../../services/MaterialDataService';
@@ -138,15 +139,27 @@ const Gentani = () => {
     //     value: uniqueKatashiki,
     //     label: uniqueKatashiki,
     //   }));
+    // const optionsMaterialDesc = Array.from(
+    //     new Map(
+    //       materialData.map((material) => [material.material_desc, material]) // Use a Map to remove duplicates by material_desc
+    //     ).values()
+    //   ).map((material) => ({
+    //     value: material.material_no, // Use material_desc as the value
+    //     label: `${material.material_no} - ${material.material_desc}`, // Combine material_no and material_desc for the label
+    //     plant: material.plant,
+    //     plant2: material.plant2 || "",
+    //   }));
       
-      const optionsMaterialDesc = Array.from(
-        new Map(
-          gentaniData.map((gentani) => [gentani.material_desc, gentani]) // Use a Map to remove duplicates by material_desc
-        ).values()
-      ).map((gentani) => ({
-        value: gentani.material_no, // Use material_desc as the value
-        label: `${gentani.material_no} - ${gentani.material_desc}`, // Combine material_no and material_desc for the label
-      }));
+    //   useEffect(()=>{
+    //     console.log("material data :", materialData)
+    //   })
+    const optionsMaterialDesc= materialData.map((material) => ({
+        value: material.material_no,
+        label: `${material.material_no} - ${material.material_desc}`,
+        plant: material.plant,
+        plant2: material.plant2 ? material.plant2 : "",
+    }));
+    
     
     const colorStyles = {
         control: (styles, { isFocused }) => ({
@@ -291,7 +304,7 @@ const Gentani = () => {
 
           // If the error comes from Axios, check the error response
           if (error.response) {
-            console.error("Error Response: ", error.response);
+            console.error("Error Response: ", error);
             addToast(templateToast("Error", error.response.data.message));
           } 
           else {
@@ -441,6 +454,15 @@ const Gentani = () => {
         )
     }
 
+    const handleDownloadTemplate = () => {
+        const link = document.createElement('a');
+        link.href = FileTemplateUpload;
+        link.download = 'template-upload-gentani.xlsx'; // Optional custom filename
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     const handleDownload = (data) => {
         const table = Object.keys(data).map((key) => ({
             no: Number(key) + 1,
@@ -511,28 +533,28 @@ const Gentani = () => {
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Material No<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown variant="btn-group" style={{width: "100%"}} direction="center">
-                                <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formData.material_no} {formData.material_no != "Select" && "-"} {formData.material_desc}</CDropdownToggle>
-                                <CDropdownMenu>
-                                    {materialData && materialData.map((material, index)=>{
-                                        return(
-                                            <CDropdownItem 
-                                                key={index}  
-                                                onClick={()=>setFormData((prev)=>({...prev, material_no: material.material_no, material_desc: material.material_desc, plant: material.plant, plant2: material.plant2 ? material.plant2 : ""}))}
-                                                className='cursor-pointer dropdown-item'
-                                                >
-                                                    {material.material_no} - {material.material_desc}
-                                            </CDropdownItem>
-                                        )
-                                    })}
-                                </CDropdownMenu>
-                            </CDropdown>
+                            <Select 
+                                options={optionsMaterialDesc} 
+                                placeholder="Select" 
+                                isClearable 
+                                value={optionsMaterialDesc.find((option) => option.value === formData.material_no) || null} 
+                                onChange={(e) => setFormData({ 
+                                    ...formData, 
+                                    material_no: e ? e.value : "",
+                                    material_desc: e ? e.label.split(" - ")[1] : "",
+                                    plant: e ? e.plant : "", 
+                                    plant2: e.plant2 ? e.plant2 : "", 
+                                })} 
+                                className='w-100' 
+                                styles={colorStyles}
+                            />
+
                         </CCol>
                     </CRow>
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Plant<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown variant="btn-group" style={{width: "100%"}} direction="center">
+                            <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} disabled={formData.material_no === "Select"} className='d-flex justify-content-between align-items-center dropdown-search'>{formData.plant !="" ? formData.plant : "Select"}</CDropdownToggle>
                                 <CDropdownMenu>
                                     <CDropdownItem className='cursor-pointer' onClick={()=>setFormData({...formData, plant: "P1 - PLANT 1"})}>P1 - PLANT 1</CDropdownItem>
@@ -687,7 +709,7 @@ const Gentani = () => {
                         </CCol>
                     </CRow>
                 </CCol> */}
-                <CCol xs={12} xl={4} xxl={4} lg={4} md={6} sm={12}>
+                <CCol xs={12} xl={4} xxl={4} lg={4} md={4} sm={12}>
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor="supplyLine" className="col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ">Material</CFormLabel>
                         <CCol className='d-flex align-items-center justify-content-start gap-2 col-xxl-10 col-xl-10 col-lg-11 col-md-12'>
@@ -697,10 +719,10 @@ const Gentani = () => {
                         </CCol>
                     </CRow>
                 </CCol>
-                <CCol xs={12} xl={8} xxl={8} lg={8}>
+                <CCol xs={12} xl={8} xxl={8} lg={8} md={8} sm={12}>
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor="plant" className='col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ' >Plant</CFormLabel>
-                        <CCol className='d-flex align-items-center gap-2 col-6'>
+                        <CCol className='d-flex align-items-center gap-2 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-8'>
                             <CDropdown className='dropdown-search d-flex justify-content-between'>
                                 <CDropdownToggle className='d-flex justify-content-between align-items-center w-100'>{searchQuery.plant}</CDropdownToggle>
                                 <CDropdownMenu className='cursor-pointer'>
@@ -720,11 +742,11 @@ const Gentani = () => {
             <CRow>
                 <CCol xs={12} xxl={12} className='mt-xl-0 mt-4'>
                     <CButton className='btn-add-master' onClick={()=>setVisibleModalAdd((prev) => ({ ...prev, state: true}))}>Add Gentani</CButton>
-                    <CDropdown variant="btn-group btn-download mx-2">
+                    <CDropdown className="btn-group btn-download mx-2">
                         <CDropdownToggle  style={{color: "white"}}>Download</CDropdownToggle>
                         <CDropdownMenu>
-                            <CDropdownItem onClick={()=>handleDownlaodTemplate()}>Template</CDropdownItem>
-                            <CDropdownItem onClick={()=>handleDownload(paginatedData)}>Gentani Data Table</CDropdownItem>
+                            <CDropdownItem className='cursor-pointer' style={{textDecoration: "none"}} onClick={()=>handleDownloadTemplate()}>Template</CDropdownItem>
+                            <CDropdownItem className='cursor-pointer' style={{textDecoration: "none"}} onClick={()=>handleDownload(paginatedData)}>Gentani Data Table</CDropdownItem>
                         </CDropdownMenu>
                     </CDropdown>
                     

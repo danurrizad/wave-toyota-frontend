@@ -348,7 +348,7 @@ const Material = () => {
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Plant<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown variant="btn-group" style={{width: "100%"}} direction="center">
+                            <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formAddData.plant}</CDropdownToggle>
                                 <CDropdownMenu>
                                     <CDropdownItem onClick={()=>setFormAddData((prev)=>({ ...prev, plant: "P1 - PLANT 1"}))}>P1 - PLANT 1</CDropdownItem>
@@ -378,7 +378,7 @@ const Material = () => {
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Uom<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown variant="btn-group" style={{width: "100%"}} direction="center">
+                            <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formAddData.uom}</CDropdownToggle>
                                 <CDropdownMenu>
                                     <CDropdownItem onClick={()=>setFormAddData((prev)=>({...prev, uom: "Gram"}))}>Gram</CDropdownItem>
