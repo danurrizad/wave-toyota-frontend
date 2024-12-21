@@ -31,7 +31,10 @@ import {
     CToast,
     CToastHeader,
     CToastBody,
-    CSpinner
+    CSpinner,
+    CImage,
+    CCardBody,
+    CCard,
 } from '@coreui/react'
 
 import dayjs from 'dayjs';
@@ -41,6 +44,7 @@ import * as icon from "@coreui/icons";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Select from 'react-select'
+import ImageGuide from '/src/assets/images/master/upload-guidance.png'
 
 import useGentaniDataService from './../../../services/GentaniDataService';
 import useMaterialDataService from './../../../services/MaterialDataService';
@@ -87,9 +91,10 @@ const Gentani = () => {
     })
 
     const [formDeleteData, setFormDeleteData] = useState({
-        gentani_id: 0,
-        katashiki: "",
-        material_no: ""
+        gentani_id: null,
+        // katashiki: "",
+        material_no: "",
+        plant: ""
     })
 
     const handleModalUpdate = (data) => {
@@ -108,8 +113,9 @@ const Gentani = () => {
         setVisibleModalDelete(true)
         setFormDeleteData({
             gentani_id: data.gentani_id,
-            katashiki: data.katashiki,
-            material_no: data.material_no
+            // katashiki: data.katashiki,
+            material_no: data.material_no,
+            plant: data.plant
         })
     }
 
@@ -126,12 +132,12 @@ const Gentani = () => {
         plant: "All"
     });
 
-    const optionsKatashiki = Array.from(
-        new Set(gentaniData.map((gentani) => gentani.katashiki))
-      ).map((uniqueKatashiki) => ({
-        value: uniqueKatashiki,
-        label: uniqueKatashiki,
-      }));
+    // const optionsKatashiki = Array.from(
+    //     new Set(gentaniData.map((gentani) => gentani.katashiki))
+    //   ).map((uniqueKatashiki) => ({
+    //     value: uniqueKatashiki,
+    //     label: uniqueKatashiki,
+    //   }));
       
       const optionsMaterialDesc = Array.from(
         new Map(
@@ -172,11 +178,11 @@ const Gentani = () => {
         const { katashiki, materialDescOrNo, plant } = searchQuery
 
         const filtered = gentaniData.filter( gentani => {
-            const matchesKatashiki = !katashiki || gentani.katashiki.toLowerCase() === katashiki.toLowerCase()
+            // const matchesKatashiki = !katashiki || gentani.katashiki.toLowerCase() === katashiki.toLowerCase()
             const matchesDescOrNo = gentani.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase()) || gentani.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
             // const matchesNo = gentani.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
             const matchesPlant = plant === "All" || gentani.plant.toLowerCase().includes(plant.toLowerCase())
-            return matchesKatashiki && matchesDescOrNo && matchesPlant
+            return matchesDescOrNo && matchesPlant
         })
         
         setFilteredData(filtered)
@@ -437,8 +443,7 @@ const Gentani = () => {
 
     const handleDownload = (data) => {
         const table = Object.keys(data).map((key) => ({
-            no: Number(key)+1,
-            katashiki: data[key].katashiki,
+            no: Number(key) + 1,
             material_no: data[key].material_no,
             material_desc: data[key].material_desc,
             plant: data[key].plant,
@@ -449,25 +454,28 @@ const Gentani = () => {
             updated_by: data[key].updated_by,
             updatedAt: dayjs(data[key].updatedAt).format('YYYY-MM-DD HH:mm:ss'),
         }));
-        
-        // 2. Convert the filtered data into a worksheet
+    
+        // Convert the filtered data into a worksheet
         const worksheet = XLSX.utils.json_to_sheet(table);
-        
-        // 3. Create a workbook and append the worksheet
+    
+        // Create a workbook and append the worksheet
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "FilteredTable");
-        
-        // 4. Generate a binary string representation of the workbook
+    
+        // Generate a binary string representation of the workbook
         const excelBuffer = XLSX.write(workbook, {
             bookType: "xlsx",
             type: "array",
         });
-        
-        // 5. Create a Blob and save the file
+    
+        // Generate a file name dynamically
+        const now = dayjs();
+        const fileName = `Gentani_Export_${now.format('YYYYMMDD_HHmmss')}.xlsx`;
+    
+        // Create a Blob and save the file
         const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(blob, `Gentani Table.xlsx`);
+        saveAs(blob, fileName);
     };
-
 
 
   return (
@@ -494,12 +502,12 @@ const Gentani = () => {
                     <CModalTitle id="AddGentaniData">Insert Gentani Data</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
-                    <CRow className="mb-3">
+                    {/* <CRow className="mb-3">
                         <CFormLabel htmlFor="katashiki" className="col-sm-4 col-form-label">Katashiki<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8}>
                             <CFormInput type="text" id="katashiki" onChange={(e)=>setFormData((prev)=>({...prev, katashiki: e.target.value}))}/>
                         </CCol>
-                    </CRow>
+                    </CRow> */}
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Material No<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
@@ -560,12 +568,12 @@ const Gentani = () => {
                     <CModalTitle id="UpdateGentaniData">Update Gentani Data</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
-                    <CRow className="mb-3">
+                    {/* <CRow className="mb-3">
                         <CFormLabel htmlFor="materialNo" className="col-sm-4 col-form-label">Katashiki</CFormLabel>
                         <CCol sm={8}>
                             <CFormInput type="text" id="materialNo" disabled value={formUpdateData?.katashiki }/>
                         </CCol>
-                    </CRow>
+                    </CRow> */}
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Material No</CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
@@ -616,11 +624,9 @@ const Gentani = () => {
                 <CModalBody>
                     <CRow>
                         <CCol>
-                            <p>Are you sure want to delete this Gentani with 
-                                <span style={{fontWeight: "bold"}}> Katashiki : {formDeleteData.katashiki} </span>
-                                 and 
-                                <span style={{fontWeight: "bold"}}> Material No : {formDeleteData.material_no} </span>
-                            </p>
+                            <p>Are you sure want to delete this Gentani ?</p>
+                            <p>Material No &emsp;: <span style={{fontWeight: "bold"}}>{formDeleteData.material_no}</span></p>
+                            <p>Plant &emsp;&emsp;&emsp;&emsp;: <span style={{fontWeight: "bold"}}>{formDeleteData.plant}</span></p>
                         </CCol>
                     </CRow>
                 </CModalBody>
@@ -644,6 +650,16 @@ const Gentani = () => {
                     <CModalTitle id="UploadGentaniData">Upload Gentani Data</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
+                    <CRow className='mb-3'>
+                        <CFormLabel>Guide for File Upload Requirement Fields</CFormLabel>
+                        <div className='px-3'>
+                            <CCard >
+                                <CCardBody className='w-100'>
+                                    <CImage src={ImageGuide} style={{width: "inherit"}}/>
+                                </CCardBody>
+                            </CCard>
+                        </div>
+                    </CRow>
                     <CRow className="mb-3">
                         <CFormLabel htmlFor="quantitiy" className="col-sm-4 col-form-label">File (.xlsx)<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8}>
@@ -663,15 +679,14 @@ const Gentani = () => {
 {/* ---------------------------------------------------------------------------------------------/END OF MODALS-------------------------------------------------------------------------------------------------------------- */}
             
             <CRow>
-                <CCol xs={12} xl={3} xxl={4} lg={3} md={6} sm={12}>
+                {/* <CCol xs={12} xl={3} xxl={4} lg={3} md={6} sm={12}>
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor="materialDesc" className='col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12  col-sm-2 '>Katashiki</CFormLabel>
                         <CCol className="d-flex align-items-center justify-content-start gap-2 col-xxl-10 col-xl-10 col-lg-11 col-md-11" >
-                            {/* <CFormInput type="text" id="materialDesc" value={searchQuery.katashiki} onChange={(e) => setSearchQuery((prev)=>({...prev, katashiki: e.target.value}))}/>  */}
                             <Select options={optionsKatashiki} placeholder="All" isClearable value={optionsKatashiki.find((option) => option.value === searchQuery.katashiki) || null} onChange={(e) => setSearchQuery({ ...searchQuery, katashiki: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
-                </CCol>
+                </CCol> */}
                 <CCol xs={12} xl={4} xxl={4} lg={4} md={6} sm={12}>
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor="supplyLine" className="col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ">Material</CFormLabel>
@@ -682,10 +697,10 @@ const Gentani = () => {
                         </CCol>
                     </CRow>
                 </CCol>
-                <CCol xs={12} xl={5} xxl={4} lg={5}>
+                <CCol xs={12} xl={8} xxl={8} lg={8}>
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor="plant" className='col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ' >Plant</CFormLabel>
-                        <CCol className='d-flex align-items-center gap-2 col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8 '>
+                        <CCol className='d-flex align-items-center gap-2 col-6'>
                             <CDropdown className='dropdown-search d-flex justify-content-between'>
                                 <CDropdownToggle className='d-flex justify-content-between align-items-center w-100'>{searchQuery.plant}</CDropdownToggle>
                                 <CDropdownMenu className='cursor-pointer'>
@@ -695,7 +710,7 @@ const Gentani = () => {
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
-                        <CCol className="d-flex justify-content-end gap-3 col-sm-2 col-xxl-4 col-xl-4 col-lg-4 col-md-4">
+                        <CCol className="d-flex justify-content-end gap-3 col-sm-2 col-xxl-6 col-xl-6 col-lg-6 col-md-6">
                             <CButton className="btn-search" onClick={()=>handleSearch()}>Search</CButton>
                             <CButton color="secondary" onClick={() => handleClearSearch()}>Clear</CButton>
                         </CCol >
@@ -703,9 +718,17 @@ const Gentani = () => {
                 </CCol>
             </CRow>
             <CRow>
-                <CCol xs={12} xxl={12} className='mt-4'>
+                <CCol xs={12} xxl={12} className='mt-xl-0 mt-4'>
                     <CButton className='btn-add-master' onClick={()=>setVisibleModalAdd((prev) => ({ ...prev, state: true}))}>Add Gentani</CButton>
-                    <CButton className='btn-download mx-2' onClick={()=>handleDownload(paginatedData)}>Download</CButton>
+                    <CDropdown variant="btn-group btn-download mx-2">
+                        <CDropdownToggle  style={{color: "white"}}>Download</CDropdownToggle>
+                        <CDropdownMenu>
+                            <CDropdownItem onClick={()=>handleDownlaodTemplate()}>Template</CDropdownItem>
+                            <CDropdownItem onClick={()=>handleDownload(paginatedData)}>Gentani Data Table</CDropdownItem>
+                        </CDropdownMenu>
+                    </CDropdown>
+                    
+                    {/* <CButton className='btn-download mx-2' onClick={()=>handleDownload(paginatedData)}>Download</CButton> */}
                     <CButton className='btn-upload' onClick={()=>setVisibleModalUpload(true)}>Upload</CButton>
                 </CCol>
             </CRow>
@@ -715,7 +738,7 @@ const Gentani = () => {
                         <CTableHead>
                             <CTableRow color="dark">
                                 <CTableHeaderCell scope="col" colSpan={2} className='text-center'>Action</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Katashiki</CTableHeaderCell>
+                                {/* <CTableHeaderCell scope="col">Katashiki</CTableHeaderCell> */}
                                 <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Plant</CTableHeaderCell>
@@ -737,7 +760,7 @@ const Gentani = () => {
                                         <CTableDataCell className='text-center'>
                                             <CButton className='btn-icon-delete' onClick={()=>handleModalDelete(gentani)}><CIcon icon={icon.cilTrash}/></CButton>
                                         </CTableDataCell>
-                                        <CTableDataCell>{gentani.katashiki}</CTableDataCell>
+                                        {/* <CTableDataCell>{gentani.katashiki}</CTableDataCell> */}
                                         <CTableDataCell>{gentani.material_no}</CTableDataCell>
                                         <CTableDataCell>{gentani.material_desc}</CTableDataCell>
                                         <CTableDataCell>{gentani.plant}</CTableDataCell>
