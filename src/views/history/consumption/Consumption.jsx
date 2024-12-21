@@ -253,6 +253,9 @@ const Consumption = () => {
                         <CCol xl={8} xs={9} md={8} sm={5} className='d-flex gap-1' >
                             <DateRangePicker 
                                 placeholder="Select date period"
+                                placement='bottomEnd'
+                                showOneCalendar
+                                preventOverflow
                                 loading={loading}
                                 value={period}
                                 onChange={setPeriod}

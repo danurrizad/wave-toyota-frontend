@@ -12,6 +12,12 @@ background: radial-gradient(circle, rgba(54,61,75,1) 0%, rgba(40,46,60,1) 100%);
     left: 0;
 }
 
+@media (max-width: 1600px)  {
+    .bg-car.left, .bg-car.right{
+        width: 40%;
+    }
+}
+
 @media (max-width: 1180px)  {
     .box-green, .box-yellow, .box-red{
         width: 30px !important;
