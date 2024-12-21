@@ -49,7 +49,6 @@ import Select from 'react-select'
 
 function Supplying() {
     const [showScanner, setShowScanner] = useState(false)
-    const [scannedResult, setScannedResult] = useState([])
     const [visibleModalAdd, setVisibleModalAdd] = useState(false)
     const [visibleModalScanner, setVisibleModalScanner] = useState(false)
     const [formData, setFormData] = useState({
@@ -109,7 +108,6 @@ function Supplying() {
   };
   
   useEffect(()=>{
-    // getMaterial()
     getSupplyQty()
   }, [])
 
@@ -132,39 +130,32 @@ function Supplying() {
     label: `${material.material_no} - ${material.material_desc}`, // Combine material_no and material_desc for the label
   }));
   
-  
-// const optionsSupplyLine = Array.from(
-//     new Set(materialData.map((material) => material.supply_line))
-//   ).map((uniqueSupplyLine) => ({
-//     value: uniqueSupplyLine,
-//     label: uniqueSupplyLine,
-//   }));
 
-const colorStyles = {
-    control: (styles, { isFocused }) => ({
-        ...styles,
-        borderColor: isFocused ? 'black' : styles.borderColor, // Change border color when focused
-        boxShadow: isFocused ? '0 0 0 0.5px black' : styles.boxShadow, // Add blue outline
-        '&:hover': {
-            borderColor: isFocused ? 'black' : styles.borderColor, // Keeps focus border on hover
-        },
+    const colorStyles = {
+        control: (styles, { isFocused }) => ({
+            ...styles,
+            borderColor: isFocused ? 'black' : styles.borderColor, // Change border color when focused
+            boxShadow: isFocused ? '0 0 0 0.5px black' : styles.boxShadow, // Add blue outline
+            '&:hover': {
+                borderColor: isFocused ? 'black' : styles.borderColor, // Keeps focus border on hover
+            },
+            }),
+        option: (styles, { isFocused, isSelected, isDisabled  }) => ({
+            ...styles,
+            backgroundColor: isSelected
+            ? '#808080' // Background color when the option is selected
+            : isFocused
+            ? '#F3F4F7' // Background color when the option is focused
+            :  undefined, // Default background color
+            ':active': {
+                backgroundColor: !isDisabled
+                ? isSelected
+                    ? '#808080' // Background when selected and active
+                    : '#F3F4F7' // Background when focused and active
+                : undefined,
+            },
         }),
-    option: (styles, { isFocused, isSelected, isDisabled  }) => ({
-        ...styles,
-        backgroundColor: isSelected
-        ? '#808080' // Background color when the option is selected
-        : isFocused
-        ? '#F3F4F7' // Background color when the option is focused
-        :  undefined, // Default background color
-        ':active': {
-            backgroundColor: !isDisabled
-            ? isSelected
-                ? '#808080' // Background when selected and active
-                : '#F3F4F7' // Background when focused and active
-            : undefined,
-        },
-    }),
-};
+    };
 
   const handleSearch = () => {
     const {  materialDescOrNo, plant } = searchQuery 
@@ -346,14 +337,10 @@ const colorStyles = {
         <CContainer>
             
         {/* Loading Spinner */}
-        { loading && 
-            <div className="loading">
-                <CSpinner />
-            </div>
-            }
+        { loading && <div className="loading"><CSpinner /></div>}
 
-            {/* Toast */}
-            <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
+        {/* Toast */}
+        <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
 
         {renderModalUpdate()}
         {renderModalScanner()}
