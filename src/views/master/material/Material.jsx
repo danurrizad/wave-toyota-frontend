@@ -109,13 +109,15 @@ const Material = () => {
 
     // const [paginatedData, setPaginatedData] = useState([])
 
-    const [searchQuery, setSearchQuery] = useState({ materialDesc: "", supplyLine: "", plant: "All" })
+    const [searchQuery, setSearchQuery] = useState({ materialDescOrNo: "", supplyLine: "", plant: "All" })
     
     const optionsMaterialDesc = Array.from(
-        new Set(materialData.map((material) => material.material_desc))
-      ).map((uniqueMaterialDesc) => ({
-        value: uniqueMaterialDesc,
-        label: uniqueMaterialDesc,
+        new Map(
+          materialData.map((material) => [material.material_desc, material]) // Use a Map to remove duplicates by material_desc
+        ).values()
+      ).map((material) => ({
+        value: material.material_no, // Use material_desc as the value
+        label: `${material.material_no} - ${material.material_desc}`, // Combine material_no and material_desc for the label
       }));
       
     const optionsSupplyLine = Array.from(
@@ -176,13 +178,13 @@ const Material = () => {
     }
 
     const handleSearch = () => {
-        const { materialDesc, supplyLine, plant } = searchQuery;
+        const { materialDescOrNo, supplyLine, plant } = searchQuery;
 
         const filtered = materialData.filter(material => {
-            const matchesDesc = material.material_desc.toLowerCase().includes(materialDesc.toLowerCase());
+            const matchesDescOrNo = material.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase()) || material.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase());
             const matchesSupplyLine = material.supply_line.toLowerCase().includes(supplyLine.toLowerCase());
             const matchesPlant = plant === "All" || material.plant.toLowerCase().includes(plant.toLowerCase());
-            return matchesDesc && matchesSupplyLine && matchesPlant;
+            return matchesDescOrNo && matchesSupplyLine && matchesPlant;
         });
 
         setFilteredData(filtered);
@@ -191,7 +193,7 @@ const Material = () => {
     };
 
     const handleClearSearch = () => {
-        setSearchQuery({ materialDesc: "", supplyLine: "", plant: "All" });
+        setSearchQuery({ materialDescOrNo: "", supplyLine: "", plant: "All" });
         setFilteredData(materialData);
         setTotalPage(Math.ceil(materialData.length / itemPerPage));
         setCurrentPage(1);
@@ -315,16 +317,10 @@ const Material = () => {
         <>
         <CContainer fluid >
              {/* Loading Spinner */}
-             { loading && 
-            <div className="loading">
-                <CSpinner />
-            </div>
-            }
+             { loading && <div className="loading"><CSpinner /></div>}
 
             {/* Toast */}
             <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
-
-            
 
             {/* Start of Modal Add */}
             <CModal
@@ -507,29 +503,30 @@ const Material = () => {
                 </CModalFooter>
             </CModal>
             {/* End of Modal Delete */}
+
+{/* ---------------------------------------------------------------------------------------------/END OF MODALS-------------------------------------------------------------------------------------------------------------- */}            
             
             <CRow>
-                <CCol xs={12} xl={4}>
+                <CCol xs={12} xxl={4} xl={4} lg={4} md={6}>
                     <CRow className="mb-3">
-                    <CFormLabel htmlFor="materialDesc" className='col-sm-4 col-form-label'>Material Description</CFormLabel>
-                        <CCol className="d-flex align-items-center justify-content-start gap-2 col-xl-7" >
-                            {/* <CFormInput type="text" id="materialDesc" value={searchQuery.materialDesc} onChange={(e) => setSearchQuery({ ...searchQuery, materialDesc: e.target.value })} /> */}
-                            <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDesc) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDesc: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
+                        <CFormLabel htmlFor="materialDesc" className='col-form-label col-xl-12 col-lg-12 col-md-12 col-sm-2'>Material</CFormLabel>
+                        <CCol className="d-flex align-items-center justify-content-start gap-2 col-xl-11 col-md-11">
+                            <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol>
-                <CCol xs={12} xl={4}>
+                <CCol xs={12} xxl={4} xl={3} lg={3} md={6}>
                     <CRow className="mb-3">
-                        <CFormLabel htmlFor="supplyLine" className="col-sm-4 col-xl-3 col-form-label">Supply Line</CFormLabel>
-                        <CCol className='d-flex align-items-center justify-content-end gap-2 col-xl-7'>
+                        <CFormLabel htmlFor="supplyLine" className="col-form-label col-xl-12 col-lg-12 col-md-12 col-sm-2">Supply Line</CFormLabel>
+                        <CCol className='d-flex align-items-center justify-content-end gap-2 col-xl-11 col-lg-11'>
                             <Select options={optionsSupplyLine} placeholder="All" isClearable value={optionsSupplyLine.find((option) => option.value === searchQuery.supplyLine) || null} onChange={(e) => setSearchQuery({ ...searchQuery, supplyLine: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol>
-                <CCol xs={12} xl={4}>
+                <CCol xs={12} xxl={4} xl={5} lg={5} md={12} >
                     <CRow className="mb-3">
-                        <CFormLabel htmlFor="plant" className='col-sm-4 col-xl-2 col-form-label' >Plant</CFormLabel>
-                        <CCol className='d-flex align-items-center gap-2 col-sm-6 col-xl-7'>
+                        <CFormLabel htmlFor="plant" className='col-form-label col-xl-12 col-lg-12 col-md-12 col-sm-2'>Plant</CFormLabel>
+                        <CCol className='d-flex align-items-center gap-2 col-sm-6 col-xl-8 col-lg-7 col-md-8 col-sm-8'>
                             <CDropdown className='dropdown-search d-flex justify-content-between'>
                                 <CDropdownToggle className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
                                 <CDropdownMenu className='cursor-pointer'>
@@ -539,7 +536,7 @@ const Material = () => {
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
-                        <CCol  className="d-flex justify-content-end gap-3 col-sm-2 col-xl-3">
+                        <CCol  className="d-flex justify-content-end gap-3 col-sm-2 col-xl-4 col-lg-5 col-md-4" >
                             <CButton className='btn-search' onClick={()=>handleSearch()}>Search</CButton>
                             <CButton color="secondary" onClick={() => handleClearSearch()}>Clear</CButton>
                         </CCol >

@@ -133,11 +133,13 @@ const Gentani = () => {
         label: uniqueKatashiki,
       }));
       
-    const optionsMaterialDesc = Array.from(
-        new Set(materialData.map((material) => material.material_desc))
-      ).map((uniqueMaterialDesc) => ({
-        value: uniqueMaterialDesc,
-        label: uniqueMaterialDesc,
+      const optionsMaterialDesc = Array.from(
+        new Map(
+          gentaniData.map((gentani) => [gentani.material_desc, gentani]) // Use a Map to remove duplicates by material_desc
+        ).values()
+      ).map((gentani) => ({
+        value: gentani.material_no, // Use material_desc as the value
+        label: `${gentani.material_no} - ${gentani.material_desc}`, // Combine material_no and material_desc for the label
       }));
     
     const colorStyles = {
@@ -658,32 +660,34 @@ const Gentani = () => {
             </CModal>
             {/* End of Modal Upload */}
 
+{/* ---------------------------------------------------------------------------------------------/END OF MODALS-------------------------------------------------------------------------------------------------------------- */}
+            
             <CRow>
-                <CCol xs={12} xl={4}>
+                <CCol xs={12} xl={3} xxl={4} lg={3} md={6} sm={12}>
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor="materialDesc" className='col-sm-4 col-xl-2 col-form-label'>Katashiki</CFormLabel>
-                        <CCol className="d-flex align-items-center justify-content-start gap-2 col-xl-7" >
+                        <CFormLabel htmlFor="materialDesc" className='col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12  col-sm-2 '>Katashiki</CFormLabel>
+                        <CCol className="d-flex align-items-center justify-content-start gap-2 col-xxl-10 col-xl-10 col-lg-11 col-md-11" >
                             {/* <CFormInput type="text" id="materialDesc" value={searchQuery.katashiki} onChange={(e) => setSearchQuery((prev)=>({...prev, katashiki: e.target.value}))}/>  */}
                             <Select options={optionsKatashiki} placeholder="All" isClearable value={optionsKatashiki.find((option) => option.value === searchQuery.katashiki) || null} onChange={(e) => setSearchQuery({ ...searchQuery, katashiki: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol>
-                <CCol xs={12} xl={4}>
+                <CCol xs={12} xl={4} xxl={4} lg={4} md={6} sm={12}>
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor="supplyLine" className="col-sm-4 col-form-label">Material Desc</CFormLabel>
-                        <CCol className='d-flex align-items-center justify-content-start gap-2 col-xl-7'>
+                        <CFormLabel htmlFor="supplyLine" className="col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ">Material</CFormLabel>
+                        <CCol className='d-flex align-items-center justify-content-start gap-2 col-xxl-10 col-xl-10 col-lg-11 col-md-12'>
                             {/* <CFormInput type="text" id="supplyLine" value={searchQuery.materialDescOrNo} onChange={(e)=>setSearchQuery((prev)=>({ ...prev, materialDescOrNo: e.target.value}))}/> */}
                             <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                             
                         </CCol>
                     </CRow>
                 </CCol>
-                <CCol xs={12} xl={4}>
+                <CCol xs={12} xl={5} xxl={4} lg={5}>
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor="plant" className='col-sm-4 col-xl-2 col-form-label' >Plant</CFormLabel>
-                        <CCol className='d-flex align-items-center gap-2 col-sm-6 col-xl-8'>
+                        <CFormLabel htmlFor="plant" className='col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ' >Plant</CFormLabel>
+                        <CCol className='d-flex align-items-center gap-2 col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8 '>
                             <CDropdown className='dropdown-search d-flex justify-content-between'>
-                                <CDropdownToggle width={400} className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
+                                <CDropdownToggle className='d-flex justify-content-between align-items-center w-100'>{searchQuery.plant}</CDropdownToggle>
                                 <CDropdownMenu className='cursor-pointer'>
                                         <CDropdownItem onClick={() => setSearchQuery((prev)=>({...prev, plant: "All"}))}>All</CDropdownItem>
                                         <CDropdownItem onClick={() => setSearchQuery((prev)=>({...prev, plant: "P1 - Plant 1"}))}>P1 - Plant 1</CDropdownItem>
@@ -691,7 +695,7 @@ const Gentani = () => {
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
-                        <CCol className="d-flex justify-content-end gap-3 col-sm-2">
+                        <CCol className="d-flex justify-content-end gap-3 col-sm-2 col-xxl-4 col-xl-4 col-lg-4 col-md-4">
                             <CButton className="btn-search" onClick={()=>handleSearch()}>Search</CButton>
                             <CButton color="secondary" onClick={() => handleClearSearch()}>Clear</CButton>
                         </CCol >
@@ -699,7 +703,7 @@ const Gentani = () => {
                 </CCol>
             </CRow>
             <CRow>
-                <CCol xs={12} xl={4} className='mt-4'>
+                <CCol xs={12} xxl={12} className='mt-4'>
                     <CButton className='btn-add-master' onClick={()=>setVisibleModalAdd((prev) => ({ ...prev, state: true}))}>Add Gentani</CButton>
                     <CButton className='btn-download mx-2' onClick={()=>handleDownload(paginatedData)}>Download</CButton>
                     <CButton className='btn-upload' onClick={()=>setVisibleModalUpload(true)}>Upload</CButton>
