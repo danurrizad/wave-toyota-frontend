@@ -7,7 +7,11 @@ const useAuthDataService = () => {
 
     const login = async(body) => {
         try {
-            const response = await axios.post(`${BACKEND_URL}/api/auth/login`, body)
+            const response = await axios.post(`${BACKEND_URL}/api/auth/login`, body, 
+                {
+                    withCredentials: true
+                }
+            )
             return response
         } catch (error) {
             throw error

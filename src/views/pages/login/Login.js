@@ -62,6 +62,12 @@ const Login = () => {
     }
   }
 
+  useEffect(()=>{
+    if(auth.errMsg){
+      addToast(templateToast("Error", auth.errMsg))
+    }
+  }, [])
+
   const [toast, addToast] = useState(0)
     const toaster = useRef()
     const templateToast = (type, msg) => {

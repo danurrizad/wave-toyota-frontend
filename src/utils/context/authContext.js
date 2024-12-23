@@ -4,6 +4,8 @@
 import React, { useContext, createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthDataService from "../../services/AuthDataService";
+import axiosInstance from "../AxiosInstance";
+import axios from "axios";
 
 const AuthContext = createContext();
 
@@ -11,17 +13,62 @@ const AuthProvider = ({ children }) => {
   const { login, verifyToken } = useAuthDataService()
   const [user, setUser] = useState(localStorage.getItem("user") || "");
   const [token, setToken] = useState(localStorage.getItem("site") || "");
+  const [errMsg, setErrMsg] = useState("")
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const navigate = useNavigate();
+
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async() => {
+    try {
+      if(token){
+        const responseToken = await verifyToken(token)
+          // console.log("responseToken Verifiy :", responseToken)
+          if(responseToken.status === 200){
+            setUser(responseToken.data.responseUser.username)
+            localStorage.setItem("user", responseToken.data.responseUser.username)
+            setIsAuthenticated(true)
+          } else{
+            localStorage.removeItem("site");
+            localStorage.removeItem("user");
+            setUser(null)
+            setToken(null)
+          }
+      }
+    } catch (error) {
+      if(error.response.data){
+        setErrMsg("Token expired!")
+      }
+      // console.log("Error checking auth :", error)
+      localStorage.removeItem("site");
+      localStorage.removeItem("user");
+      setUser(null)
+      setToken(null)
+    }
+  }
+  // const checkAuth = async () => {
+  //       try {
+  //         const response = await axios.get("/auth/getAuth");
+  //         console.log("Response checkAuth :", response)
+  //         // setUser(response.data.user);
+  //       } catch (error) {
+  //         console.error("Authentication check failed:", error);
+  //         setUser(null);
+  //       }
+  //     };
 
   const loginAction = async (form) => {
     try {
       const response = await login(form);
-      if (response.data) {
-        setToken(response.data.token);
-        localStorage.setItem("site", response.data.token);
 
-        const responseToken = await verifyToken(response.data.token)
+      if (response.data) {
+        setToken(response.data.accessToken);
+        localStorage.setItem("site", response.data.accessToken);
+        
+        const responseToken = await verifyToken(response.data.accessToken)
         if(responseToken.status === 200){
           setUser(responseToken.data.responseUser.username)
           localStorage.setItem("user", responseToken.data.responseUser.username)
@@ -47,7 +94,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, isAuthenticated, loginAction, logOut }}>
+    <AuthContext.Provider value={{ token, user, isAuthenticated, errMsg, loginAction, logOut }}>
       {children}
     </AuthContext.Provider>
   );
