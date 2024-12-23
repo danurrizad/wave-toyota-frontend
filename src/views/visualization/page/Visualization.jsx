@@ -284,7 +284,7 @@ const Visualization = () => {
             slidesPerView={1}
             // onSlideChange={(swiper) => console.log('slide change into: ', swiper.activeIndex)}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            onSwiper={(swiper) => console.log("swipe into :", swiper)}
+            // onSwiper={(swiper) => console.log("swipe into :", swiper)}
             pagination={{ clickable: true }}
             scrollbar={{ draggable: true }}
             autoplay={{
