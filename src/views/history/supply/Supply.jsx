@@ -124,6 +124,7 @@ const Supply = () => {
       const supplyDate = parseISO(supply.supply_date);
       const fromDate = period ? new Date(period[0]) : null;
       const toDate = period ? new Date(period[1]) : null;
+      toDate.setHours(23, 59, 59, 999)
   
       const withinDateRange =
         (!fromDate || supplyDate >= fromDate) &&

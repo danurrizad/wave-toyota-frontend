@@ -150,16 +150,17 @@ const Consumption = () => {
     const filtered = consumptionData.filter((consumption) => {
         const matchesDescorNo = consumption.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase()) || consumption.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
         //   const matchesPlant = plant === "All" || consumption.plant.toLowerCase().includes(plant.toLowerCase());
-  
+        
+
       // Parse the consumption_date and filter by date range
       const consumptionDate = parseISO(consumption.consumption_date);
       const fromDate = period ? new Date(period[0]) : null;
       const toDate = period ? new Date(period[1]) : null;
-  
+      toDate.setHours(23, 59, 59, 999)    
+        
       const withinDateRange =
         (!fromDate || consumptionDate >= fromDate) &&
         (!toDate || consumptionDate <= toDate);
-  
       return matchesDescorNo && withinDateRange;
     });
     setFilteredData(filtered);
