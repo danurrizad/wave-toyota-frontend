@@ -132,8 +132,6 @@ const Dashboard = () => {
             ]}
           />
         </CCol>
-      </CRow>
-      <CRow>
         <CCol xs={12} xl={2}>
           <CWidgetStatsD
             className="mb-3"
@@ -154,8 +152,9 @@ const Dashboard = () => {
               { title: 'monitoring', value: monitoringData.length },
             ]}
           />
-        </CCol>
+        </CCol>    
       </CRow>
+      
       <h1 className='pt-5 pb-3'>HISTORY</h1>
       <CRow>
         <CCol xs={12} xl={4}>
