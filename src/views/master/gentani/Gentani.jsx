@@ -536,7 +536,7 @@ const Gentani = () => {
                             <Select 
                                 options={optionsMaterialDesc} 
                                 placeholder="Select" 
-                                isClearable 
+                                // isClearable 
                                 value={optionsMaterialDesc.find((option) => option.value === formData.material_no) || null} 
                                 onChange={(e) => setFormData({ 
                                     ...formData, 
