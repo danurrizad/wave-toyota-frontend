@@ -1,9 +1,10 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react'
-import { CContainer, CCol, CWidgetStatsD, CRow } from '@coreui/react'
+import { CContainer, CCol, CWidgetStatsD, CRow, CCard, CImage, CButton, CCardTitle, CHeaderText } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import * as icon from "@coreui/icons";
 import { CChartLine } from '@coreui/react-chartjs';
+import ImageDashboard from '/src/assets/images/dashboard/dashboard_img.png'
 
 import useMaterialDataService from './../../services/MaterialDataService';
 import useGentaniDataService from '../../services/GentaniDataService';
@@ -99,7 +100,26 @@ const Dashboard = () => {
 
   return (
     <CContainer fluid>
-      <h1 className='mb-3'>MASTER</h1>
+      {/* <CCard className='bg-white p-4' style={{height: "100%"}} > */}
+         <CRow>
+           <CCol xxl={{order: 0, span: 8}} xs={{order: 1, span: 12}}>
+             <div className='d-flex flex-column justify-content-center  h-100'>
+               <h1 className='text-dashboard-title'><span style={{color: "red"}}>ANDON</span> VISUALIZATION</h1>
+               <h3 className='text-dashboard-subtitle' style={{fontWeight: "lighter"}}>Comprehensive solution for monitoring material supply and consumption</h3>
+               <div className='d-flex justify-content-start gap-4 mt-4'>
+                  <CButton className='tag-dashboard' disabled style={{border: "2px solid black", width: "150px", color: "black"}}>Master</CButton>
+                  <CButton className='tag-dashboard' disabled style={{border: "2px solid black", width: "150px", color: "black"}}>History</CButton>
+                  <CButton className='tag-dashboard' disabled style={{border: "2px solid black", width: "150px", color: "black"}}>Visualization</CButton>
+               </div>
+             </div>
+           </CCol>
+           <CCol xxl={{order: 1, span: 4, offset: 0}} xs={{order: 0, span: 6, offset:3}} className='h-100'>
+             <CImage src={ImageDashboard} className='w-100 image-dashboard'/>
+           </CCol>
+         </CRow>
+        {/* <CCard className='my-4'></CCard> */}
+      {/* </CCard> */}
+      {/* <h1 className='my-4'>MASTER</h1>
       <CRow>
         <CCol xs={12} xl={2}>
           <CWidgetStatsD
@@ -177,7 +197,7 @@ const Dashboard = () => {
             ]}
           />
         </CCol>
-      </CRow>
+      </CRow> */}
       
       
     </CContainer>
