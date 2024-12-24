@@ -156,8 +156,9 @@ const Consumption = () => {
       const consumptionDate = parseISO(consumption.consumption_date);
       const fromDate = period ? new Date(period[0]) : null;
       const toDate = period ? new Date(period[1]) : null;
-      toDate.setHours(23, 59, 59, 999)    
-        
+      if(toDate !== null){
+        toDate.setHours(23, 59, 59, 999)    
+      }
       const withinDateRange =
         (!fromDate || consumptionDate >= fromDate) &&
         (!toDate || consumptionDate <= toDate);
