@@ -108,9 +108,30 @@ const Dashboard = () => {
             <h1 className='text-dashboard-title'><span style={{color: "red"}}>ANDON</span> VISUALIZATION</h1>
             <h3 className='text-dashboard-subtitle' style={{fontWeight: "lighter"}}>Comprehensive solution for monitoring material supply and consumption</h3>
             <div className='d-flex justify-content-start gap-4 mt-4'>
-              <CButton className='tag-dashboard' disabled style={{border: "2px solid black", width: "150px", color: "black"}}>Master</CButton>
-              <CButton className='tag-dashboard' disabled style={{border: "2px solid black", width: "150px", color: "black"}}>History</CButton>
-              <CButton className='tag-dashboard' disabled style={{border: "2px solid black", width: "150px", color: "black"}}>Visualization</CButton>
+              {/* <button disabled className="btn-dashboard">
+                <svg width="180px" height="60px" viewBox="0 0 180 60" className="border dashboard">
+                  <polyline points="179,1 179,59 1,59 1,1 179,1" className="bg-line" />
+                  <polyline points="179,1 179,59 1,59 1,1 179,1" className="hl-line" />
+                </svg>
+                <span>Master</span>
+              </button>
+              <button disabled className="btn-dashboard">
+                <svg width="180px" height="60px" viewBox="0 0 180 60" className="border dashboard2">
+                  <polyline points="179,1 179,59 1,59 1,1 179,1" className="bg-line" />
+                  <polyline points="179,1 179,59 1,59 1,1 179,1" className="hl-line" />
+                </svg>
+                <span>History</span>
+              </button>
+              <button disabled className="btn-dashboard">
+                <svg width="180px" height="60px" viewBox="0 0 180 60" className="border dashboard">
+                  <polyline points="179,1 179,59 1,59 1,1 179,1" className="bg-line" />
+                  <polyline points="179,1 179,59 1,59 1,1 179,1" className="hl-line" />
+                </svg>
+                <span>Visualization</span>
+              </button> */}
+              <CButton className='tag-dashboard' disabled style={{ width: "200px", color: "black"}}>Master</CButton>
+              <CButton className='tag-dashboard' disabled style={{ width: "200px", color: "black"}}>History</CButton>
+              <CButton className='tag-dashboard' disabled style={{ width: "200px", color: "black"}}>Visualization</CButton>
             </div>
           </div>
         </CCol>
