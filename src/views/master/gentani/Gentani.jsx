@@ -344,13 +344,12 @@ const Gentani = () => {
                     created_by: auth.user,
                 };
                 const response = await createGentaniDataByUpload('/gentani/upload', bodyFile);
-                // console.log(response)
-                addToast(templateToast("Success", response.data.message));
-                if(response.data.errors.length !== 0){
-                    addToast(templateToast("Failed", `${response.data.errors.length} Gentani failed to create!`))
+                const listError = response.data.errors
+                if(response.data.errors){
+                    addToastErr(templateToastMultipleMsg("Failed", listError))
                 }
-                if(response.data.created.length === 0){
-                    addToast(templateToast("Error", "All Gentani has already exist!"))
+                if(response.data.created.length !== 0){
+                    addToast(templateToast("Success", response.data.message));
                 }
             } catch (error) {
                 console.error("Error processing file:", error);
@@ -430,10 +429,12 @@ const Gentani = () => {
 
 
     const [toast, addToast] = useState(0)
+    const [toastErr, addToastErr] = useState(0)
     const toaster = useRef()
+    const toasterErr = useRef()
     const templateToast = (type, msg) => {
         return(
-            <CToast autohide={true} key={Date.now()}>
+            <CToast visible={true} autohide={true} key={Date.now()} ref={toaster}>
                 <CToastHeader closeButton>
                     <svg
                     className="rounded me-2 bg-black"
@@ -450,6 +451,35 @@ const Gentani = () => {
                     {/* <small>7 min ago</small> */}
                 </CToastHeader>
                 <CToastBody>{msg}</CToastBody>
+            </CToast>
+        )
+    }
+
+    const templateToastMultipleMsg = (type, data) => {
+        return(
+            <CToast visible={true} autohide={true} key={Date.now()} ref={toasterErr} style={{ overflow: "auto", height: "75vh"}}>
+                <CToastHeader closeButton>
+                    <svg
+                    className="rounded me-2 bg-black"
+                    width="20"
+                    height="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    preserveAspectRatio="xMidYMid slice"
+                    focusable="false"
+                    role="img"
+                    >
+                    <rect width="100%" height="100%" fill={`${type === 'Success' ? "#29d93e" : "#e85454"}`}></rect>
+                    </svg>
+                    <div className="fw-bold me-auto">{type}</div>
+                    {/* <small>7 min ago</small> */}
+                </CToastHeader>
+                <CToastBody style={{overflow: "auto"}}>
+                    {data.map((data, index)=>{
+                        return(
+                            <p key={index}>{data.message}</p>
+                        )
+                    })}
+                </CToastBody>
             </CToast>
         )
     }
@@ -512,6 +542,7 @@ const Gentani = () => {
 
             {/* Toast */}
             <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
+            <CToaster className="p-3" placement="middle-end" push={toastErr} ref={toasterErr}/>
 
             {/* Start of Modal Add */}
             <CModal
