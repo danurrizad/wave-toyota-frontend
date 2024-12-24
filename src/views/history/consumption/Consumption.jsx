@@ -24,6 +24,7 @@ import {
     CFormText,
   } from '@coreui/react'
 
+import dayjs from 'dayjs';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -210,7 +211,7 @@ const Consumption = () => {
           material_desc: data[key].material_desc,
           consumption_date: dateData[key],
           consumption_time: timeData[key],
-          katashiki: data[key].katashiki,
+        //   katashiki: data[key].katashiki,
           initial_stock: data[key].initial_stock,
           final_stock: data[key].final_stock,
           qty: data[key].qty,
@@ -228,10 +229,14 @@ const Consumption = () => {
           bookType: "xlsx",
           type: "array",
         });
+
+        // Generate a file name dynamically
+        const now = dayjs();
+        const fileName = `Consumption_Export_${now.format('YYYYMMDD_HHmmss')}.xlsx`;
       
         // 5. Create a Blob and save the file
         const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(blob, `Consumption History Table.xlsx`);
+        saveAs(blob, fileName);
       };
       
   
@@ -290,7 +295,7 @@ const Consumption = () => {
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Consumption Date</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Consumption Time</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Katashiki</CTableHeaderCell>
+                                {/* <CTableHeaderCell scope="col">Katashiki</CTableHeaderCell> */}
                                 <CTableHeaderCell scope="col">Initial Stock</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Final Stock</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Qty</CTableHeaderCell>
@@ -310,7 +315,7 @@ const Consumption = () => {
                                         <CTableDataCell>{consumption.material_desc}</CTableDataCell>
                                         <CTableDataCell>{date}</CTableDataCell>
                                         <CTableDataCell>{time}</CTableDataCell>
-                                        <CTableDataCell>{consumption.katashiki}</CTableDataCell>
+                                        {/* <CTableDataCell>{consumption.katashiki}</CTableDataCell> */}
                                         <CTableDataCell>{consumption.initial_stock}</CTableDataCell>
                                         <CTableDataCell>{consumption.final_stock}</CTableDataCell>
                                         <CTableDataCell>{consumption.qty}</CTableDataCell>

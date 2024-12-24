@@ -24,6 +24,7 @@ import {
     CFormText,
   } from '@coreui/react'
 
+import dayjs from 'dayjs';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { parseISO, isWithinInterval, format } from "date-fns";
@@ -192,10 +193,14 @@ const Supply = () => {
             bookType: "xlsx",
             type: "array",
         });
+
+        // Generate a file name dynamically
+        const now = dayjs();
+        const fileName = `Supply_Export_${now.format('YYYYMMDD_HHmmss')}.xlsx`;
         
         // 5. Create a Blob and save the file
         const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(blob, `Supply History Table.xlsx`);
+        saveAs(blob, fileName);
     };
 
   return (
