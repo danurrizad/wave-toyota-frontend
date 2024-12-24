@@ -13,6 +13,7 @@ import useSetupDataService from '../../services/SetupDataService';
 import useSupplyQtyDataService from '../../services/SupplyQtyDataService';
 import useMonitoringDataService from '../../services/MonitoringDataService';
 import useHistoryDataService from '../../services/HistoryDataService';
+import CardBody from 'rsuite/esm/Card/CardBody';
 
 
 const Dashboard = () => {
@@ -100,107 +101,23 @@ const Dashboard = () => {
   }, [])
 
   return (
-    <CContainer fluid>
-      {/* <CCard className='bg-white p-4' style={{height: "100%"}} > */}
-         <CRow>
-           <CCol xxl={{order: 0, span: 8}} xs={{order: 1, span: 12}}>
-             <div className='d-flex flex-column justify-content-center  h-100'>
-               <h1 className='text-dashboard-title'><span style={{color: "red"}}>ANDON</span> VISUALIZATION</h1>
-               <h3 className='text-dashboard-subtitle' style={{fontWeight: "lighter"}}>Comprehensive solution for monitoring material supply and consumption</h3>
-               <div className='d-flex justify-content-start gap-4 mt-4'>
-                  <CButton className='tag-dashboard' disabled style={{border: "2px solid black", width: "150px", color: "black"}}>Master</CButton>
-                  <CButton className='tag-dashboard' disabled style={{border: "2px solid black", width: "150px", color: "black"}}>History</CButton>
-                  <CButton className='tag-dashboard' disabled style={{border: "2px solid black", width: "150px", color: "black"}}>Visualization</CButton>
-               </div>
-             </div>
-           </CCol>
-           <CCol xxl={{order: 1, span: 4, offset: 0}} xs={{order: 0, span: 6, offset:3}} className='h-100'>
-             <CImage src={ImageDashboard} className='w-100 image-dashboard'/>
-           </CCol>
-         </CRow>
-        {/* <CCard className='my-4'></CCard> */}
-      {/* </CCard> */}
-      {/* <h1 className='my-4'>MASTER</h1>
-      <CRow>
-        <CCol xs={12} xl={2}>
-          <CWidgetStatsD
-            className="mb-3"
-            icon={<CIcon className="my-4 text-black" icon={icon.cilSpreadsheet} height={52} />}
-            style={{ '--cui-card-cap-bg': 'white' }}
-            values={[
-              { title: 'materials', value: materialData.length },
-              // { title: 'gentani', value: gentaniData.length },
-            ]}
-          />
+    <CContainer className='bg-white wrapper' fluid style={{overflowX:"hidden", position: "absolute", top: "0", left: "0", width: "100vw"}}>
+      <CRow className='d-flex justify-content-center align-items-center flex-grow-1' style={{height: "100vh"}}>
+        <CCol xxl={{order: 0, span: 6}} xs={{order: 1, span: 12}}>
+          <div className='d-flex flex-column justify-content-center h-100 column-text'>
+            <h1 className='text-dashboard-title'><span style={{color: "red"}}>ANDON</span> VISUALIZATION</h1>
+            <h3 className='text-dashboard-subtitle' style={{fontWeight: "lighter"}}>Comprehensive solution for monitoring material supply and consumption</h3>
+            <div className='d-flex justify-content-start gap-4 mt-4'>
+              <CButton className='tag-dashboard' disabled style={{border: "2px solid black", width: "150px", color: "black"}}>Master</CButton>
+              <CButton className='tag-dashboard' disabled style={{border: "2px solid black", width: "150px", color: "black"}}>History</CButton>
+              <CButton className='tag-dashboard' disabled style={{border: "2px solid black", width: "150px", color: "black"}}>Visualization</CButton>
+            </div>
+          </div>
         </CCol>
-        <CCol xs={12} xl={2}>
-          <CWidgetStatsD
-            className="mb-3"
-            icon={<CIcon className="my-4 text-black" icon={icon.cilCart} height={52} />}
-            style={{ '--cui-card-cap-bg': 'white' }}
-            values={[
-              { title: 'gentani', value: gentaniData.length },
-            ]}
-          />
+        <CCol xxl={{order: 1, span: 4, offset: 0}} xs={{order: 0, span: 12, offset:0}} className='d-xl-flex d-flex justify-content-center align-items-center column-image'>
+          <CImage src={ImageDashboard} className='w-100 image-dashboard'/>
         </CCol>
-        <CCol xs={12} xl={2}>
-          <CWidgetStatsD
-            className="mb-3"
-            icon={<CIcon className="my-4 text-black" icon={icon.cilCog} height={52} />}
-            style={{ '--cui-card-cap-bg': 'white' }}
-            values={[
-              { title: 'setup', value: setupData.length },
-            ]}
-          />
-        </CCol>
-        <CCol xs={12} xl={2}>
-          <CWidgetStatsD
-            className="mb-3"
-            icon={<CIcon className="my-4 text-black" icon={icon.cilDataTransferUp} height={52} />}
-            style={{ '--cui-card-cap-bg': 'white' }}
-            values={[
-              { title: 'supply quantity', value: supplyQtyData.length },
-              // { title: 'gentani', value: gentaniData.length },
-            ]}
-          />
-        </CCol>
-        <CCol xs={12} xl={2}>
-          <CWidgetStatsD
-            className="mb-3"
-            icon={<CIcon className="my-4 text-black" icon={icon.cilChart} height={52} />}
-            style={{ '--cui-card-cap-bg': 'white' }}
-            values={[
-              { title: 'monitoring', value: monitoringData.length },
-            ]}
-          />
-        </CCol>    
       </CRow>
-      
-      <h1 className='pt-5 pb-3'>HISTORY</h1>
-      <CRow>
-        <CCol xs={12} xl={4}>
-          <CWidgetStatsD
-            className="mb-3"
-            icon={<CIcon className="my-4 text-black" icon={icon.cilGarage} height={52} />}
-            style={{ '--cui-card-cap-bg': 'white' }}
-            values={[
-              { title: 'consumption', value: historyData.consumption.length },
-            ]}
-          />
-        </CCol>
-        <CCol xs={12} xl={4}>
-          <CWidgetStatsD
-            className="mb-3"
-            icon={<CIcon className="my-4 text-black" icon={icon.cilIndustry} height={52} />}
-            style={{ '--cui-card-cap-bg': 'white' }}
-            values={[
-              { title: 'supply', value: historyData.supply.length },
-            ]}
-          />
-        </CCol>
-      </CRow> */}
-      
-      
     </CContainer>
   )
 }

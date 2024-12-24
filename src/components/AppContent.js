@@ -11,7 +11,7 @@ import AuthProvider from '../utils/context/authContext'
 
 const AppContent = () => {
   return (
-    <CContainer className="px-4" fluid>
+    <CContainer className="px-4 h-100" fluid>
       <CCol xs={12}>
         <Suspense fallback={<CSpinner color="primary" />}>
           <AuthProvider>

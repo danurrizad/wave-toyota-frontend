@@ -7,7 +7,7 @@ const DefaultLayout = () => {
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100" style={{ backgroundColor: '#F3F4F7' }}>
         <AppHeader />
-        <div className="body flex-grow-1">
+        <div className="body flex-grow-1 d-flex" style={{ height: '100%' }}>
           <AppContent />
         </div>
         <AppFooter />

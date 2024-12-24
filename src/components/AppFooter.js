@@ -3,7 +3,7 @@ import { CFooter } from '@coreui/react'
 
 const AppFooter = () => {
   return (
-    <CFooter className="px-4">
+    <CFooter className="px-4" style={{ zIndex: '100' }}>
       <div className="text-center w-100">
         <a
           href="#"
