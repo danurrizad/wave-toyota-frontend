@@ -4,7 +4,8 @@ import { CContainer, CCol, CWidgetStatsD, CRow, CCard, CImage, CButton, CCardTit
 import CIcon from '@coreui/icons-react'
 import * as icon from "@coreui/icons";
 import { CChartLine } from '@coreui/react-chartjs';
-import ImageDashboard from '/src/assets/images/dashboard/dashboard_img.png'
+// import ImageDashboard from '/src/assets/images/dashboard/dashboard_img.png'
+import ImageDashboard from '/src/assets/images/dashboard/dashboard_img_2.png'
 
 import useMaterialDataService from './../../services/MaterialDataService';
 import useGentaniDataService from '../../services/GentaniDataService';

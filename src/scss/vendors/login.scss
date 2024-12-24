@@ -36,8 +36,17 @@
 
 
 // `sm` applies to x-small devices (portrait phones, less than 576px)
-@media (max-width: 575.98px) { 
+@media (max-width: 766px) { 
     .card-login.image-cover{
         display: none;   
+    }
+    .text-title-login{
+        font-size: 40px;
+    }
+ }
+
+ @media (max-width: 500px) { 
+    .text-title-login{
+        font-size: 28px;
     }
  }

@@ -107,8 +107,9 @@ const Login = () => {
               style={{ width: '30px' }}
               src={ImageLogo}
             />
-            <h1 className="" style={{ color: '#dd5a43' }}>
-              ANDON VISUALIZATION
+            {/* <h1 className="" style={{ color: '#dd5a43' }}> */}
+            <h1 className="text-title-login" >
+              <span style={{ color: 'red' }}>ANDON</span> VISUALIZATION
             </h1>
           </CCol>
         </CRow>
