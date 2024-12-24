@@ -88,13 +88,13 @@ const Visualization = () => {
   useEffect(()=>{
     getChartOptions()
   },[])
-
+  
   Highcharts.setOptions({
     lang: {
-        thousandsSep: '.'
+      thousandsSep: '.'
     }
-});
-
+  });
+  
   useEffect(() => {
     const intervalId = setInterval(() => {
       getChartOptions();
@@ -202,6 +202,22 @@ const Visualization = () => {
         </CCard> */}
       </CCol>
     ));
+  const renderCharts5 = () =>
+    option.map((opt, index) => (
+      opt.visualization_name === "Visualization 5" && 
+      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0 "  key={index}>
+          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
+            <HighchartsReact
+              highcharts={Highcharts}
+              options={opt}
+              allowChartUpdate={true}
+              constructorType="chart"
+            />
+          </CCardBody>
+        {/* <CCard xs={6} className="bg-white d-flex">
+        </CCard> */}
+      </CCol>
+    ));
 
   
 
@@ -253,7 +269,7 @@ const Visualization = () => {
         <CCol xl={6} xs={12}>
           <CCardBody>
             <h1 className='text-center text-title' style={{color: "white"}}>ANDON DIRECT MATERIAL SUPPLY</h1>
-            <h3 className='text-center text-title' style={{color: "white"}}><span style={{color: "#FF1F1F"}}>TMMIN</span> {activeIndex === 0 || activeIndex === 1 ? <span style={{color: "#ADFFF9"}}>PLANT 1</span> : <span style={{color: "#FCAA37"}}>PLANT 2</span>}</h3>
+            <h3 className='text-center text-title' style={{color: "white"}}><span style={{color: "#FF1F1F"}}>TMMIN</span> {activeIndex === 0 || activeIndex === 1 || activeIndex === 2 ? <span style={{color: "#ADFFF9"}}>PLANT 1</span> : <span style={{color: "#FCAA37"}}>PLANT 2</span>}</h3>
           </CCardBody>
         </CCol>
         <CCol xl={{order:0}} xs={{order: 2}} className='col-xl-3 col-6'>
@@ -295,10 +311,28 @@ const Visualization = () => {
             loop
             modules={[Autoplay, Pagination, Navigation]}
           >
-            <SwiperSlide className='d-flex flex-wrap'>{renderCharts1()}</SwiperSlide>
+            {/* <SwiperSlide className='d-flex flex-wrap'>{renderCharts1()}</SwiperSlide>
             <SwiperSlide className='d-flex flex-wrap'>{renderCharts2()}</SwiperSlide>
             <SwiperSlide className='d-flex flex-wrap'>{renderCharts3()}</SwiperSlide>
-            <SwiperSlide className='d-flex flex-wrap'>{renderCharts4()}</SwiperSlide>
+            <SwiperSlide className='d-flex flex-wrap'>{renderCharts4()}</SwiperSlide> */}
+
+
+            {option.some(o => o.visualization_name === "Visualization 1") && (
+                <SwiperSlide className='d-flex flex-wrap'>{renderCharts1()}</SwiperSlide>
+            )}
+            {option.some(o => o.visualization_name === "Visualization 2") && (
+                <SwiperSlide className='d-flex flex-wrap'>{renderCharts2()}</SwiperSlide>
+            )}
+            {option.some(o => o.visualization_name === "Visualization 3") && (
+                <SwiperSlide className='d-flex flex-wrap'>{renderCharts3()}</SwiperSlide>
+            )}
+            {option.some(o => o.visualization_name === "Visualization 4") && (
+                <SwiperSlide className='d-flex flex-wrap'>{renderCharts4()}</SwiperSlide>
+            )}
+
+            {option.some(o => o.visualization_name === "Visualization 5") && (
+                <SwiperSlide className='d-flex flex-wrap'>{renderCharts5()}</SwiperSlide>
+            )}
           </Swiper>
         </CCol>
       </CRow>

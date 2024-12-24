@@ -216,12 +216,19 @@ const Monitoring = () => {
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <CDropdown className="btn-group" style={{width: "100%"}}  direction="center">
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.visualization_name}</CDropdownToggle>
-                                <CDropdownMenu >
-                                    <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 1"}))}>Visualization 1</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 2"}))}>Visualization 2</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 3"}))}>Visualization 3</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 4"}))}>Visualization 4</CDropdownItem>
-                                </CDropdownMenu>
+                                {formUpdateData.plant === "P1 - PLANT 1" && (
+                                    <CDropdownMenu >
+                                        <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 1"}))}>Visualization 1</CDropdownItem>
+                                        <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 2"}))}>Visualization 2</CDropdownItem>
+                                        <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 3"}))}>Visualization 3</CDropdownItem>
+                                    </CDropdownMenu>
+                                )}
+                                {formUpdateData.plant === "P2 - PLANT 2" && (
+                                    <CDropdownMenu >
+                                        <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 4"}))}>Visualization 4</CDropdownItem>
+                                        <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 5"}))}>Visualization 5</CDropdownItem>
+                                    </CDropdownMenu>
+                                )}
                             </CDropdown>
                         </CCol>
                     </CRow>
@@ -269,6 +276,7 @@ const Monitoring = () => {
                                     <CDropdownItem onClick={()=>setSearchQuery({ visualization_name: "Visualization 2"})}>Visualization 2</CDropdownItem>
                                     <CDropdownItem onClick={()=>setSearchQuery({ visualization_name: "Visualization 3"})}>Visualization 3</CDropdownItem>
                                     <CDropdownItem onClick={()=>setSearchQuery({ visualization_name: "Visualization 4"})}>Visualization 4</CDropdownItem>
+                                    <CDropdownItem onClick={()=>setSearchQuery({ visualization_name: "Visualization 5"})}>Visualization 5</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
