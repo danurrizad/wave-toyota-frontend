@@ -25,9 +25,6 @@ import {
     CModalFooter,
     CModalTitle,
     CToaster,
-    CToast,
-    CToastHeader,
-    CToastBody,
     CSpinner
 } from '@coreui/react'
 
@@ -38,6 +35,7 @@ import * as icon from "@coreui/icons";
 import Select from 'react-select'
 
 import { useAuth } from '../../../utils/context/authContext';
+import templateToast from '../../../components/ToasterComponent';
 
 const Material = () => {
     const [loading, setLoading] = useState(false)
@@ -47,16 +45,10 @@ const Material = () => {
         state: false, 
         desc: "" 
     })
-    const [visibleModalQR, setVisibleModalQR] = useState(false)
-    const [dataQR, setDataQR] = useState({
-        material_no: "",
-        material_desc: "",
-        plant: "",
-        uom: ""
-    })
-    
 
     const auth = useAuth()
+    const [toast, addToast] = useState(0)
+    const toaster = useRef()
     
     const { getMaterialData, createMaterialData, updateMaterialData, deleteMaterialData } = useMaterialDataService()
 
@@ -87,7 +79,6 @@ const Material = () => {
     ])
 
     const handleOpenModalUpdate = (data) => {
-        console.log("Material form :", data)
         setVisibleModalUpdate(true)
         setFormUpdateData({
             material_no: data.material_no,
@@ -103,11 +94,9 @@ const Material = () => {
     }
 
     const [currentPage, setCurrentPage] = useState(1)
-    const [totalMaterialData, setTotalMaterialData] = useState(0)
     const [itemPerPage, setItemPerPage] = useState(10)
     const [totalPage, setTotalPage] = useState(0)
 
-    // const [paginatedData, setPaginatedData] = useState([])
 
     const [searchQuery, setSearchQuery] = useState({ materialDescOrNo: "", supplyLine: "", plant: "All" })
     
@@ -165,7 +154,6 @@ const Material = () => {
 
             setMaterialData(response.data)
             setFilteredData(response.data) // Initialize filtered data
-            setTotalMaterialData(response.data.length)
         } catch (error) {
             if(error.response){
                 addToast(templateToast("Error", error.response.data.message))
@@ -231,8 +219,6 @@ const Material = () => {
                 addToast(templateToast("Error", error.response.data.message));
             } 
             else {
-                // Fallback for unexpected errors
-                console.error("Unexpected Error: ", error);
                 addToast(templateToast("Error", "An unexpected error occurred."));
             }
         } finally{
@@ -247,16 +233,13 @@ const Material = () => {
             addToast(templateToast("Success", response.data.message))
             setVisibleModalUpdate(false)
             getMaterial()
-            // if(response.status === 200){
-            // }else{
-            //     addToast(templateToast("Error", response.response.data.message))
-            // }
         } catch (error) {
-            console.log("Error :", error)
             if(error.response){
                 addToast(templateToast("Error", error.response.data.message))
             }
-            addToast(templateToast("Error", error.message))
+            else{
+                addToast(templateToast("Error", error.message))
+            }
         } finally{
             setLoading(false)
         }
@@ -266,51 +249,20 @@ const Material = () => {
         try {
             setLoading(true)
             const response = await deleteMaterialData(`material/${noMaterial}/${plant}`)
-            if(response.status === 200){
-                addToast(templateToast("Success", response.data.message))
-                setVisibleModalDelete({state: false, desc: "", plant: ""})
-                getMaterial()
-            }else{
-                addToast(templateToast("Error", response.response.data.message))
-            }
+            addToast(templateToast("Success", response.data.message))
+            setVisibleModalDelete({state: false, desc: "", plant: ""})
+            getMaterial()
         } catch (error) {
-            console.log(error)
+            // console.log(error)
             if(error.response){
                 addToast(templateToast("Error", error.response.data.message))
             } else {
-                console.log(error)
                 addToast(templateToast("Error", error.message))
             }
         } finally{
             setLoading(false)
         }
     }
-
-    const [toast, addToast] = useState(0)
-    const toaster = useRef()
-    const templateToast = (type, msg) => {
-        return(
-            <CToast autohide={true} key={Date.now()}>
-                <CToastHeader closeButton>
-                    <svg
-                    className="rounded me-2 bg-black"
-                    width="20"
-                    height="20"
-                    xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                    role="img"
-                    >
-                    <rect width="100%" height="100%" fill={`${type === 'Error' ? "#e85454" : "#29d93e"}`}></rect>
-                    </svg>
-                    <div className="fw-bold me-auto">{type}</div>
-                    {/* <small>7 min ago</small> */}
-                </CToastHeader>
-                <CToastBody>{msg}</CToastBody>
-            </CToast>
-        )
-    }
-
     
 
     return (
@@ -350,9 +302,9 @@ const Material = () => {
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formAddData.plant}</CDropdownToggle>
-                                <CDropdownMenu>
-                                    <CDropdownItem onClick={()=>setFormAddData((prev)=>({ ...prev, plant: "P1 - PLANT 1"}))}>P1 - PLANT 1</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setFormAddData((prev)=>({ ...prev, plant: "P2 - PLANT 2"}))} >P2 - PLANT 2</CDropdownItem>
+                                <CDropdownMenu className='cursor-pointer'>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormAddData((prev)=>({ ...prev, plant: "P1 - PLANT 1"}))}>P1 - PLANT 1</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormAddData((prev)=>({ ...prev, plant: "P2 - PLANT 2"}))} >P2 - PLANT 2</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
@@ -380,11 +332,11 @@ const Material = () => {
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formAddData.uom}</CDropdownToggle>
-                                <CDropdownMenu>
-                                    <CDropdownItem onClick={()=>setFormAddData((prev)=>({...prev, uom: "Gram"}))}>Gram</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setFormAddData((prev)=>({...prev, uom: "Liter"}))}>Liter</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setFormAddData((prev)=>({...prev, uom: "Meter"}))}>Meter</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setFormAddData((prev)=>({...prev, uom: "Kilogram"}))}>Kilogram</CDropdownItem>
+                                <CDropdownMenu className='cursor-pointer'>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormAddData((prev)=>({...prev, uom: "Gram"}))}>Gram</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormAddData((prev)=>({...prev, uom: "Liter"}))}>Liter</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormAddData((prev)=>({...prev, uom: "Meter"}))}>Meter</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormAddData((prev)=>({...prev, uom: "Kilogram"}))}>Kilogram</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
@@ -427,9 +379,9 @@ const Material = () => {
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.plant}</CDropdownToggle>
-                                <CDropdownMenu>
-                                    <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, plant: "P1 - PLANT 1"}))}>P1 - PLANT 1</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, plant: "P2 - PLANT 2"}))} >P2 - PLANT 2</CDropdownItem>
+                                <CDropdownMenu className='cursor-pointer'>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, plant: "P2 - PLANT 2"}))} >P2 - PLANT 2</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, plant: "P1 - PLANT 1"}))}>P1 - PLANT 1</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
@@ -457,11 +409,11 @@ const Material = () => {
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.uom}</CDropdownToggle>
-                                <CDropdownMenu>
-                                    <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({...prev, uom: "Gram"}))}>Gram</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({...prev, uom: "Liter"}))}>Liter</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({...prev, uom: "Meter"}))}>Meter</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({...prev, uom: "Kilogram"}))}>Kilogram</CDropdownItem>
+                                <CDropdownMenu className='cursor-pointer'>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({...prev, uom: "Gram"}))}>Gram</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({...prev, uom: "Liter"}))}>Liter</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({...prev, uom: "Meter"}))}>Meter</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({...prev, uom: "Kilogram"}))}>Kilogram</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
@@ -530,9 +482,9 @@ const Material = () => {
                             <CDropdown className='dropdown-search d-flex justify-content-between'>
                                 <CDropdownToggle className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
                                 <CDropdownMenu className='cursor-pointer'>
-                                    <CDropdownItem onClick={() => setSearchQuery({ ...searchQuery, plant: "All" })}>All</CDropdownItem>
-                                    <CDropdownItem onClick={() => setSearchQuery({ ...searchQuery, plant: "P1 - PLANT 1" })}>P1 - PLANT 1</CDropdownItem>
-                                    <CDropdownItem onClick={() => setSearchQuery({ ...searchQuery, plant: "P2 - PLANT 2" })}>P2 - PLANT 2</CDropdownItem>
+                                    <CDropdownItem style={{ textDecoration: "none"}} onClick={() => setSearchQuery({ ...searchQuery, plant: "All" })}>All</CDropdownItem>
+                                    <CDropdownItem style={{ textDecoration: "none"}} onClick={() => setSearchQuery({ ...searchQuery, plant: "P1 - PLANT 1" })}>P1 - PLANT 1</CDropdownItem>
+                                    <CDropdownItem style={{ textDecoration: "none"}} onClick={() => setSearchQuery({ ...searchQuery, plant: "P2 - PLANT 2" })}>P2 - PLANT 2</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
@@ -608,11 +560,11 @@ const Material = () => {
                     <CFormLabel htmlFor="size" className='col-form-label' >Size</CFormLabel>
                     <CDropdown>
                         <CDropdownToggle color="white">{itemPerPage}</CDropdownToggle>
-                        <CDropdownMenu>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
+                        <CDropdownMenu className='cursor-pointer'>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
                         </CDropdownMenu>
                     </CDropdown>
                 </CCol>

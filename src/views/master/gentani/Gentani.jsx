@@ -9,8 +9,6 @@ import {
     CTableDataCell, 
     CRow, 
     CCol, 
-    CInputGroup, 
-    CInputGroupText, 
     CFormInput,
     CDropdown,
     CDropdownToggle,
@@ -21,7 +19,6 @@ import {
     CButton,
     CPagination,
     CPaginationItem,
-    CFormText,
     CModal,
     CModalHeader,
     CModalBody,
@@ -133,26 +130,6 @@ const Gentani = () => {
         plant: "All"
     });
 
-    // const optionsKatashiki = Array.from(
-    //     new Set(gentaniData.map((gentani) => gentani.katashiki))
-    //   ).map((uniqueKatashiki) => ({
-    //     value: uniqueKatashiki,
-    //     label: uniqueKatashiki,
-    //   }));
-    // const optionsMaterialDesc = Array.from(
-    //     new Map(
-    //       materialData.map((material) => [material.material_desc, material]) // Use a Map to remove duplicates by material_desc
-    //     ).values()
-    //   ).map((material) => ({
-    //     value: material.material_no, // Use material_desc as the value
-    //     label: `${material.material_no} - ${material.material_desc}`, // Combine material_no and material_desc for the label
-    //     plant: material.plant,
-    //     plant2: material.plant2 || "",
-    //   }));
-      
-    //   useEffect(()=>{
-    //     console.log("material data :", materialData)
-    //   })
     const optionsMaterialDesc= materialData.map((material) => ({
         value: material.material_no,
         label: `${material.material_no} - ${material.material_desc}`,
@@ -587,9 +564,9 @@ const Gentani = () => {
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} disabled={formData.material_no === "Select"} className='d-flex justify-content-between align-items-center dropdown-search'>{formData.plant !="" ? formData.plant : "Select"}</CDropdownToggle>
-                                <CDropdownMenu>
-                                    <CDropdownItem className='cursor-pointer' onClick={()=>setFormData({...formData, plant: "P1 - PLANT 1"})}>P1 - PLANT 1</CDropdownItem>
-                                    {formData.plant2 !== "" && <CDropdownItem className='cursor-pointer' onClick={()=>setFormData({...formData, plant: "P2 - PLANT 2"})}>P2 - PLANT 2</CDropdownItem>}
+                                <CDropdownMenu className='cursor-pointer'>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormData({...formData, plant: "P1 - PLANT 1"})}>P1 - PLANT 1</CDropdownItem>
+                                    {formData.plant2 !== "" && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormData({...formData, plant: "P2 - PLANT 2"})}>P2 - PLANT 2</CDropdownItem>}
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
@@ -745,7 +722,7 @@ const Gentani = () => {
                         <CFormLabel htmlFor="supplyLine" className="col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ">Material</CFormLabel>
                         <CCol className='d-flex align-items-center justify-content-start gap-2 col-xxl-10 col-xl-10 col-lg-11 col-md-12'>
                             {/* <CFormInput type="text" id="supplyLine" value={searchQuery.materialDescOrNo} onChange={(e)=>setSearchQuery((prev)=>({ ...prev, materialDescOrNo: e.target.value}))}/> */}
-                            <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
+                            <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100 cursor-pointer' styles={colorStyles}/>
                             
                         </CCol>
                     </CRow>
@@ -757,9 +734,9 @@ const Gentani = () => {
                             <CDropdown className='dropdown-search d-flex justify-content-between'>
                                 <CDropdownToggle className='d-flex justify-content-between align-items-center w-100'>{searchQuery.plant}</CDropdownToggle>
                                 <CDropdownMenu className='cursor-pointer'>
-                                        <CDropdownItem onClick={() => setSearchQuery((prev)=>({...prev, plant: "All"}))}>All</CDropdownItem>
-                                        <CDropdownItem onClick={() => setSearchQuery((prev)=>({...prev, plant: "P1 - Plant 1"}))}>P1 - Plant 1</CDropdownItem>
-                                        <CDropdownItem onClick={() => setSearchQuery((prev)=>({...prev, plant: "P2 - Plant 2"}))}>P2 - Plant 2</CDropdownItem>
+                                        <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, plant: "All"}))}>All</CDropdownItem>
+                                        <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, plant: "P1 - Plant 1"}))}>P1 - Plant 1</CDropdownItem>
+                                        <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, plant: "P2 - Plant 2"}))}>P2 - Plant 2</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
@@ -839,11 +816,11 @@ const Gentani = () => {
                     <CFormLabel htmlFor="size" className='col-form-label' >Size</CFormLabel>
                     <CDropdown>
                         <CDropdownToggle color="white">{itemPerPage}</CDropdownToggle>
-                        <CDropdownMenu>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
+                        <CDropdownMenu className='cursor-pointer'>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
                         </CDropdownMenu>
                     </CDropdown>
                 </CCol>

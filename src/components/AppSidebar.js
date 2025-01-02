@@ -52,9 +52,9 @@ const AppSidebar = () => {
       }}
     >
       <CSidebarHeader className="border-bottom">
-        <CSidebarBrand href='/' style={{textDecoration: "none", textDecorationStyle: "none"}}>
+        <CSidebarBrand href='/' className='sidebar-title' style={{textDecoration: "none", textDecorationStyle: "none"}}>
           <CImage className="sidebar-narrow" src={ImageLogo} style={{width: "24px"}}/>
-          <CHeaderText className="sidebar-brand-full">ANDON VISUALIZATION</CHeaderText>
+          <CHeaderText className="sidebar-brand-full" >ANDON VISUALIZATION</CHeaderText>
           {/* <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} /> */}
           {/* <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} /> */}
           {/* <CIcon customClassName="sidebar-brand-narrow" src="src/assets/images/logo/app-logo.png" height={32} /> */}

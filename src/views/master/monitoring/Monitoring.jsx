@@ -10,8 +10,6 @@ import {
     CTableDataCell, 
     CRow, 
     CCol, 
-    CInputGroup, 
-    CInputGroupText, 
     CFormInput,
     CDropdown,
     CDropdownToggle,
@@ -22,28 +20,21 @@ import {
     CButton,
     CPagination,
     CPaginationItem,
-    CFormText,
     CModal,
     CModalHeader,
     CModalTitle,
     CModalBody,
     CModalFooter,
     CToaster,
-    CToast,
-    CToastHeader,
-    CToastBody,
     CSpinner
 } from '@coreui/react'
 
-import dayjs from 'dayjs';
 import CIcon from '@coreui/icons-react';
 import * as icon from "@coreui/icons";
 
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
-
 import useMonitoringDataService from '../../../services/MonitoringDataService'
 import { useAuth } from '../../../utils/context/authContext';
+import templateToast from '../../../components/ToasterComponent';
 
 const Monitoring = () => {
     const auth = useAuth()
@@ -68,7 +59,6 @@ const Monitoring = () => {
         try {
             setLoading(true)
             const response = await getMonitoringData('monitoring')
-            setTotalMonitoringData(response.data.data.length)
             setMonitoringData(response.data.data)
             setFilteredData(response.data.data)
 
@@ -89,7 +79,7 @@ const Monitoring = () => {
             const response = await updateMonitoringData('monitoring', materialNo, form)
             getMonitoring()
             setVisibleModalUpdate(false)
-            addToast(templateToast("Success", `Monitoring data for Material No. ${materialNo} updated!`))
+            addToast(templateToast("Success", response.data.message))
         } catch (error) {
             if(error.response){
                 addToast(templateToast("Error", error.response.data.message))
@@ -107,10 +97,11 @@ const Monitoring = () => {
 
     // PAGINATION AND SEARCH
     const [currentPage, setCurrentPage] = useState(1)
-    const [totalMonitoringData, setTotalMonitoringData] = useState(0)
     const [itemPerPage, setItemPerPage] = useState(10)
     const [totalPage, setTotalPage] = useState(0)
     const [filteredData, setFilteredData] = useState([])
+    const [toast, addToast] = useState(0)
+    const toaster = useRef()
 
     // Handle search functionality
     const [searchQuery, setSearchQuery] = useState({
@@ -147,32 +138,7 @@ const Monitoring = () => {
         setItemPerPage(item)
         setCurrentPage(1)
     }
-
-    const [toast, addToast] = useState(0)
-    const toaster = useRef()
-    const templateToast = (type, msg) => {
-        return(
-            <CToast autohide={true} key={Date.now()}>
-                <CToastHeader closeButton>
-                    <svg
-                    className="rounded me-2 bg-black"
-                    width="20"
-                    height="20"
-                    xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                    role="img"
-                    >
-                    <rect width="100%" height="100%" fill={`${type === 'Error' ? "#e85454" : "#29d93e"}`}></rect>
-                    </svg>
-                    <div className="fw-bold me-auto">{type}</div>
-                    {/* <small>7 min ago</small> */}
-                </CToastHeader>
-                <CToastBody>{msg}</CToastBody>
-            </CToast>
-        )
-    }
-
+   
     const renderModalUpdate = () =>{
         return(
             <>
@@ -217,16 +183,16 @@ const Monitoring = () => {
                             <CDropdown className="btn-group" style={{width: "100%"}}  direction="center">
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.visualization_name}</CDropdownToggle>
                                 {formUpdateData.plant === "P1 - PLANT 1" && (
-                                    <CDropdownMenu >
-                                        <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 1"}))}>Visualization 1</CDropdownItem>
-                                        <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 2"}))}>Visualization 2</CDropdownItem>
-                                        <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 3"}))}>Visualization 3</CDropdownItem>
+                                    <CDropdownMenu className='cursor-pointer'>
+                                        <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 1"}))}>Visualization 1</CDropdownItem>
+                                        <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 2"}))}>Visualization 2</CDropdownItem>
+                                        <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 3"}))}>Visualization 3</CDropdownItem>
                                     </CDropdownMenu>
                                 )}
                                 {formUpdateData.plant === "P2 - PLANT 2" && (
-                                    <CDropdownMenu >
-                                        <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 4"}))}>Visualization 4</CDropdownItem>
-                                        <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 5"}))}>Visualization 5</CDropdownItem>
+                                    <CDropdownMenu className='cursor-pointer'>
+                                        <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 4"}))}>Visualization 4</CDropdownItem>
+                                        <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 5"}))}>Visualization 5</CDropdownItem>
                                     </CDropdownMenu>
                                 )}
                             </CDropdown>
@@ -270,13 +236,13 @@ const Monitoring = () => {
                         <CCol className='d-flex align-items-center gap-2 col-sm-8 col-xl-6'>
                             <CDropdown className='dropdown-search d-flex justify-content-between'>
                                 <CDropdownToggle className='d-flex justify-content-between align-items-center dropdown-search'>{searchQuery.visualization_name}</CDropdownToggle>
-                                <CDropdownMenu className=''>
-                                    <CDropdownItem onClick={()=>setSearchQuery({ visualization_name: "All"})}>All</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setSearchQuery({ visualization_name: "Visualization 1"})}>Visualization 1</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setSearchQuery({ visualization_name: "Visualization 2"})}>Visualization 2</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setSearchQuery({ visualization_name: "Visualization 3"})}>Visualization 3</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setSearchQuery({ visualization_name: "Visualization 4"})}>Visualization 4</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setSearchQuery({ visualization_name: "Visualization 5"})}>Visualization 5</CDropdownItem>
+                                <CDropdownMenu className='cursor-pointer'>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "All"})}>All</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 1"})}>Visualization 1 (Plant 1)</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 2"})}>Visualization 2 (Plant 1)</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 3"})}>Visualization 3 (Plant 1)</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 4"})}>Visualization 4 (Plant 2)</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 5"})}>Visualization 5 (Plant 2)</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
@@ -326,11 +292,11 @@ const Monitoring = () => {
                     <CFormLabel htmlFor="size" className='col-form-label' >Size</CFormLabel>
                     <CDropdown>
                         <CDropdownToggle color="white">{itemPerPage}</CDropdownToggle>
-                        <CDropdownMenu>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
+                        <CDropdownMenu className='cursor-pointer'>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
                         </CDropdownMenu>
                     </CDropdown>
                 </CCol>

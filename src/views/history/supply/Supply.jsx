@@ -9,9 +9,6 @@ import {
     CTableDataCell, 
     CRow, 
     CCol, 
-    CInputGroup, 
-    CInputGroupText, 
-    CFormInput,
     CDropdown,
     CDropdownToggle,
     CDropdownMenu,
@@ -21,19 +18,20 @@ import {
     CButton,
     CPagination,
     CPaginationItem,
-    CFormText,
+    CToaster,
   } from '@coreui/react'
 
 import dayjs from 'dayjs';
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { parseISO, isWithinInterval, format } from "date-fns";
+import { parseISO } from "date-fns";
 
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 import useHistoryDataService from '../../../services/HistoryDataService';
 import useMaterialDataService from './../../../services/MaterialDataService';
+import templateToast from '../../../components/ToasterComponent';
+
 import { DateRangePicker } from 'rsuite'
 import Select from 'react-select'
 
@@ -45,6 +43,8 @@ const Supply = () => {
   const [supplyHistoryData, setSupplyHistoryData] = useState([])
   const [materialData, setMaterialData] = useState([])
   const [filteredData, setFilteredData] = useState([])
+  const [toast, addToast] = useState(0)
+  const toaster = useRef()
 
   const getSupplyHistoryData = async() => {
     try {
@@ -52,7 +52,12 @@ const Supply = () => {
         setSupplyHistoryData(response.data.data)
         setFilteredData(response.data.data)
     } catch (error) {
-        console.log("Error fetching supply history :", error)
+        if (error.response){
+            addToast(templateToast("Error", error.response.message))
+        }
+        else{
+            addToast(templateToast("Error", error.message))
+        }
     }
   }
 
@@ -61,7 +66,12 @@ const Supply = () => {
         const response = await getMaterialData('material')
         setMaterialData(response.data)
     } catch (error) {
-        console.log("Error fetching material :", error)
+        if (error.response){
+            addToast(templateToast("Error", error.response.message))
+        }
+        else{
+            addToast(templateToast("Error", error.message))
+        }
     }
   }
 
@@ -206,6 +216,10 @@ const Supply = () => {
   return (
     <>
         <CContainer fluid >
+
+        {/* Toast */}
+        <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
+
         <CRow>
             <CCol xl={4} xs={12}>
                 <CRow className=''>
@@ -284,11 +298,11 @@ const Supply = () => {
                     <CFormLabel htmlFor="size" className='col-form-label' >Size</CFormLabel>
                     <CDropdown>
                         <CDropdownToggle color="white">{itemPerPage}</CDropdownToggle>
-                        <CDropdownMenu>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
+                        <CDropdownMenu className='cursor-pointer'>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
                         </CDropdownMenu>
                     </CDropdown>
                 </CCol>

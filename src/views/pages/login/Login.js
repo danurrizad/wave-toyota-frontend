@@ -31,6 +31,7 @@ import { cilLockLocked, cilUser } from '@coreui/icons'
 
 import useAuthDataService from './../../../services/AuthDataService';
 import { useAuth } from '../../../utils/context/authContext'
+import templateToast from '../../../components/ToasterComponent'
 import ImageEtios from '../../../assets/images/login/etios.jpg'
 import ImageInnova from '../../../assets/images/login/innova.jpg'
 import ImageVios from '../../../assets/images/login/vios.jpg'
@@ -38,27 +39,29 @@ import ImageYaris from '../../../assets/images/login/yaris.jpg'
 import ImageLogo from '../../../assets/images/logo/app-logo.png'
 
 const Login = () => {
-  // const { login } = useAuthDataService()
   const auth = useAuth()
-  const navigate = useNavigate()
   const [showPass, setShowPass] = useState(false)
   const [ formData, setFormData ] = useState({
     email: "",
     password: ""
   })
+  const [toast, addToast] = useState(0)
+  const toaster = useRef()
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleLogin = async(form) => {
     try {
-      const response = await auth.loginAction(form)
+      setIsLoading(true)
+      await auth.loginAction(form)
       addToast(templateToast("Success", "Welcome!"))
-      // navigate('/')
     } catch (error) {
         if(error.response){
           addToast(templateToast("Error", error.response.data.message))
         }else{
-          console.log("Error :", error)
           addToast(templateToast("Error", error.message))
         }
+    } finally{
+      setIsLoading(false)
     }
   }
 
@@ -68,30 +71,7 @@ const Login = () => {
     }
   }, [])
 
-  const [toast, addToast] = useState(0)
-    const toaster = useRef()
-    const templateToast = (type, msg) => {
-        return(
-            <CToast autohide={true} key={Date.now()}>
-                <CToastHeader closeButton>
-                    <svg
-                    className="rounded me-2 bg-black"
-                    width="20"
-                    height="20"
-                    xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                    role="img"
-                    >
-                    <rect width="100%" height="100%" fill={`${type === 'Error' ? "#e85454" : "#29d93e"}`}></rect>
-                    </svg>
-                    <div className="fw-bold me-auto">{type}</div>
-                    {/* <small>7 min ago</small> */}
-                </CToastHeader>
-                <CToastBody>{msg}</CToastBody>
-            </CToast>
-        )
-    }
+   
 
   return (
     <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
@@ -152,8 +132,8 @@ const Login = () => {
                 
                     <CRow>
                       <CCol xs={6}>
-                        <CButton className="px-4 btn-login" onClick={()=>handleLogin(formData)}>
-                          Login
+                        <CButton disabled={isLoading} className="px-4 btn-login d-flex align-items-center gap-2" onClick={()=>handleLogin(formData)}>
+                          {isLoading && <CSpinner size='sm'/> }Login
                         </CButton>
                       </CCol>
                     </CRow>

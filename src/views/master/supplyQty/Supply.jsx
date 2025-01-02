@@ -38,13 +38,13 @@ import dayjs from 'dayjs';
 import CIcon from '@coreui/icons-react';
 import * as icon from "@coreui/icons";
 
-import GenerateQR from '../../../utils/ReaderQR';
 import QRCode from 'react-qr-code';
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 import useSupplyQtyDataService from '../../../services/SupplyQtyDataService'
 import { useAuth } from '../../../utils/context/authContext';
+import templateToast from '../../../components/ToasterComponent';
 
 const Supply = () => {
     const auth = useAuth()
@@ -79,13 +79,15 @@ const Supply = () => {
         try {
             setLoading(true)
             const response = await getSupplyQtyData('supply-qty')
-
             setSupplyQtyData(response.data.data)
             setFilteredData(response.data.data)
-            setTotalSupplyData(response.data.data.length)
-            
         } catch (error) {
-            addToast(templateToast("Error", error.message))
+            if(error.response){
+                addToast(templateToast("Error", error.response.message))
+            }
+            else{
+                addToast(templateToast("Error", error.message))
+            }
         } finally{
             setLoading(false)
         }
@@ -95,10 +97,9 @@ const Supply = () => {
         try {
             setLoading(true)
             const response = await updateSupplyQtyData('supply-qty', materialNo, body)
-
             getSupplyQty()
             setVisibleModalUpdate(false)
-            addToast(templateToast("Success", `Supply for Material No. ${materialNo} updated`))
+            addToast(templateToast("Success", response.data.message))
         } catch (error) {
             if (error.response) {
                 addToast(templateToast("Error", error.response.data.message));
@@ -118,10 +119,10 @@ const Supply = () => {
     // PAGINATION AND SEARCH
     const [loading, setLoading] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
-    const [totalSupplyData, setTotalSupplyData] = useState(0)
     const [itemPerPage, setItemPerPage] = useState(10)
     const [totalPage, setTotalPage] = useState(0)
-    // const [paginatedData, setPaginatedData] = useState([])
+    const [toast, addToast] = useState(0)
+    const toaster = useRef()
 
     // Handle search functionality
     const [searchQuery, setSearchQuery] = useState({
@@ -159,31 +160,6 @@ const Supply = () => {
     }, [filteredData, itemPerPage]);
 
     const paginatedData = filteredData.slice((currentPage - 1) * itemPerPage, currentPage * itemPerPage);
-
-    const [toast, addToast] = useState(0)
-    const toaster = useRef()
-    const templateToast = (type, msg) => {
-        return(
-            <CToast autohide={true} key={Date.now()}>
-                <CToastHeader closeButton>
-                    <svg
-                    className="rounded me-2 bg-black"
-                    width="20"
-                    height="20"
-                    xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                    role="img"
-                    >
-                    <rect width="100%" height="100%" fill={`${type === 'Error' ? "#e85454" : "#29d93e"}`}></rect>
-                    </svg>
-                    <div className="fw-bold me-auto">{type}</div>
-                    {/* <small>7 min ago</small> */}
-                </CToastHeader>
-                <CToastBody>{msg}</CToastBody>
-            </CToast>
-        )
-    }
 
     const renderModalUpdate = () =>{
         return(
@@ -395,10 +371,10 @@ const Supply = () => {
                         <CCol className='d-flex align-items-center gap-2 col-sm-8 col-xl-6'>
                             <CDropdown className='dropdown-search d-flex justify-content-between'>
                                 <CDropdownToggle width={400} className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
-                                <CDropdownMenu>
-                                    <CDropdownItem onClick={()=>setSearchQuery({ plant: "All"})}>All</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setSearchQuery({ plant: "P1 - Plant 1"})}>P1 - Plant 1</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setSearchQuery({ plant: "P2 - Plant 2"})}>P2 - Plant 2</CDropdownItem>
+                                <CDropdownMenu className='cursor-pointer'>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ plant: "All"})}>All</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ plant: "P1 - Plant 1"})}>P1 - Plant 1</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ plant: "P2 - Plant 2"})}>P2 - Plant 2</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
@@ -462,11 +438,11 @@ const Supply = () => {
                     <CFormLabel htmlFor="size" className='col-form-label' >Size</CFormLabel>
                     <CDropdown>
                         <CDropdownToggle color="white">{itemPerPage}</CDropdownToggle>
-                        <CDropdownMenu>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
+                        <CDropdownMenu className='cursor-pointer'>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
                         </CDropdownMenu>
                     </CDropdown>
                 </CCol>

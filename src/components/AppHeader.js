@@ -70,14 +70,14 @@ const AppHeader = () => {
         </CHeaderNav>
         <CHeaderNav className="ms-auto">
           <CNavItem>
-            <CNavLink className="">
+            <CNavLink className="" style={{ textDecoration: 'none' }}>
               {dateState.toLocaleString('en-US', {
                 dateStyle: 'full',
               })}
             </CNavLink>
           </CNavItem>
           <CNavItem>
-            <CNavLink className="">
+            <CNavLink className="" style={{ textDecoration: 'none' }}>
               {dateState.toLocaleString('en-US', {
                 hour: 'numeric',
                 minute: 'numeric',

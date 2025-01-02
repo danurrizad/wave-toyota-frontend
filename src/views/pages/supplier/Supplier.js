@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import useHistoryDataService from '../../../services/HistoryDataService'
 import useSupplyQtyDataService from '../../../services/SupplyQtyDataService'
 import HeaderSupplier from '../../../components/header/HeaderSupplier'
+import templateToast from '../../../components/ToasterComponent'
 
 import { 
     CTable, 
@@ -15,7 +16,6 @@ import {
     CRow, 
     CCol, 
     CInputGroup, 
-    CInputGroupText, 
     CFormInput,
     CDropdown,
     CDropdownToggle,
@@ -26,19 +26,13 @@ import {
     CButton,
     CPagination,
     CPaginationItem,
-    CFormText,
     CModal,
     CModalTitle,
     CModalHeader,
     CModalBody,
-    CModalContent,
     CModalFooter,
     CSpinner,
     CToaster,
-    CToast,
-    CToastHeader,
-    CToastBody,
-    CLink
   } from '@coreui/react'
 
 import CIcon from '@coreui/icons-react';
@@ -120,6 +114,8 @@ function Supplying() {
     materialNo:"",
     plant: "All"
   })
+  const [toast, addToast] = useState(0)
+  const toaster = useRef()
 
   const optionsMaterialDesc = Array.from(
     new Map(
@@ -276,10 +272,10 @@ function Supplying() {
         </CModal>
         {/* End of Modal Update */}
         </CContainer>
-    )
-}
+      )
+    }
 
-{/* Start of Modal Scanner */}
+    {/* Start of Modal Scanner */}
     const renderModalScanner = () => {
         return(
             <CContainer>
@@ -298,31 +294,7 @@ function Supplying() {
         </CContainer>
         )
     }
-
-    const [toast, addToast] = useState(0)
-    const toaster = useRef()
-    const templateToast = (type, msg) => {
-        return(
-            <CToast autohide={true} key={Date.now()}>
-                <CToastHeader closeButton>
-                    <svg
-                    className="rounded me-2 bg-black"
-                    width="20"
-                    height="20"
-                    xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                    role="img"
-                    >
-                    <rect width="100%" height="100%" fill={`${type === 'Error' ? "#e85454" : "#29d93e"}`}></rect>
-                    </svg>
-                    <div className="fw-bold me-auto">{type}</div>
-                    {/* <small>7 min ago</small> */}
-                </CToastHeader>
-                <CToastBody>{msg}</CToastBody>
-            </CToast>
-        )
-}
+    
 
   useEffect(() => {
     document.title = "Andon Visualization - Supplier"; // Set the document title
@@ -370,9 +342,9 @@ function Supplying() {
                         <CDropdown className='dropdown-search d-flex justify-content-between'>
                             <CDropdownToggle width={400} className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
                             <CDropdownMenu className='cursor-pointer'>
-                                <CDropdownItem className="active:bg-black focus:bg-black" onClick={() => setSearchQuery({ ...searchQuery, plant: "All" })}>All</CDropdownItem>
-                                <CDropdownItem className="active:bg-black focus:bg-black" onClick={() => setSearchQuery({ ...searchQuery, plant: "P1 - PLANT 1" })}>P1 - PLANT 1</CDropdownItem>
-                                <CDropdownItem className="active:bg-black focus:bg-black" onClick={() => setSearchQuery({ ...searchQuery, plant: "P2 - PLANT 2" })}>P2 - PLANT 2</CDropdownItem>
+                                <CDropdownItem style={{ textDecoration: "none" }} className="active:bg-black focus:bg-black" onClick={() => setSearchQuery({ ...searchQuery, plant: "All" })}>All</CDropdownItem>
+                                <CDropdownItem style={{ textDecoration: "none" }} className="active:bg-black focus:bg-black" onClick={() => setSearchQuery({ ...searchQuery, plant: "P1 - PLANT 1" })}>P1 - PLANT 1</CDropdownItem>
+                                <CDropdownItem style={{ textDecoration: "none" }} className="active:bg-black focus:bg-black" onClick={() => setSearchQuery({ ...searchQuery, plant: "P2 - PLANT 2" })}>P2 - PLANT 2</CDropdownItem>
                             </CDropdownMenu>
                         </CDropdown>
                     </CCol>
@@ -432,14 +404,11 @@ function Supplying() {
                 <CFormLabel htmlFor="size" className='col-form-label' >Size</CFormLabel>
                 <CDropdown>
                     <CDropdownToggle color="white">{itemPerPage}</CDropdownToggle>
-                    <CDropdownMenu>
-                        <CDropdownItem onClick={() => handleSetItemPerPage(1)}>1</CDropdownItem>
-                        <CDropdownItem onClick={() => handleSetItemPerPage(2)}>2</CDropdownItem>
-                        <CDropdownItem onClick={() => handleSetItemPerPage(3)}>3</CDropdownItem>
-                        <CDropdownItem onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
-                        <CDropdownItem onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
-                        <CDropdownItem onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
-                        <CDropdownItem onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
+                    <CDropdownMenu className='cursor-pointer'>
+                        <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
+                        <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
+                        <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
+                        <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
                     </CDropdownMenu>
                 </CDropdown>
             </CCol>

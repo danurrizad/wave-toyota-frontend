@@ -18,6 +18,10 @@
     height: 100%;
 }
 
+.sidebar-title:hover, .sidebar-title:active, .sidebar-title:focus{
+    color: white;
+}
+
 @media (max-width: 1400px)  {
     .image-dashboard{
         width: 50% !important;

@@ -15,6 +15,7 @@ const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("site") || "");
   const [errMsg, setErrMsg] = useState("")
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [statusLogin, setStatusLogin] = useState("LoggedOut")
   const navigate = useNavigate();
 
 
@@ -49,21 +50,10 @@ const AuthProvider = ({ children }) => {
       setToken(null)
     }
   }
-  // const checkAuth = async () => {
-  //       try {
-  //         const response = await axios.get("/auth/getAuth");
-  //         console.log("Response checkAuth :", response)
-  //         // setUser(response.data.user);
-  //       } catch (error) {
-  //         console.error("Authentication check failed:", error);
-  //         setUser(null);
-  //       }
-  //     };
 
   const loginAction = async (form) => {
     try {
       const response = await login(form);
-
       if (response.data) {
         setToken(response.data.accessToken);
         localStorage.setItem("site", response.data.accessToken);
@@ -73,6 +63,8 @@ const AuthProvider = ({ children }) => {
           setUser(responseToken.data.responseUser.username)
           localStorage.setItem("user", responseToken.data.responseUser.username)
           setIsAuthenticated(true)
+          localStorage.setItem("status", "Success")
+          setStatusLogin("Success")
           navigate("/");
         }
 
@@ -94,7 +86,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, isAuthenticated, errMsg, loginAction, logOut }}>
+    <AuthContext.Provider value={{ token, user, isAuthenticated, errMsg, statusLogin, loginAction, logOut }}>
       {children}
     </AuthContext.Provider>
   );

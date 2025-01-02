@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { 
     CTable, 
     CTableHead, 
@@ -8,10 +8,7 @@ import {
     CTableHeaderCell, 
     CTableDataCell, 
     CRow, 
-    CCol, 
-    CInputGroup, 
-    CInputGroupText, 
-    CFormInput,
+    CCol,
     CDropdown,
     CDropdownToggle,
     CDropdownMenu,
@@ -21,11 +18,10 @@ import {
     CButton,
     CPagination,
     CPaginationItem,
-    CFormText,
+    CToaster
   } from '@coreui/react'
 
 import dayjs from 'dayjs';
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import * as XLSX from "xlsx";
@@ -34,23 +30,18 @@ import { DateRangePicker } from 'rsuite'
 import Select from 'react-select'
 
 import useHistoryDataService from './../../../services/HistoryDataService';
-import useSetupDataService from '../../../services/SetupDataService';
-import useGentaniDataService from '../../../services/GentaniDataService';
+import templateToast from '../../../components/ToasterComponent';
 
-import { parseISO, isWithinInterval, format } from "date-fns";
+import { parseISO } from "date-fns";
 
 const Consumption = () => {
-  const [period, setPeriod] = useState(null);
+  const [period, setPeriod] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [toast, addToast] = useState(0)
+  const toaster = useRef()
 
   const [consumptionData, setConsumptionData] = useState([])
-  const [ setupData, setSetupData ] = useState([])
-  const [ gentaniData, setGentaniData ] = useState([])
-  
-
-  const {getConsumptionHistory, createConsumptionHistory} = useHistoryDataService()
-  const { getSetupData } = useSetupDataService()
-  const { getGentaniData } = useGentaniDataService()
+  const {getConsumptionHistory} = useHistoryDataService()
 
   const getConsumption = async() => {
     try {
@@ -58,44 +49,17 @@ const Consumption = () => {
         setConsumptionData(response.data.data)
         setFilteredData(response.data.data)
     } catch (error) {
-        console.log(error)
-    }
-  }
-
-  const getSetup = async() => {
-    try {
-        const response = await getSetupData('setup')
-        setSetupData(response.data.data)
-
-    } catch (error) {
-        console.log(error)
         if(error.response){
-
-        } else{
-
+            addToast(templateToast("Error", error.response.message))
+        }
+        else{
+            addToast(templateToast("Error", error.response.message))
         }
     }
   }
-
-  const getGentani = async() =>{
-    try {
-        const response = await getGentaniData('gentani')
-        setGentaniData(response.data)
-    } catch (error) {
-        console.log("ERROR GENTANI :", error)
-        if(error.response){
-
-        } else{
-
-        }
-    }
-  }
-
 
   useEffect(()=>{
     getConsumption()
-    getSetup()
-    getGentani()
   }, [])
 
 
@@ -243,6 +207,9 @@ const Consumption = () => {
   return (
     <>
         <CContainer fluid >
+            {/* Toast */}
+            <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
+
             <CRow >
                 <CCol xl={4} xs={12} >
                     <CRow className=''>
@@ -335,11 +302,11 @@ const Consumption = () => {
                     <CFormLabel htmlFor="size" className='col-form-label' >Size</CFormLabel>
                     <CDropdown>
                         <CDropdownToggle color="white">{itemPerPage}</CDropdownToggle>
-                        <CDropdownMenu>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
+                        <CDropdownMenu className='cursor-pointer'>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
+                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
                         </CDropdownMenu>
                     </CDropdown>
                 </CCol>
