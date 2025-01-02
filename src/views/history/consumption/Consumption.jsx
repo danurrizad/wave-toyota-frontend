@@ -18,7 +18,8 @@ import {
     CButton,
     CPagination,
     CPaginationItem,
-    CToaster
+    CToaster,
+    CSpinner
   } from '@coreui/react'
 
 import dayjs from 'dayjs';
@@ -45,6 +46,7 @@ const Consumption = () => {
 
   const getConsumption = async() => {
     try {
+        setLoading(true)
         const response = await getConsumptionHistory()
         setConsumptionData(response.data.data)
         setFilteredData(response.data.data)
@@ -55,6 +57,8 @@ const Consumption = () => {
         else{
             addToast(templateToast("Error", error.response.message))
         }
+    } finally{
+        setLoading(false)
     }
   }
 
@@ -207,6 +211,9 @@ const Consumption = () => {
   return (
     <>
         <CContainer fluid >
+            {/* Loading Spinner */}
+            { loading && <div className="loading"><CSpinner /></div>}
+
             {/* Toast */}
             <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
 
@@ -215,7 +222,7 @@ const Consumption = () => {
                     <CRow className=''>
                         <CFormLabel htmlFor="plant" className='col-form-label col-xl-2 col-md-2 col-3'>Material</CFormLabel>
                         <CCol className="d-flex align-items-center justify-content-start gap-2 col-xl-9 col-9 col-md-10">
-                            <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
+                            <Select noOptionsMessage={() =>  "No material found" } options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol>
@@ -291,7 +298,8 @@ const Consumption = () => {
                             } )}
                         </CTableBody>
                     </CTable>
-                    {paginatedData.length === 0 && <h2 className='text-center py-4'>No consumption history</h2>}
+                    {paginatedData.length === 0 && !loading && <h2 className='text-center py-4'>No consumption history</h2>}
+                    {loading && <h2 className='text-center py-4'>...</h2>}
                 </CCol>
             </CRow>
             <CRow>

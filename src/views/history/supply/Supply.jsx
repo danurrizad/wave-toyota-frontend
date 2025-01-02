@@ -19,6 +19,7 @@ import {
     CPagination,
     CPaginationItem,
     CToaster,
+    CSpinner,
   } from '@coreui/react'
 
 import dayjs from 'dayjs';
@@ -36,6 +37,7 @@ import { DateRangePicker } from 'rsuite'
 import Select from 'react-select'
 
 const Supply = () => {
+  const [ loading, setLoading ] = useState(false)
   const [period, setPeriod] = useState(null);
 
   const { getSupplyHistory } = useHistoryDataService()
@@ -48,6 +50,7 @@ const Supply = () => {
 
   const getSupplyHistoryData = async() => {
     try {
+        setLoading(true)
         const response = await getSupplyHistory()
         setSupplyHistoryData(response.data.data)
         setFilteredData(response.data.data)
@@ -58,11 +61,14 @@ const Supply = () => {
         else{
             addToast(templateToast("Error", error.message))
         }
+    } finally {
+        setLoading(false)
     }
   }
 
   const getMaterial = async() => {
     try {
+        setLoading(true)
         const response = await getMaterialData('material')
         setMaterialData(response.data)
     } catch (error) {
@@ -72,6 +78,8 @@ const Supply = () => {
         else{
             addToast(templateToast("Error", error.message))
         }
+    } finally {
+        setLoading(false)
     }
   }
 
@@ -217,6 +225,9 @@ const Supply = () => {
     <>
         <CContainer fluid >
 
+        {/* Loading Spinner */}
+        { loading && <div className="loading"><CSpinner /></div>}
+
         {/* Toast */}
         <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
 
@@ -225,7 +236,7 @@ const Supply = () => {
                 <CRow className=''>
                     <CFormLabel htmlFor="plant" className='col-form-label col-xl-2 col-md-2 col-3' >Material</CFormLabel>
                     <CCol className="d-flex align-items-center justify-content-start gap-2 col-xl-9 col-9 col-md-10">
-                        <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
+                        <Select noOptionsMessage={() =>  "No material found" } options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                     </CCol>
                 </CRow>
             </CCol>
@@ -287,7 +298,8 @@ const Supply = () => {
                             } )}
                         </CTableBody>
                     </CTable>
-                    {paginatedData.length === 0 && <h2 className='text-center py-4'>No supply history</h2>}
+                    {paginatedData.length === 0 && !loading && <h2 className='text-center py-4'>No supply history</h2>}
+                    {loading && <h2 className='text-center py-4'>...</h2>}
                 </CCol>
             </CRow>
             <CRow>

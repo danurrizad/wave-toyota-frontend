@@ -294,7 +294,8 @@ const Setup = () => {
                             } )}
                         </CTableBody>
                     </CTable>
-                    {paginatedData?.length === 0 && <h2 className='text-center py-4'>No setup data found!</h2>}
+                    {paginatedData?.length === 0 && !loading && <h2 className='text-center py-4'>No setup data found!</h2>}
+                    {loading && <h2 className='text-center py-4'>...</h2>}
                 </CCol>
             </CRow>
             <CRow>

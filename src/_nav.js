@@ -1,20 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilLaptop, cilHistory, cilMonitor, cilAccountLogout } from '@coreui/icons'
-import {
-  cilBell,
-  cilCalculator,
-  cilChartPie,
-  cilCursor,
-  cilDescription,
-  cilDrop,
-  cilExternalLink,
-  cilNotes,
-  cilPencil,
-  cilPuzzle,
-  cilSpeedometer,
-  cilStar,
-} from '@coreui/icons'
+import { cilLaptop, cilHistory, cilMonitor, cilBarcode, cilSpeedometer } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const _nav = [
@@ -92,27 +78,17 @@ const _nav = [
         name: 'Visualization',
         to: '/visualization',
       },
-      // {
-      //   component: CNavItem,
-      //   name: 'Visualization 1',
-      //   to: '/visualization/1',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Visualization 2',
-      //   to: '/visualization/2',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Visualization 3',
-      //   to: '/visualization/3',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Visualization 4',
-      //   to: '/visualization/4',
-      // },
     ],
+  },
+  {
+    component: CNavTitle,
+    name: 'SUPPLIER',
+  },
+  {
+    component: CNavItem,
+    icon: <CIcon icon={cilBarcode} customClassName="nav-icon" />,
+    name: 'Supplier Page',
+    to: '/supplier',
   },
   // {
   //   component: CNavTitle,
@@ -122,7 +98,7 @@ const _nav = [
   //   component: CNavItem,
   //   icon: <CIcon icon={cilAccountLogout} customClassName="nav-icon" />,
   //   name: 'Logout',
-  //   to: '/login',
+  //   onclick: handleLogout(),
   // },
 ]
 

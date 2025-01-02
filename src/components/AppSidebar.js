@@ -1,15 +1,23 @@
 /* eslint-disable prettier/prettier */
-import React from 'react'
+import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CButton,
   CButtonGroup,
   CCloseButton,
+  CCol,
   CHeaderText,
   CImage,
+  CModal,
+  CModalBody,
+  CModalFooter,
+  CModalHeader,
+  CModalTitle,
   CNavbarNav,
   CNavbarText,
+  CNavGroup,
   CNavItem,
+  CRow,
   CSidebar,
   CSidebarBrand,
   CSidebarFooter,
@@ -40,6 +48,8 @@ const AppSidebar = () => {
     auth.logOut()
   }
 
+  const [visibleModalLogout, setVisibleModalLogout] = useState(false)
+
   return (
     <CSidebar
       className="border-end"
@@ -51,6 +61,33 @@ const AppSidebar = () => {
         dispatch({ type: 'set', sidebarShow: visible })
       }}
     >
+      {/* Start of Modal Delete */}
+      <CModal
+          backdrop="static"
+          visible={visibleModalLogout}
+          onClose={() => setVisibleModalLogout(false)}
+          aria-labelledby="Logout"
+          >
+          <CModalHeader>
+              <CModalTitle id="Logout">Logout</CModalTitle>
+          </CModalHeader>
+          <CModalBody>
+              <CRow>
+                  <CCol>
+                      <p>Are you sure want to logout?</p>
+                      
+                  </CCol>
+              </CRow>
+          </CModalBody>
+          <CModalFooter>
+              <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalLogout(false)}>
+              Close
+              </CButton>
+              <CButton className='btn-add-master' onClick={()=>handleLogout()}>Yes</CButton>
+          </CModalFooter>
+      </CModal>
+      {/* End of Modal Delete */}
+
       <CSidebarHeader className="border-bottom">
         <CSidebarBrand href='/' className='sidebar-title' style={{textDecoration: "none", textDecorationStyle: "none"}}>
           <CImage className="sidebar-narrow" src={ImageLogo} style={{width: "24px"}}/>
@@ -66,15 +103,28 @@ const AppSidebar = () => {
           onClick={() => dispatch({ type: 'set', sidebarShow: false })}
         />
       </CSidebarHeader>
+      
       <AppSidebarNav items={navigation} />
-      <CSidebarHeader>
+
+      {/* <CSidebarHeader className='p-0'>
         <CSidebarNav>
-          <CButtonGroup className='btn-group-logout' style={{backgroundColor: "black", cursor: "pointer"}} onClick={()=>handleLogout()}>
-            <CIcon className='sidebar-narrow' icon={cilAccountLogout}/>
-            <CButton className='btn-logout sidebar-brand-full'>Logout</CButton>
+          <CNavGroup className='btn-group-logout px-3' style={{ cursor: "pointer", width: "100%"}} onClick={()=>handleLogout()}>
+            <CIcon className='icon-logout' icon={cilAccountLogout} style={{backgroundColor: "red", width: "10%"}}/>
+            <CButton className='btn-logout' style={{backgroundColor: "green", width: "10px"}}>Logout</CButton>
+          </CNavGroup>
+        </CSidebarNav>
+      </CSidebarHeader> */}
+      
+      <CSidebarHeader className='p-0'>
+        <CSidebarNav>
+          <CButtonGroup className='btn-group-logout px-3' style={{ cursor: "pointer"}} onClick={()=>setVisibleModalLogout(true)}>
+            <CIcon className='icon-logout' icon={cilAccountLogout}/>
+            <CButton className='btn-logout sidebar-brand-full' style={{ textDecoration: "none", border: "0"}}>Logout</CButton>
           </CButtonGroup>
         </CSidebarNav>
       </CSidebarHeader>
+
+
       {/* <AppSidebarNav items={navigation} /> */}
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler

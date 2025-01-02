@@ -319,7 +319,7 @@ function Supplying() {
 
         <CRow className='py-4 d-flex align-items-start'>
             <CCol className='text-center'>
-                <h1>Master Supply Quantity</h1>
+                <h1>Master Supplier Material</h1>
                 <h6>Input quantity to supply material</h6>
             </CCol>
         </CRow>
@@ -330,7 +330,7 @@ function Supplying() {
                     <CFormLabel htmlFor="materialDesc" className='col-xl-2 col-form-label col-md-3'>Material</CFormLabel>
                     <CCol className="d-flex align-items-center justify-content-start gap-2" >
                         {/* <CFormInput type="text" id="materialDesc" value={searchQuery.materialDescOrNo} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e.target.value })} /> */}
-                        <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
+                        <Select noOptionsMessage={() =>  "No material found" } options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                     </CCol>
                 </CRow>
             </CCol>
@@ -393,7 +393,8 @@ function Supplying() {
                 })}
             </CTableBody>
         </CTable>
-        { paginatedData.length === 0 && <h2 className='text-center py-4'>No material found!</h2>}
+        { paginatedData.length === 0 && !loading && <h2 className='text-center py-4'>No material found!</h2>}
+        { loading && <h2 className='text-center py-4'>...</h2>}
        </CRow>
 
        <CRow>

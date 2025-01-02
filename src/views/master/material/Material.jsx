@@ -463,7 +463,7 @@ const Material = () => {
                     <CRow className="mb-3">
                         <CFormLabel htmlFor="materialDesc" className='col-form-label col-xl-12 col-lg-12 col-md-12 col-sm-2'>Material</CFormLabel>
                         <CCol className="d-flex align-items-center justify-content-start gap-2 col-xl-11 col-md-11">
-                            <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
+                            <Select noOptionsMessage={() =>  "No material found" } options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol>
@@ -471,7 +471,7 @@ const Material = () => {
                     <CRow className="mb-3">
                         <CFormLabel htmlFor="supplyLine" className="col-form-label col-xl-12 col-lg-12 col-md-12 col-sm-2">Supply Line</CFormLabel>
                         <CCol className='d-flex align-items-center justify-content-end gap-2 col-xl-11 col-lg-11'>
-                            <Select options={optionsSupplyLine} placeholder="All" isClearable value={optionsSupplyLine.find((option) => option.value === searchQuery.supplyLine) || null} onChange={(e) => setSearchQuery({ ...searchQuery, supplyLine: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
+                            <Select noOptionsMessage={() =>  "No supply line found" } options={optionsSupplyLine} placeholder="All" isClearable value={optionsSupplyLine.find((option) => option.value === searchQuery.supplyLine) || null} onChange={(e) => setSearchQuery({ ...searchQuery, supplyLine: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol>
@@ -548,7 +548,8 @@ const Material = () => {
                         </CTableBody>
                     </CTable>
                 </CCol>
-                    {paginatedData?.length === 0 && <h2 className='text-center py-4'>No material data found!</h2>}
+                    {paginatedData?.length === 0 && !loading && <h2 className='text-center py-4'>No material data found!</h2>}
+                    {loading && <h2 className='text-center py-4'>...</h2>}
             </CRow>
 
             {/* Pagination */}

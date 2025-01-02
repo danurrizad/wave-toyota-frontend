@@ -542,6 +542,7 @@ const Gentani = () => {
                         <CFormLabel className="col-sm-4 col-form-label">Material No<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <Select 
+                                noOptionsMessage={() =>  "No material found" }
                                 options={optionsMaterialDesc} 
                                 placeholder="Select" 
                                 // isClearable 
@@ -722,7 +723,7 @@ const Gentani = () => {
                         <CFormLabel htmlFor="supplyLine" className="col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ">Material</CFormLabel>
                         <CCol className='d-flex align-items-center justify-content-start gap-2 col-xxl-10 col-xl-10 col-lg-11 col-md-12'>
                             {/* <CFormInput type="text" id="supplyLine" value={searchQuery.materialDescOrNo} onChange={(e)=>setSearchQuery((prev)=>({ ...prev, materialDescOrNo: e.target.value}))}/> */}
-                            <Select options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100 cursor-pointer' styles={colorStyles}/>
+                            <Select noOptionsMessage={() =>  "No material found" } options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100 cursor-pointer' styles={colorStyles}/>
                             
                         </CCol>
                     </CRow>
@@ -806,7 +807,8 @@ const Gentani = () => {
                         </CTableBody>
                     </CTable>
                 </CCol>
-                    {paginatedData?.length === 0 && <h2 className='text-center py-4'>No gentani data found!</h2>}
+                    {paginatedData?.length === 0 && !loading && <h2 className='text-center py-4'>No gentani data found!</h2>}
+                    {loading && <h2 className='text-center py-4'>...</h2>}
             </CRow>
             <CRow>
                 <CCol xs={8} xl={6} className='d-flex align-items-end'>
