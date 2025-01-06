@@ -133,11 +133,11 @@ const Supply = () => {
     };
 
   const handleSearch = () => {
-    const { materialDescOrNo } = searchQuery;
+    const { materialDescOrNo, plant } = searchQuery;
   
     const filtered = supplyHistoryData.filter((supply) => {
       const matchesDescorNo = supply.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase()) || supply.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase());
-    //   const matchesPlant = plant === "All" || supply.plant.toLowerCase().includes(plant.toLowerCase());
+      const matchesPlant = plant === "All" || supply?.plant?.toLowerCase().includes(plant.toLowerCase());
   
       // Parse the consumption_date and filter by date range
       const supplyDate = parseISO(supply.supply_date);
@@ -150,7 +150,7 @@ const Supply = () => {
         (!fromDate || supplyDate >= fromDate) &&
         (!toDate || supplyDate <= toDate);
   
-      return matchesDescorNo && withinDateRange;
+      return matchesDescorNo && withinDateRange && matchesPlant;
     });
   
     setFilteredData(filtered);
@@ -159,7 +159,7 @@ const Supply = () => {
   };
 
   const handleClearSearch = () => {
-    setSearchQuery({ materialDescOrNo: "", plant: ""})
+    setSearchQuery({ materialDescOrNo: "", plant: "All"})
     setPeriod(null)
     setFilteredData(supplyHistoryData)
     setTotalPage(Math.ceil(supplyHistoryData.length / itemPerPage))
@@ -232,20 +232,33 @@ const Supply = () => {
         <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
 
         <CRow>
-            <CCol xl={4} xs={12}>
-                <CRow className=''>
-                    <CFormLabel htmlFor="plant" className='col-form-label col-xl-2 col-md-2 col-3' >Material</CFormLabel>
-                    <CCol className="d-flex align-items-center justify-content-start gap-2 col-xl-9 col-9 col-md-10">
+            <CCol xl={3} sm={6} xs={12}>
+                <CRow className='mb-3'>
+                    <CFormLabel htmlFor="plant" className='col-form-label col-xxl-12 col-md-2 col-3' >Material</CFormLabel>
+                    <CCol className="d-flex align-items-center justify-content-start gap-2 col-xxl-11 col-12 col-md-11">
                         <Select noOptionsMessage={() =>  "No material found" } options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                     </CCol>
                 </CRow>
             </CCol>
-            <CCol xl={8} xs={12}>
-                <CRow className='mb-3 pt-xl-0 pt-3'>
-                    <CCol xl={1} xs={3} md={2} sm={3}>
-                        <CFormLabel className="col-xs-2 col-form-label">Period</CFormLabel>
+            <CCol xl={3} md={6} sm={6} xs={12} >
+                <CRow className='mb-3'>
+                    <CFormLabel htmlFor="plant" className='col-form-label col-sm-12 col-xxl-12' >Plant</CFormLabel>
+                    <CCol className='d-flex align-items-center gap-2 col-xxl-11 col-12 col-md-12'>
+                        <CDropdown className='dropdown-search d-flex justify-content-between'>
+                            <CDropdownToggle width={400} className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
+                            <CDropdownMenu className='cursor-pointer'>
+                                <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, plant: "All"})}>All</CDropdownItem>
+                                <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, plant: "P1 - PLANT 1"})}>P1 - Plant 1</CDropdownItem>
+                                <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, plant: "P2 - PLANT 2"})}>P2 - Plant 2</CDropdownItem>
+                            </CDropdownMenu>
+                        </CDropdown>
                     </CCol>
-                    <CCol xl={8} xs={9} md={8} sm={5}>
+                </CRow>
+            </CCol>
+            <CCol xl={6} md={12} sm={12} xs={12}>
+                <CRow className='mb-3 pt-xl-0 pt-3'>
+                    <CFormLabel className="col-form-label col-xxl-12">Period</CFormLabel>
+                    <CCol xl={8} xs={9} md={6} sm={6}>
                         <DateRangePicker 
                             placeholder="Select date period"
                             value={period}
@@ -253,7 +266,7 @@ const Supply = () => {
                             format="MMMM dd, yyyy" 
                         />
                     </CCol>
-                    <CCol xl={3} xs={12} md={2} sm={4}>
+                    <CCol xl={4} md={6} sm={6} xs={12}>
                         <CRow className='mb-xl-3 mb-md-3 mb-0 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-0 mt-3'>
                             <CCol className="d-flex justify-content-end gap-2 col-sm-12 col-xl-12 col-md-12">
                                 <CButton className='btn-search' onClick={()=>handleSearch()}>Search</CButton>
@@ -272,25 +285,34 @@ const Supply = () => {
             <CRow>
                 <CCol className='py-4 text-table-small'>
                     <CTable bordered striped>
-                        <CTableHead>
+                        <CTableHead style={{ verticalAlign: "middle", textAlign: "center" }}>
                             <CTableRow color="dark">
-                                <CTableHeaderCell scope="col" className='text-center'>No</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Supply By</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Supply Date</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Supply Time</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2} className='text-center'>No</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2} align='left'>Material No</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2}>Material Desc</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2}>Plant</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2}>Supply By</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" colSpan={2} className='text-center'>Supply Qty</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2}>Supply Date</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2}>Supply Time</CTableHeaderCell>
+                            </CTableRow>
+                            <CTableRow color="dark">
+                                <CTableHeaderCell scope="col">By Pack</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">By Uom</CTableHeaderCell>
                             </CTableRow>
                         </CTableHead>
                         <CTableBody>
                         { paginatedData && paginatedData.map((supply, index) => {
                             const time = new Date(supply.supply_time).toISOString().split('T')[1].split('.')[0]
                                 return(
-                                    <CTableRow key={index}>
+                                    <CTableRow key={index} style={{ verticalAlign: "middle" }} >
                                         <CTableDataCell className='text-center'>{index+1}</CTableDataCell>
                                         <CTableDataCell>{supply.material_no}</CTableDataCell>
                                         <CTableDataCell>{supply.material_desc}</CTableDataCell>
+                                        <CTableDataCell>{supply.plant}</CTableDataCell>
                                         <CTableDataCell>{supply.supply_by}</CTableDataCell>
+                                        <CTableDataCell>{supply.qty_pack}</CTableDataCell>
+                                        <CTableDataCell>{supply.qty_uom}</CTableDataCell>
                                         <CTableDataCell>{supply.supply_date}</CTableDataCell>
                                         <CTableDataCell>{time}</CTableDataCell>
                                     </CTableRow>

@@ -50,7 +50,9 @@ function Supplying() {
         material_desc: "",
         plant: "",
         uom: "",
-        qty: 0,
+        pack: "",
+        qty_pack: 1,
+        qty_uom: 0,
         supply_by: ""
     })
     const [defaultQty, setDefaultQty] = useState(0)
@@ -93,12 +95,13 @@ function Supplying() {
     }
   }
 
-
     // Handler for when the input loses focus
   const handleBlur = () => {
     // Round the value to the nearest step
-    const adjustedValue = Math.ceil(formData.qty / defaultQty) * defaultQty;
-    setFormData({...formData, qty: adjustedValue});
+    
+    const adjustedValuePack = Math.ceil(formData.qty_pack / 1) * 1;
+    const adjustedValueUom = Math.ceil(formData.qty_uom / defaultQty) * defaultQty;
+    setFormData({...formData, qty_pack: adjustedValuePack, qty_uom: adjustedValueUom});
   };
   
   useEffect(()=>{
@@ -193,10 +196,60 @@ function Supplying() {
         material_desc: data.material_desc,
         plant: data.plant,
         uom: data.uom,
-        qty: data.qty,
+        pack: data.pack,
+        qty_pack: 1,
+        qty_uom: data.qty,
         supply_by: ""
     })
     setDefaultQty(data.qty)
+  }
+
+  const handleChangeQtyPack = (e) => {
+    setFormData({
+        ...formData,
+        qty_pack: e.target.value,
+        qty_uom: defaultQty * e.target.value
+    })
+  }
+  const handleChangeQtyUom = (e) => {
+    setFormData({
+        ...formData,
+        qty_uom: e.target.value,
+        qty_pack: Math.ceil(e.target.value / defaultQty)
+    })
+  }
+
+  const handleClickQtyPack = (upOrDown) => {
+    if(upOrDown === "up"){
+        setFormData({
+            ...formData, 
+            qty_pack: formData.qty_pack + 1, 
+            qty_uom: defaultQty * (formData.qty_pack + 1)
+        })
+    } else if(upOrDown === "down"){
+        setFormData({
+            ...formData, 
+            qty_pack: formData.qty_pack - 1 < 0 ? 0 : formData.qty_pack - 1, 
+            qty_uom: defaultQty * (formData.qty_pack - 1) < 0 ? 0 : defaultQty * (formData.qty_pack - 1)
+        })
+    }
+  }
+
+  const handleClickQtyUom = (upOrDown) => {
+    if(upOrDown === "up"){
+        setFormData({
+            ...formData, 
+            qty_uom: formData.qty_uom + defaultQty, 
+            qty_pack: Math.ceil( (formData.qty_uom + defaultQty) / defaultQty) 
+        })
+    }
+    else if (upOrDown === "down"){
+        setFormData({
+            ...formData, 
+            qty_uom: formData.qty_uom - defaultQty < 0 ? 0 : formData.qty_uom - defaultQty,
+            qty_pack: Math.ceil( (formData.qty_uom - defaultQty) / defaultQty) < 0 ? 0 : Math.ceil( (formData.qty_uom - defaultQty) / defaultQty),
+        })
+    }
   }
 
 
@@ -245,15 +298,42 @@ function Supplying() {
                     </CCol>
                 </CRow>
                 <CRow className="mb-3">
-                    <CFormLabel htmlFor="qty" className="col-sm-4 col-form-label">Quantity<span style={{color: "red"}}>*</span></CFormLabel>
+                    <CFormLabel htmlFor="uom" className="col-sm-4 col-form-label">Pack</CFormLabel>
                     <CCol sm={8}>
+                        <CFormInput type="text" id="uom" disabled value={formData.pack || ""}/>
+                    </CCol>
+                </CRow>
+                <CRow className="mb-">
+                    <CFormLabel htmlFor="qty" className="col-sm-4 col-form-label">Quantity</CFormLabel>
+                </CRow>
+                <CRow className="mb-3">
+                    <CFormLabel htmlFor="qty_pack" className="col-sm-4 col-form-label">By Pack<span style={{color: "red"}}>*</span></CFormLabel>
+                    <CCol sm={6}>
                         <CInputGroup>
-                            <CFormInput type="number" id="qty" step={defaultQty} value={formData.qty} onBlur={handleBlur} onChange={(e) => setFormData({...formData, qty: e.target.value})}/>
+                            <CFormInput type="number" id="qty_pack" step={1} value={formData.qty_pack} onBlur={handleBlur} onChange={handleChangeQtyPack}/>
                             <div className='d-flex flex-column'>
-                                <button className='btn-number up' onClick={()=>setFormData({...formData, qty: formData.qty+defaultQty})}><CIcon icon={icon.cilCaretTop}/></button>
-                                <button className='btn-number down' onClick={()=>setFormData({...formData, qty: formData.qty - defaultQty < 0 ? 0 : formData.qty-defaultQty})}><CIcon icon={icon.cilCaretBottom}/></button>
+                                <button className='btn-number up' onClick={() => handleClickQtyPack("up")}><CIcon icon={icon.cilCaretTop}/></button>
+                                <button className='btn-number down' onClick={() => handleClickQtyPack("down")}><CIcon icon={icon.cilCaretBottom}/></button>
                             </div>
                         </CInputGroup>
+                    </CCol>
+                    <CCol sm={2}>
+                        <CFormLabel htmlFor="qty" className="col-sm-4 col-form-label">{formData.pack}</CFormLabel>
+                    </CCol>
+                </CRow>
+                <CRow className="mb-3">
+                    <CFormLabel htmlFor="qty" className="col-sm-4 col-form-label">By Uom<span style={{color: "red"}}>*</span></CFormLabel>
+                    <CCol sm={6}>
+                        <CInputGroup>
+                            <CFormInput type="number" id="qty" step={defaultQty} value={formData.qty_uom} onBlur={handleBlur} onChange={handleChangeQtyUom}/>
+                            <div className='d-flex flex-column'>
+                                <button className='btn-number up' onClick={()=>handleClickQtyUom("up")}><CIcon icon={icon.cilCaretTop}/></button>
+                                <button className='btn-number down' onClick={()=>handleClickQtyUom("down")}><CIcon icon={icon.cilCaretBottom}/></button>
+                            </div>
+                        </CInputGroup>
+                    </CCol>
+                    <CCol sm={2}>
+                        <CFormLabel htmlFor="qty" className="col-sm-4 col-form-label">{formData.uom}</CFormLabel>
                     </CCol>
                 </CRow>
                 <CRow className="mb-3">

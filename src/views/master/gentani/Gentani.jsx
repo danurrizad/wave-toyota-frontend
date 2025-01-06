@@ -49,15 +49,17 @@ import useMaterialDataService from './../../../services/MaterialDataService';
 import { useAuth } from '../../../utils/context/authContext';
 
 const Gentani = () => {
-    const {getGentaniData, createGentaniData, createGentaniDataByUpload, updateGentaniData, deleteGentaniData} = useGentaniDataService()
+    const {getGentaniData, createGentaniData, createGentaniDataByUpload, updateGentaniData, deleteGentaniData, getRatioProductionData, updateRatioProductionData} = useGentaniDataService()
     const {getMaterialData} = useMaterialDataService()
     const [ gentaniData, setGentaniData ] = useState([])
     const [ materialData, setMaterialData ] = useState([])
     const [ filteredData, setFilteredData ] = useState([])
+    const [ ratioProdData, setRatioProdData ] = useState([])
 
     const auth = useAuth()
 
     const [visibleModalAdd, setVisibleModalAdd] = useState(false)
+    const [visibleModalRatio, setVisibleModalRatio] = useState(false)
     const [visibleModalUpload, setVisibleModalUpload] = useState(false)
     const [visibleModalUpdate, setVisibleModalUpdate] = useState(false)
     const [visibleModalDelete, setVisibleModalDelete] = useState(false)
@@ -68,10 +70,37 @@ const Gentani = () => {
         material_desc: "",
         plant: "",
         plant2: "",
-        quantity: "",
+        uom: "",
+        quantity_fortuner: 0,
+        quantity_zenix: 0,
+        quantity_innova: 0,
+        quantity_avanza: 0,
+        quantity_yaris: 0,
+        quantity_calya: 0,
         created_by: auth.user,
         updated_by: ""
     })
+
+    const [ formUpdateRatio, setFormUpdateRatio ] = useState({
+        fortuner: 0,
+        zenix: 0,
+        innova: 0,
+        avanza: 0,
+        yaris: 0,
+        calya: 0
+    })
+
+    const handleModalRatio = (data) => {
+        setVisibleModalRatio(true)
+        setFormUpdateRatio({
+            fortuner: data.data[0].fortuner,
+            zenix: data.data[0].zenix,
+            innova: data.data[0].innova,
+            avanza: data.data[0].avanza,
+            yaris: data.data[0].yaris,
+            calya: data.data[0].calya,
+        })
+    }
 
     const [file, setFile] = useState(null)
 
@@ -80,11 +109,18 @@ const Gentani = () => {
     }
 
     const [formUpdateData, setFormUpdateData] = useState({
+        gentani_id: null,
         katashiki: "",
         material_no: "Select",
         material_desc: "",
         plant: "",
-        quantity: "",
+        uom: "",
+        quantity_fortuner: 0,
+        quantity_zenix: 0,
+        quantity_innova: 0,
+        quantity_avanza: 0,
+        quantity_yaris: 0,
+        quantity_calya: 0,
         updated_by: auth.user
     })
 
@@ -98,11 +134,18 @@ const Gentani = () => {
     const handleModalUpdate = (data) => {
         setVisibleModalUpdate(true)
         setFormUpdateData({
+            gentani_id: data.gentani_id,
             katashiki: data.katashiki,
             material_no: data.material_no,
             material_desc: data.material_desc,
             plant: data.plant,
-            quantity: data.quantity,
+            uom: data.uom,
+            quantity_fortuner: data.quantity_fortuner,
+            quantity_zenix: data.quantity_zenix,
+            quantity_innova: data.quantity_innova,
+            quantity_avanza: data.quantity_avanza,
+            quantity_yaris: data.quantity_yaris,
+            quantity_calya: data.quantity_calya,
             updated_by: auth.user
         })
     }
@@ -119,7 +162,6 @@ const Gentani = () => {
 
     const [loading, setLoading] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
-    const [totalGentaniData, setTotalGentaniData] = useState(0)
     const [itemPerPage, setItemPerPage] = useState(10)
     const [totalPage, setTotalPage] = useState(0)
 
@@ -127,7 +169,8 @@ const Gentani = () => {
     const [searchQuery, setSearchQuery] = useState({
         katashiki: "",
         materialDescOrNo: "",
-        plant: "All"
+        plant: "All",
+        unit: "All"
     });
 
     const optionsMaterialDesc= materialData.map((material) => ({
@@ -137,7 +180,7 @@ const Gentani = () => {
         plant2: material.plant2 ? material.plant2 : "",
     }));
     
-    
+    // STYLING FOR SELECT
     const colorStyles = {
         control: (styles, { isFocused }) => ({
             ...styles,
@@ -165,14 +208,18 @@ const Gentani = () => {
     };
 
     const handleSearch = () => {
-        const { katashiki, materialDescOrNo, plant } = searchQuery
+        const { katashiki, materialDescOrNo, plant, unit } = searchQuery
+        console.log("unit query :", unit)
 
         const filtered = gentaniData.filter( gentani => {
             // const matchesKatashiki = !katashiki || gentani.katashiki.toLowerCase() === katashiki.toLowerCase()
             const matchesDescOrNo = gentani.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase()) || gentani.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
-            // const matchesNo = gentani.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
             const matchesPlant = plant === "All" || gentani.plant.toLowerCase().includes(plant.toLowerCase())
-            return matchesDescOrNo && matchesPlant
+            // Dynamically access the property based on `unit`
+            const matchesUnit = unit === "All" || (gentani[`quantity_${unit.toLowerCase()}`] !== undefined && gentani[`quantity_${unit.toLowerCase()}`] !== null &&  gentani[`quantity_${unit.toLowerCase()}`] !== 0);
+
+            console.log("matchesUnit:", matchesUnit)
+            return matchesDescOrNo && matchesPlant && matchesUnit
         })
         
         setFilteredData(filtered)
@@ -181,7 +228,7 @@ const Gentani = () => {
     };
 
     const handleClearSearch = () => {
-        setSearchQuery({ katashiki: "", materialDescOrNo: "", plant: "All"})
+        setSearchQuery({ katashiki: "", materialDescOrNo: "", plant: "All", unit: "All"})
         setFilteredData(gentaniData)
         setTotalPage(Math.ceil(gentaniData.length / itemPerPage))
         setCurrentPage(1)
@@ -192,15 +239,11 @@ const Gentani = () => {
         setCurrentPage(1)
     }
 
-
     useEffect(()=>{
         setTotalPage(Math.ceil(filteredData.length / itemPerPage))
     }, [filteredData, itemPerPage])
 
     const paginatedData = filteredData.slice((currentPage - 1) * itemPerPage, currentPage * itemPerPage)
-    
-
-    
     
     const mergeMaterials = (data) => {
         const grouped = {};
@@ -250,7 +293,23 @@ const Gentani = () => {
 
             setGentaniData(response.data)
             setFilteredData(response.data)
-            setTotalGentaniData(response.data.length)
+            // setTotalGentaniData(response.data.length)
+        } catch (error) {
+            if(error.response){
+                addToast(templateToast("Error", error.response.data.message))
+            } else{
+                addToast(templateToast("Error", error.message))
+            }
+        } finally{
+            setLoading(false)
+        }
+    }
+
+    const getRatioProduction = async() => {
+        try {
+            setLoading(true)
+            const response = await getRatioProductionData('ratio-production')
+            setRatioProdData(response.data)
         } catch (error) {
             if(error.response){
                 addToast(templateToast("Error", error.response.data.message))
@@ -265,6 +324,7 @@ const Gentani = () => {
     useEffect(() => {
         getGentani()
         getMaterial()
+        getRatioProduction()
     }, [])
 
     const handleCreateGentani = async (form) => {
@@ -273,20 +333,25 @@ const Gentani = () => {
           const response = await createGentaniData("gentani", form);
           addToast(templateToast("Success", response.data.message));
           
-          setFormData((prev)=>({...prev, plant: "Select", plant2: "", material_no: "Select", material_desc: ""}))
+          setFormData((prev)=>({
+            ...prev, 
+            plant: "Select", 
+            plant2: "", 
+            uom: "", 
+            material_no: "Select", 
+            material_desc: "", 
+            quantity_fortuner: 0,
+            quantity_zenix: 0,
+            quantity_innova: 0,
+        }))
           setVisibleModalAdd(false)
           getGentani()
       
         } catch (error) {
-
-          // If the error comes from Axios, check the error response
           if (error.response) {
-            console.error("Error Response: ", error);
             addToast(templateToast("Error", error.response.data.message));
           } 
           else {
-            // Fallback for unexpected errors
-            console.error("Unexpected Error: ", error);
             addToast(templateToast("Error", "An unexpected error occurred."));
           }
         } finally{
@@ -312,7 +377,7 @@ const Gentani = () => {
     
                 // Convert the first worksheet to JSON
                 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: null });
     
                 // Prepare the body for the request
                 const bodyFile = {
@@ -321,16 +386,8 @@ const Gentani = () => {
                     created_by: auth.user,
                 };
                 const response = await createGentaniDataByUpload('/gentani/upload', bodyFile);
-                const listError = response.data.errors
-                if(response.data.errors){
-                    addToastErr(templateToastMultipleMsg("Failed", listError))
-                }
-                if(response.data.created.length !== 0){
-                    addToast(templateToast("Success", response.data.message));
-                }
+                addToastErr(templateToastMultipleMsg(response))
             } catch (error) {
-                console.error("Error processing file:", error);
-    
                 // Handle errors
                 const errorMessage = error.response?.data?.message || error.message;
                 addToast(templateToast("Error", errorMessage));
@@ -346,11 +403,16 @@ const Gentani = () => {
         reader.readAsArrayBuffer(file);
     };
 
-    const handleUpdateGentani = async(gentaniId, qty) => {
+    const handleUpdateGentani = async(gentaniId, qty_fortuner, qty_zenix, qty_innova, qty_avanza, qty_yaris, qty_calya) => {
         try {
             setLoading(true)
             const body = {
-                quantity: qty,
+                quantity_fortuner: qty_fortuner,
+                quantity_zenix: qty_zenix,
+                quantity_innova: qty_innova,
+                quantity_avanza: qty_avanza,
+                quantity_yaris: qty_yaris,
+                quantity_calya: qty_calya,
                 updated_by: auth.user
             }
             const response = await updateGentaniData("gentani", gentaniId, body)
@@ -359,20 +421,16 @@ const Gentani = () => {
             
             
         } catch (error) {
-            // If the error comes from Axios, check the error response
           if (error.response) {
-            console.error("Error Response: ", error.response);
             addToast(templateToast("Error", error.response.data.message));
           } 
           else {
-            // Fallback for unexpected errors
-            console.error("Unexpected Error: ", error);
             addToast(templateToast("Error", "An unexpected error occurred."));
           }
         } finally{
             setLoading(false)
             getGentani()
-            setVisibleModalUpdate((prev)=>({...prev, state: false}))
+            setVisibleModalUpdate(false)
         }
     }
 
@@ -387,14 +445,10 @@ const Gentani = () => {
             getGentani()
 
         } catch (error) {
-            // If the error comes from Axios, check the error response
             if (error.response) {
-                console.error("Error Response: ", error.response);
                 addToast(templateToast("Error", error.response.data.message));
             } 
             else {
-                // Fallback for unexpected errors
-                console.error("Unexpected Error: ", error);
                 addToast(templateToast("Error", "An unexpected error occurred."));
             }
         } finally{
@@ -402,7 +456,23 @@ const Gentani = () => {
         }
     }
       
-
+    const handleUpdateRatio = async(body) =>{
+        try {
+            setLoading(true)
+            const response = await updateRatioProductionData('ratio-production', body, 1)
+            addToast(templateToast("Success", response.data.message))
+            setVisibleModalRatio(false)
+            getRatioProduction()
+        } catch (error) {
+            if(error.response){
+                addToast(templateToast("Error", error.response.data.message))
+            }else{
+                addToast(templateToast("Error", error.message))
+            }
+        } finally{
+            setLoading(false)
+        }
+    }
 
 
     const [toast, addToast] = useState(0)
@@ -432,32 +502,56 @@ const Gentani = () => {
         )
     }
 
-    const templateToastMultipleMsg = (type, data) => {
+    const templateToastMultipleMsg = (data) => {
         return(
-            <CToast visible={true} autohide={true} key={Date.now()} ref={toasterErr} style={{ overflow: "auto", height: "75vh"}}>
-                <CToastHeader closeButton>
-                    <svg
-                    className="rounded me-2 bg-black"
-                    width="20"
-                    height="20"
-                    xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                    role="img"
-                    >
-                    <rect width="100%" height="100%" fill={`${type === 'Success' ? "#29d93e" : "#e85454"}`}></rect>
-                    </svg>
-                    <div className="fw-bold me-auto">{type}</div>
-                    {/* <small>7 min ago</small> */}
-                </CToastHeader>
-                <CToastBody style={{overflow: "auto"}}>
-                    {data.map((data, index)=>{
-                        return(
-                            <p key={index}>{data.message}</p>
-                        )
-                    })}
-                </CToastBody>
-            </CToast>
+           <CToaster className='position-static'>
+                {data.data.created.length > 0 && (
+                    <CToast visible={true} autohide={true} key={Date.now()} ref={toaster}>
+                        <CToastHeader closeButton>
+                            <svg
+                            className="rounded me-2 bg-black"
+                            width="20"
+                            height="20"
+                            xmlns="http://www.w3.org/2000/svg"
+                            preserveAspectRatio="xMidYMid slice"
+                            focusable="false"
+                            role="img"
+                            >
+                            <rect width="100%" height="100%" fill="#29d93e"></rect>
+                            </svg>
+                            <div className="fw-bold me-auto">Success</div>
+                            {/* <small>7 min ago</small> */}
+                        </CToastHeader>
+                        <CToastBody>{data.data.message}</CToastBody>
+                    </CToast>
+                )}
+                {data.data.errors.length > 0 && (
+                    <CToast visible={true} autohide={true} key={Date.now() + 1000} ref={toasterErr} style={{ overflow: "auto", maxHeight: "75vh"}}>
+                        <CToastHeader closeButton>
+                            <svg
+                            className="rounded me-2 bg-black"
+                            width="20"
+                            height="20"
+                            xmlns="http://www.w3.org/2000/svg"
+                            preserveAspectRatio="xMidYMid slice"
+                            focusable="false"
+                            role="img"
+                            >
+                            <rect width="100%" height="100%" fill="#e85454"></rect>
+                            </svg>
+                            <div className="fw-bold me-auto">Failed</div>
+                            {/* <small>7 min ago</small> */}
+                        </CToastHeader>
+                        <CToastBody style={{overflow: "auto"}}>
+                            {data.data.errors.map((error, index)=>{
+                                return(
+                                    <p key={index}>{error.message}</p>
+                                )
+                            })}
+                        </CToastBody>
+                    </CToast>
+                )}
+           </CToaster>
         )
     }
 
@@ -476,7 +570,12 @@ const Gentani = () => {
             material_no: data[key].material_no,
             material_desc: data[key].material_desc,
             plant: data[key].plant,
-            quantity: data[key].quantity,
+            quantity_fortuner: data[key].quantity_fortuner,
+            quantity_zenix: data[key].quantity_zenix,
+            quantity_innova: data[key].quantity_innova,
+            quantity_avanza: data[key].quantity_avanza,
+            quantity_yaris: data[key].quantity_yaris,
+            quantity_calya: data[key].quantity_calya,
             uom: data[key].uom,
             created_by: data[key].created_by,
             createdAt: dayjs(data[key].createdAt).format('YYYY-MM-DD HH:mm:ss'),
@@ -518,8 +617,94 @@ const Gentani = () => {
             }
 
             {/* Toast */}
-            <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
-            <CToaster className="p-3" placement="middle-end" push={toastErr} ref={toasterErr}/>
+            {/* <CToaster className="position-static"> */}
+                <CToaster className="p-3 position-static" placement="top-end" push={toast} ref={toaster} />
+                <CToaster className="p-3 position-static" placement="top-end" push={toastErr} ref={toasterErr}/>
+            {/* </CToaster> */}
+
+
+            {/* Start of Modal RATIO */}
+            <CModal
+                backdrop="static"
+                visible={visibleModalRatio}
+                onClose={() => setVisibleModalRatio(false)}
+                aria-labelledby="Ratio"
+                >
+                <CModalHeader>
+                    <CModalTitle id="Ratio">Ratio Production</CModalTitle>
+                </CModalHeader>
+                <CModalBody>
+                    
+                   
+                    <CRow className="mb-3">
+                        <CFormLabel className="col-form-label">PLANT 1 Production</CFormLabel>
+                    </CRow>
+                    <CRow className="mb-3">
+                        <CFormLabel htmlFor="ratioF" className="col-4 col-form-label">Fortuner</CFormLabel>
+                        <CCol xs={3} sm={2}>
+                            <CFormInput type="number" inputMode='numeric' id="ratioF" value={formUpdateRatio.fortuner} onChange={(e)=>setFormUpdateRatio((prev)=>({...prev, fortuner: e.target.value}))}/>
+                        </CCol>
+                        <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                            <p>%</p>
+                        </CCol>
+                    </CRow>
+                    <CRow className="mb-3">
+                        <CFormLabel htmlFor="ratioZ" className="col-4 col-form-label">Zenix</CFormLabel>
+                        <CCol xs={3} sm={2}>
+                            <CFormInput type="number" inputMode='numeric' id="ratioZ" value={formUpdateRatio.zenix} onChange={(e)=>setFormUpdateRatio((prev)=>({...prev, zenix: e.target.value}))}/>
+                        </CCol>
+                        <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                            <p>%</p>
+                        </CCol>
+                    </CRow>
+                    <CRow className="mb-3">
+                        <CFormLabel htmlFor="ratioI" className="col-4 col-form-label">Innova</CFormLabel>
+                        <CCol xs={3} sm={2}>
+                            <CFormInput type="number" inputMode='numeric' id="ratioI" value={formUpdateRatio.innova} onChange={(e)=>setFormUpdateRatio((prev)=>({...prev, innova: e.target.value}))}/>
+                        </CCol>
+                        <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                            <p>%</p>
+                        </CCol>
+                    </CRow>
+                    <CRow className="mb-3">
+                        <CFormLabel className="col-form-label">PLANT 2 Production</CFormLabel>
+                    </CRow>
+                    <CRow className="mb-3">
+                        <CFormLabel htmlFor="ratioF" className="col-4 col-form-label">Avanza</CFormLabel>
+                        <CCol xs={3} sm={2}>
+                            <CFormInput type="number" inputMode='numeric' id="ratioF" value={formUpdateRatio.avanza} onChange={(e)=>setFormUpdateRatio((prev)=>({...prev, avanza: e.target.value}))}/>
+                        </CCol>
+                        <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                            <p>%</p>
+                        </CCol>
+                    </CRow>
+                    <CRow className="mb-3">
+                        <CFormLabel htmlFor="ratioZ" className="col-4 col-form-label">Yaris</CFormLabel>
+                        <CCol xs={3} sm={2}>
+                            <CFormInput type="number" inputMode='numeric' id="ratioZ" value={formUpdateRatio.yaris} onChange={(e)=>setFormUpdateRatio((prev)=>({...prev, yaris: e.target.value}))}/>
+                        </CCol>
+                        <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                            <p>%</p>
+                        </CCol>
+                    </CRow>
+                    <CRow className="mb-3">
+                        <CFormLabel htmlFor="ratioI" className="col-4 col-form-label">Calya</CFormLabel>
+                        <CCol xs={3} sm={2}>
+                            <CFormInput type="number" inputMode='numeric' id="ratioI" value={formUpdateRatio.calya} onChange={(e)=>setFormUpdateRatio((prev)=>({...prev, calya: e.target.value}))}/>
+                        </CCol>
+                        <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                            <p>%</p>
+                        </CCol>
+                    </CRow>
+                </CModalBody>
+                <CModalFooter>
+                    <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalRatio(false)}>
+                    Close
+                    </CButton>
+                    <CButton className='btn-add-master' onClick={()=>handleUpdateRatio(formUpdateRatio)}>Save changes</CButton>
+                </CModalFooter>
+            </CModal>
+            {/* End of Modal RATIO */}
 
             {/* Start of Modal Add */}
             <CModal
@@ -573,11 +758,39 @@ const Gentani = () => {
                         </CCol>
                     </CRow>
                     <CRow className="mb-3">
-                        <CFormLabel htmlFor="quantitiy" className="col-sm-4 col-form-label">Quantity<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CFormLabel className="col-form-label">Consumption Quantity</CFormLabel>
+                    </CRow>
+                    <CRow className="mb-3">
+                        <CFormLabel htmlFor="quantityF" className="col-sm-4 col-form-label">{formData.plant === "P1 - PLANT 1" ? "Fortuner" : "Avanza"}<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8}>
-                            <CFormInput type="number" id="quantity" onChange={(e)=>setFormData((prev)=>({...prev, quantity: e.target.value}))}/>
+                            {formData.plant === "P1 - PLANT 1" ? 
+                                <CFormInput type="number" id="quantityF" onChange={(e)=>setFormData((prev)=>({...prev, quantity_fortuner: e.target.value}))}/>
+                                    :
+                                <CFormInput type="number" id="quantityA" onChange={(e)=>setFormData((prev)=>({...prev, quantity_avanza: e.target.value}))}/>
+                            }
                         </CCol>
                     </CRow>
+                    <CRow className="mb-3">
+                        <CFormLabel htmlFor="quantityZ" className="col-sm-4 col-form-label">{formData.plant === "P1 - PLANT 1" ? "Zenix" : "Yaris"}<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CCol sm={8}>
+                            {formData.plant === "P1 - PLANT 1" ? 
+                                <CFormInput type="number" id="quantityZ" onChange={(e)=>setFormData((prev)=>({...prev, quantity_zenix: e.target.value}))}/>
+                                    :
+                                <CFormInput type="number" id="quantityY" onChange={(e)=>setFormData((prev)=>({...prev, quantity_yaris: e.target.value}))}/>
+                            }
+                        </CCol>
+                    </CRow>
+                    <CRow className="mb-3">
+                        <CFormLabel htmlFor="quantityI" className="col-sm-4 col-form-label">{formData.plant === "P1 - PLANT 1" ? "Innova" : "Calya"}<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CCol sm={8}>
+                            {formData.plant === "P1 - PLANT 1" ? 
+                                <CFormInput type="number" id="quantityI" onChange={(e)=>setFormData((prev)=>({...prev, quantity_innova: e.target.value}))}/>
+                                    :
+                                <CFormInput type="number" id="quantityC" onChange={(e)=>setFormData((prev)=>({...prev, quantity_calya: e.target.value}))}/>
+                            }
+                        </CCol>
+                    </CRow>
+                
                 </CModalBody>
                 <CModalFooter>
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalAdd(false)}>
@@ -622,14 +835,71 @@ const Gentani = () => {
                         </CCol>
                     </CRow>
                     <CRow className="mb-3">
-                        <CFormLabel htmlFor="quantitiy" className="col-sm-4 col-form-label">Quantity</CFormLabel>
+                        <CFormLabel className=" col-form-label">Consumption Quantity ({formUpdateData.uom})</CFormLabel>
+                    </CRow>
+                    <CRow className="mb-3">
+                        <CFormLabel htmlFor="quantityFA" className="col-sm-4 col-form-label">{formUpdateData.plant === "P1 - PLANT 1" ? "Fortuner" : "Avanza"}</CFormLabel>
                         <CCol sm={8}>
-                            <CFormInput type="text" id="quantity" 
-                                value={formUpdateData.quantity}  
-                                onChange={(e) => formUpdateData((prev) => ({
-                                    ...prev, 
-                                    quantity: e.target.value
-                                }))}/>
+                            {formUpdateData.plant === "P1 - PLANT 1" ? 
+                                (
+                                    <CFormInput type="number" inputMode='numeric' id="quantityF" 
+                                        value={formUpdateData.quantity_fortuner}  
+                                        onChange={(e) => setFormUpdateData((prev) => ({
+                                            ...prev, 
+                                            quantity_fortuner: e.target.value
+                                        }))}/>
+                                ) : (
+                                    <CFormInput type="number" inputMode='numeric' id="quantityA" 
+                                        value={formUpdateData.quantity_avanza}  
+                                        onChange={(e) => setFormUpdateData((prev) => ({
+                                            ...prev, 
+                                            quantity_avanza: e.target.value
+                                        }))}/>
+                                )}
+                        </CCol>
+                    </CRow>
+                    <CRow className="mb-3">
+                    <CFormLabel htmlFor="quantityZY" className="col-sm-4 col-form-label">{formUpdateData.plant === "P1 - PLANT 1" ? "Zenix" : "Yaris"}</CFormLabel>
+                        <CCol sm={8}>
+                            {formUpdateData.plant === "P1 - PLANT 1" ? 
+                                (
+                                    <CFormInput type="number" inputMode='numeric' id="quantityZ" 
+                                        value={formUpdateData.quantity_zenix}  
+                                        onChange={(e) => setFormUpdateData((prev) => ({
+                                            ...prev, 
+                                            quantity_zenix: e.target.value
+                                        }))}/>
+                                ) : (
+                                    <CFormInput type="number" inputMode='numeric' id="quantityY" 
+                                        value={formUpdateData.quantity_yaris}  
+                                        onChange={(e) => setFormUpdateData((prev) => ({
+                                            ...prev, 
+                                            quantity_yaris: e.target.value
+                                        }))}/>
+                                )}
+                            
+                        </CCol>
+                    </CRow>
+                    <CRow className="mb-3">
+                    <CFormLabel htmlFor="quantityIC" className="col-sm-4 col-form-label">{formUpdateData.plant === "P1 - PLANT 1" ? "Innova" : "Calya"}</CFormLabel>
+                        <CCol sm={8}>
+                            {formUpdateData.plant === "P1 - PLANT 1" ? 
+                                (
+                                    <CFormInput type="number" inputMode='numeric' id="quantityI" 
+                                        value={formUpdateData.quantity_innova}  
+                                        onChange={(e) => setFormUpdateData((prev) => ({
+                                            ...prev, 
+                                            quantity_innova: e.target.value
+                                        }))}/>
+                                ) : (
+                                    <CFormInput type="number" inputMode='numeric' id="quantityC" 
+                                        value={formUpdateData.quantity_calya}  
+                                        onChange={(e) => setFormUpdateData((prev) => ({
+                                            ...prev, 
+                                            quantity_calya: e.target.value
+                                        }))}/>
+                                )}
+                            
                         </CCol>
                     </CRow>
                 </CModalBody>
@@ -637,7 +907,18 @@ const Gentani = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalUpdate(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master' onClick={()=> handleUpdateGentani(visibleModalUpdate.data.gentani_id, visibleModalUpdate.data.quantity)}>Update data</CButton>
+                    <CButton className='btn-add-master' 
+                        onClick={()=> handleUpdateGentani(
+                            formUpdateData.gentani_id, 
+                            formUpdateData.quantity_fortuner,
+                            formUpdateData.quantity_zenix,
+                            formUpdateData.quantity_innova,
+                            formUpdateData.quantity_avanza,
+                            formUpdateData.quantity_yaris,
+                            formUpdateData.quantity_calya,
+                        )}
+                        >Update data
+                    </CButton>
                 </CModalFooter>
             </CModal>
             {/* End of Modal Update */}
@@ -728,20 +1009,39 @@ const Gentani = () => {
                         </CCol>
                     </CRow>
                 </CCol>
-                <CCol xs={12} xl={8} xxl={8} lg={8} md={8} sm={12}>
+                <CCol xs={12} xl={3} xxl={3} lg={3} md={3} sm={12}>
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor="plant" className='col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ' >Plant</CFormLabel>
-                        <CCol className='d-flex align-items-center gap-2 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-8'>
+                        <CCol className='d-flex align-items-center gap-2 col-xxl-10 col-xl-10 col-lg-11 col-md-12 col-sm-8'>
                             <CDropdown className='dropdown-search d-flex justify-content-between'>
                                 <CDropdownToggle className='d-flex justify-content-between align-items-center w-100'>{searchQuery.plant}</CDropdownToggle>
                                 <CDropdownMenu className='cursor-pointer'>
-                                        <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, plant: "All"}))}>All</CDropdownItem>
-                                        <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, plant: "P1 - Plant 1"}))}>P1 - Plant 1</CDropdownItem>
-                                        <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, plant: "P2 - Plant 2"}))}>P2 - Plant 2</CDropdownItem>
+                                <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, plant: "All"}))}>All</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, plant: "P1 - Plant 1"}))}>P1 - Plant 1</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, plant: "P2 - Plant 2"}))}>P2 - Plant 2</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
-                        <CCol className="d-flex justify-content-end gap-3 col-sm-2 col-xxl-6 col-xl-6 col-lg-6 col-md-6">
+                    </CRow>
+                </CCol>
+                <CCol xs={12} xl={5} xxl={5} lg={5} md={5} sm={12}>
+                    <CRow className='mb-3'>
+                        <CFormLabel htmlFor="plant" className='col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ' >Unit</CFormLabel>
+                        <CCol className='d-flex align-items-center gap-2 col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8'>
+                            <CDropdown className='dropdown-search d-flex justify-content-between'>
+                                <CDropdownToggle className='d-flex justify-content-between align-items-center w-100'>{searchQuery.unit}</CDropdownToggle>
+                                <CDropdownMenu className='cursor-pointer'>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, unit: "All"}))}>All</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, unit: "Fortuner"}))}>Fortuner</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, unit: "Zenix"}))}>Zenix</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, unit: "Innova"}))}>Innova</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, unit: "Avanza"}))}>Avanza</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, unit: "Yaris"}))}>Yaris</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, unit: "Calya"}))}>Calya</CDropdownItem>
+                                </CDropdownMenu>
+                            </CDropdown>
+                        </CCol>
+                        <CCol className="d-flex justify-content-end gap-3 col-sm-2 col-xxl-4 col-xl-4 col-lg-4 col-md-4">
                             <CButton className="btn-search" onClick={()=>handleSearch()}>Search</CButton>
                             <CButton color="secondary" onClick={() => handleClearSearch()}>Clear</CButton>
                         </CCol >
@@ -749,42 +1049,49 @@ const Gentani = () => {
                 </CCol>
             </CRow>
             <CRow>
-                <CCol xs={12} xxl={12} className='mt-xl-0 mt-4'>
-                    <CButton className='btn-add-master' onClick={()=>setVisibleModalAdd((prev) => ({ ...prev, state: true}))}>Add Gentani</CButton>
-                    <CDropdown className="btn-group btn-download mx-2">
+                <CCol xs={12} xxl={12} className='mt-xl-0 mt-4 d-flex flex-wrap p-4 gap-3 gap-sm-1'>
+                    <CButton className='btn-add-master col-sm-auto col-5 ' onClick={()=>setVisibleModalAdd(true)}>Add Gentani</CButton>
+                    <CButton className='btn-add-master mx-0 mx-sm-2 col-sm-auto col-6' onClick={()=>handleModalRatio(ratioProdData)}>Production Rate</CButton>
+                    <CDropdown className="btn-group btn-download mx-0 mx-sm-2 col-sm-auto col-5">
                         <CDropdownToggle  style={{color: "white"}}>Download</CDropdownToggle>
                         <CDropdownMenu>
                             <CDropdownItem className='cursor-pointer' style={{textDecoration: "none"}} onClick={()=>handleDownloadTemplate()}>Template</CDropdownItem>
                             <CDropdownItem className='cursor-pointer' style={{textDecoration: "none"}} onClick={()=>handleDownload(paginatedData)}>Gentani Data Table</CDropdownItem>
                         </CDropdownMenu>
                     </CDropdown>
-                    
-                    {/* <CButton className='btn-download mx-2' onClick={()=>handleDownload(paginatedData)}>Download</CButton> */}
-                    <CButton className='btn-upload' onClick={()=>setVisibleModalUpload(true)}>Upload</CButton>
+                    <CButton className='btn-upload col-sm-auto col-6' onClick={()=>setVisibleModalUpload(true)}>Upload</CButton>
                 </CCol>
             </CRow>
             <CRow>
                 <CCol className='py-4 text-table-small '>
                     <CTable bordered striped responsive>
                         <CTableHead>
-                            <CTableRow color="dark">
-                                <CTableHeaderCell scope="col" colSpan={2} className='text-center'>Action</CTableHeaderCell>
+                            <CTableRow color="dark" style={{ verticalAlign: "middle", textAlign: "center" }}>
+                                <CTableHeaderCell scope="col" colSpan={2} rowSpan={2} className='text-center'>Action</CTableHeaderCell>
                                 {/* <CTableHeaderCell scope="col">Katashiki</CTableHeaderCell> */}
-                                <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Plant</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Quantity</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Uom</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Created By</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Created Date</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Changed By</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Changed Date</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2} >Material No</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2} >Material Desc</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2} >Plant</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" colSpan={6} className='text-center'>Consumption Quantity</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2} >Uom</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2} >Created By</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2} >Created Date</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2} >Changed By</CTableHeaderCell>
+                                <CTableHeaderCell scope="col" rowSpan={2} >Changed Date</CTableHeaderCell>
+                            </CTableRow>
+                            <CTableRow color="dark" style={{ verticalAlign: "middle", textAlign: "center" }}>
+                                <CTableHeaderCell scope="col">Fortuner</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Zenix</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Innova</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Avanza</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Yaris</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Calya</CTableHeaderCell>
                             </CTableRow>
                         </CTableHead>
                         <CTableBody>
                             { paginatedData && paginatedData.map((gentani, index) => {
                                 return(
-                                    <CTableRow key={index}>
+                                    <CTableRow key={index} style={{ verticalAlign: "middle" }}>
                                         <CTableDataCell className='text-center'>
                                             <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(gentani)}><CIcon icon={icon.cilColorBorder}/></CButton>
                                         </CTableDataCell>
@@ -795,7 +1102,12 @@ const Gentani = () => {
                                         <CTableDataCell>{gentani.material_no}</CTableDataCell>
                                         <CTableDataCell>{gentani.material_desc}</CTableDataCell>
                                         <CTableDataCell>{gentani.plant}</CTableDataCell>
-                                        <CTableDataCell>{gentani.quantity}</CTableDataCell>
+                                        <CTableDataCell>{gentani.quantity_fortuner === 0 ? "" : gentani.quantity_fortuner}</CTableDataCell>
+                                        <CTableDataCell>{gentani.quantity_zenix === 0 ? "" : gentani.quantity_zenix}</CTableDataCell>
+                                        <CTableDataCell>{gentani.quantity_innova === 0 ? "" : gentani.quantity_innova}</CTableDataCell>
+                                        <CTableDataCell>{gentani.quantity_avanza === 0 ? "" : gentani.quantity_avanza}</CTableDataCell>
+                                        <CTableDataCell>{gentani.quantity_yaris === 0 ? "" : gentani.quantity_yaris}</CTableDataCell>
+                                        <CTableDataCell>{gentani.quantity_calya === 0 ? "" : gentani.quantity_calya}</CTableDataCell>
                                         <CTableDataCell>{gentani.uom}</CTableDataCell>
                                         <CTableDataCell>{gentani.created_by}</CTableDataCell>
                                         <CTableDataCell>{dayjs(gentani.createdAt).format('YYYY-MM-DD HH:mm:ss')}</CTableDataCell>

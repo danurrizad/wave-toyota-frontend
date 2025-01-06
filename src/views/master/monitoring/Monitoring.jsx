@@ -80,6 +80,7 @@ const Monitoring = () => {
             getMonitoring()
             setVisibleModalUpdate(false)
             addToast(templateToast("Success", response.data.message))
+            validateTotalVisualization()
         } catch (error) {
             if(error.response){
                 addToast(templateToast("Error", error.response.data.message))
@@ -94,6 +95,14 @@ const Monitoring = () => {
     useEffect(()=>{
         getMonitoring()
     }, [])
+
+    const validateTotalVisualization = (name) => {
+        const total = monitoringData.filter(
+            (monitoring) => monitoring.visualization_name === name
+        ).length;
+        return total < 6; // Return true if less than 6, false otherwise
+    };
+    
 
     // PAGINATION AND SEARCH
     const [currentPage, setCurrentPage] = useState(1)
@@ -184,15 +193,16 @@ const Monitoring = () => {
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.visualization_name}</CDropdownToggle>
                                 {formUpdateData.plant === "P1 - PLANT 1" && (
                                     <CDropdownMenu className='cursor-pointer'>
-                                        <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 1"}))}>Visualization 1</CDropdownItem>
-                                        <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 2"}))}>Visualization 2</CDropdownItem>
-                                        <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 3"}))}>Visualization 3</CDropdownItem>
+                                        { validateTotalVisualization("Visualization 1") && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 1"}))}>Visualization 1</CDropdownItem>}
+                                        { validateTotalVisualization("Visualization 2") && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 2"}))}>Visualization 2</CDropdownItem>}
+                                        { validateTotalVisualization("Visualization 3") && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 3"}))}>Visualization 3</CDropdownItem>}
                                     </CDropdownMenu>
                                 )}
                                 {formUpdateData.plant === "P2 - PLANT 2" && (
                                     <CDropdownMenu className='cursor-pointer'>
-                                        <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 4"}))}>Visualization 4</CDropdownItem>
-                                        <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 5"}))}>Visualization 5</CDropdownItem>
+                                        { validateTotalVisualization("Visualization 4") && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 4"}))}>Visualization 4</CDropdownItem>}
+                                        { validateTotalVisualization("Visualization 5") && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 5"}))}>Visualization 5</CDropdownItem>}
+                                        { validateTotalVisualization("Visualization 6") && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 6"}))}>Visualization 6</CDropdownItem>}
                                     </CDropdownMenu>
                                 )}
                             </CDropdown>
@@ -232,7 +242,7 @@ const Monitoring = () => {
             <CRow>
                 <CCol xl={6} xs={12} >
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor="plant" className='col-form-label col-sm-2 col-xl-1' >Plant</CFormLabel>
+                        <CFormLabel htmlFor="plant" className='col-form-label col-sm-2 col-xxl-2 col-xl-3' >Visualization</CFormLabel>
                         <CCol className='d-flex align-items-center gap-2 col-sm-8 col-xl-6'>
                             <CDropdown className='dropdown-search d-flex justify-content-between'>
                                 <CDropdownToggle className='d-flex justify-content-between align-items-center dropdown-search'>{searchQuery.visualization_name}</CDropdownToggle>
@@ -243,6 +253,7 @@ const Monitoring = () => {
                                     <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 3"})}>Visualization 3 (Plant 1)</CDropdownItem>
                                     <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 4"})}>Visualization 4 (Plant 2)</CDropdownItem>
                                     <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 5"})}>Visualization 5 (Plant 2)</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 6"})}>Visualization 6 (Plant 2)</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
@@ -253,11 +264,14 @@ const Monitoring = () => {
                     </CRow>
                 </CCol>
             </CRow>
+            <CRow className='mt-3'>
+                <p><span style={{fontWeight: "bold"}}>Note</span>: A maximum of 6 materials can be displayed in a single visualization</p>
+            </CRow>
             <CRow>
-                <CCol className='py-4 text-table-small'>
+                <CCol className='py-4 pt-2 text-table-small'>
                     <CTable bordered striped responsive>
                         <CTableHead>
-                            <CTableRow color="dark">
+                            <CTableRow color="dark" style={{ verticalAlign: "middle", textAlign: 'center' }}>
                                 <CTableHeaderCell scope="col" className='text-center'>Action</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
@@ -268,7 +282,7 @@ const Monitoring = () => {
                         <CTableBody>
                         { paginatedData && paginatedData.map((monitoring, index) => {
                                 return(
-                                    <CTableRow key={index}>
+                                    <CTableRow key={index} style={{ verticalAlign: "middle" }}>
                                         <CTableDataCell className='text-center'>
                                             <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(monitoring)}><CIcon icon={icon.cilColorBorder}/></CButton>
                                         </CTableDataCell>

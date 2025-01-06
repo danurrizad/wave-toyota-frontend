@@ -187,12 +187,8 @@ const Setup = () => {
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Plant</CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown download="btn-group disabled-dropdown" style={{width: "100%"}}  direction="center">
+                            <CDropdown disabled className="btn-group disabled-dropdown" style={{width: "100%"}}  direction="center">
                                 <CDropdownToggle  width={400} disabled className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.plant}</CDropdownToggle>
-                                <CDropdownMenu >
-                                    <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, plant: "P1 - PLANT 1"}))}>P1 - PLANT 1</CDropdownItem>
-                                    <CDropdownItem onClick={()=>setFormUpdateData((prev)=>({ ...prev, plant: "P2 - PLANT 2"}))} >P2 - PLANT 2</CDropdownItem>
-                                </CDropdownMenu>
                             </CDropdown>
                         </CCol>
                     </CRow>
@@ -256,7 +252,7 @@ const Setup = () => {
                 <CCol className='py-4 text-table-small'>
                     <CTable bordered striped responsive>
                         <CTableHead>
-                            <CTableRow color="dark" style={{backgroundColor: "blue"}}>
+                            <CTableRow color="dark" style={{backgroundColor: "blue", textAlign: "center", verticalAlign: "middle"}}>
                             <CTableHeaderCell scope="col" className='text-center'>Action</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
@@ -274,7 +270,7 @@ const Setup = () => {
                         <CTableBody>
                         { paginatedData && paginatedData.map((setup, index) => {
                                 return(
-                                    <CTableRow key={index}>
+                                    <CTableRow key={index} style={{ verticalAlign: "middle" }}>
                                         <CTableDataCell className='text-center'>
                                             <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(setup)}><CIcon icon={icon.cilColorBorder}/></CButton>
                                         </CTableDataCell>

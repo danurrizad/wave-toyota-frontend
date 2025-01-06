@@ -24,9 +24,7 @@ const QrReader = ({setShowScanner, setVisibleModalAdd, setVisibleModalScanner, s
 
   // Success
   const onScanSuccess = (result) => {
-    const [material_no, material_desc, plant, uom, qty] = result.data.split(",").map((item) => item.trim());
-    console.log("QTY after scan:", Number(qty))
-    console.log("type of:", typeof Number(qty))
+    const [material_no, material_desc, plant, uom, pack, qty_pack, qty_uom] = result.data.split(",").map((item) => item.trim());
      // Play the success sound
     if (audioRef.current) {
         audioRef.current.play().catch((err) => console.error("Audio play error:", err));
@@ -38,9 +36,11 @@ const QrReader = ({setShowScanner, setVisibleModalAdd, setVisibleModalScanner, s
         material_desc: material_desc,
         plant: plant,
         uom: uom,
-        qty: Number(qty),
+        pack: pack,
+        qty_pack: Number(qty_pack),
+        qty_uom: Number(qty_uom),
     })
-    setDefaultQty(Number(qty))
+    setDefaultQty(Number(qty_uom))
     setVisibleModalScanner(false)
     setShowScanner(false)
     setVisibleModalAdd(true)

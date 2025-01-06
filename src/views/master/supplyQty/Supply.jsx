@@ -57,7 +57,10 @@ const Supply = () => {
         material_no: "",
         material_desc: "",
         plant: "",
-        uom: ""
+        uom: "",
+        pack: "",
+        qty_pack: 0,
+        qty_uom: 0
     })
 
     const [ visibleModalUpdate, setVisibleModalUpdate ] = useState(false)
@@ -71,6 +74,7 @@ const Supply = () => {
             plant: supplyData.plant,
             qty: supplyData.qty,
             uom: supplyData.uom,
+            pack: supplyData.pack,
             updated_by: auth.user
         })
     }
@@ -83,7 +87,7 @@ const Supply = () => {
             setFilteredData(response.data.data)
         } catch (error) {
             if(error.response){
-                addToast(templateToast("Error", error.response.message))
+                addToast(templateToast("Error", error.response.data.message))
             }
             else{
                 addToast(templateToast("Error", error.message))
@@ -206,9 +210,28 @@ const Supply = () => {
                         </CCol>
                     </CRow>
                     <CRow className="mb-3">
-                        <CFormLabel htmlFor="qty" className="col-sm-4 col-form-label">Qty</CFormLabel>
+                        <CFormLabel htmlFor="uom" className="col-sm-4 col-form-label">Pack</CFormLabel>
                         <CCol sm={8}>
-                            <CFormInput type="number" id="qty" value={formUpdateData.qty || ""} onChange={(e) => setFormUpdateData((prev) => ({ ...prev, qty: e.target.value }))}/>
+                            <CFormInput type="text" id="uom" disabled value={formUpdateData.pack || ""}/>
+                        </CCol>
+                    </CRow>
+                    <CRow className="mb-3">
+                        <CFormLabel htmlFor="qty" className="col-sm-4 col-form-label">Qty/Pack</CFormLabel>
+                        <CCol xs={4}>
+                            <CFormInput 
+                                type="number" 
+                                id="qty" 
+                                value={formUpdateData.qty || ""} 
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      updateSupplyQty(formUpdateData.material_no, formUpdateData);
+                                    }
+                                  }} 
+                                onChange={(e) => setFormUpdateData((prev) => ({ ...prev, qty: e.target.value }))}
+                            />
+                        </CCol>
+                        <CCol xs={4} className='d-flex align-items-center'>
+                            <p>{formUpdateData.uom}</p>
                         </CCol>
                     </CRow>
                 </CModalBody>
@@ -216,7 +239,10 @@ const Supply = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalUpdate(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master' onClick={()=>updateSupplyQty(formUpdateData.material_no, formUpdateData)}>Save update</CButton>
+                    <CButton 
+                        className='btn-add-master'
+                        onClick={()=>updateSupplyQty(formUpdateData.material_no, formUpdateData)}
+                    >Save update</CButton>
                 </CModalFooter>
             </CModal>
             {/* End of Modal Update */}
@@ -232,7 +258,9 @@ const Supply = () => {
             material_desc: data.material_desc,
             plant: data.plant,
             uom: data.uom,
-            qty: data.qty
+            pack: data.pack,
+            qty_uom: data.qty,
+            qty_pack: 1
         })
     }
 
@@ -253,7 +281,7 @@ const Supply = () => {
                     <CRow>
                         <QRCode
                             title={`QR Code for ${dataQR.material_no}`}
-                            value={`${dataQR.material_no}, ${dataQR.material_desc}, ${dataQR.plant}, ${dataQR.uom}, ${dataQR.qty}`}
+                            value={`${dataQR.material_no}, ${dataQR.material_desc}, ${dataQR.plant}, ${dataQR.uom}, ${dataQR.pack}, ${dataQR.qty_pack}, ${dataQR.qty_uom}`}
                             bgColor="white"
                             fgColor="black"
                             size={400}
@@ -276,15 +304,20 @@ const Supply = () => {
                                 <CTableDataCell align='top' className='px-2'>:</CTableDataCell>
                                 <CTableDataCell align='top'>{dataQR.plant}</CTableDataCell>
                             </CTableRow>
-                            <CTableRow className=''>
+                            {/* <CTableRow className=''>
                                 <CTableDataCell align='top'>Uom</CTableDataCell>
                                 <CTableDataCell align='top' className='px-2'>:</CTableDataCell>
                                 <CTableDataCell align='top'>{dataQR.uom}</CTableDataCell>
+                            </CTableRow> */}
+                            <CTableRow className=''>
+                                <CTableDataCell align='top'>Pack</CTableDataCell>
+                                <CTableDataCell align='top' className='px-2'>:</CTableDataCell>
+                                <CTableDataCell align='top'>{dataQR.pack}</CTableDataCell>
                             </CTableRow>
                             <CTableRow className=''>
-                                <CTableDataCell align='top'>Quantity</CTableDataCell>
+                                <CTableDataCell align='top'>{`Quantity/Pack`}</CTableDataCell>
                                 <CTableDataCell align='top' className='px-2'>:</CTableDataCell>
-                                <CTableDataCell align='top'>{dataQR.qty}</CTableDataCell>
+                                <CTableDataCell align='top'>{dataQR.qty_uom ? dataQR.qty_uom : 0} {dataQR.uom}</CTableDataCell>
                             </CTableRow>
                         </CTable>
                     </CRow>
@@ -389,13 +422,14 @@ const Supply = () => {
                 <CCol className='py-4 text-table-small'>
                     <CTable bordered striped responsive>
                         <CTableHead>
-                            <CTableRow color="dark" >
+                            <CTableRow color="dark" style={{ verticalAlign: "middle", textAlign: "center" }}>
                             <CTableHeaderCell scope="col" className='text-center'>Action</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Plant</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Qty</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Uom</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Pack</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Created By</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Created Date</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Changed By</CTableHeaderCell>
@@ -406,7 +440,7 @@ const Supply = () => {
                         <CTableBody>
                         { paginatedData && paginatedData.map((supply, index) => {
                                 return(
-                                    <CTableRow key={index}>
+                                    <CTableRow key={index} style={{ verticalAlign: "middle" }}>
                                         <CTableDataCell className='text-center'>
                                             <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(supply)}><CIcon icon={icon.cilColorBorder}/></CButton>
                                         </CTableDataCell>
@@ -415,11 +449,12 @@ const Supply = () => {
                                         <CTableDataCell>{supply.plant}</CTableDataCell>
                                         <CTableDataCell>{supply.qty}</CTableDataCell>
                                         <CTableDataCell>{supply.uom}</CTableDataCell>
+                                        <CTableDataCell>{supply.pack}</CTableDataCell>
                                         <CTableDataCell>{supply.created_by}</CTableDataCell>
                                         <CTableDataCell>{dayjs(supply.createdAt).format('YYYY-MM-DD HH:mm:ss')}</CTableDataCell>
                                         <CTableDataCell>{supply.updated_by}</CTableDataCell>
                                         <CTableDataCell>{dayjs(supply.updatedAt).format('YYYY-MM-DD HH:mm:ss')}</CTableDataCell>
-                                        <CTableDataCell>
+                                        <CTableDataCell className='text-center'>
                                             <CButton className='btn-icon-edit' onClick={()=>handleModalQR(supply)}><CIcon icon={icon.cilClone}/></CButton>
                                         </CTableDataCell>
                                     </CTableRow>

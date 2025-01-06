@@ -62,6 +62,7 @@ const Material = () => {
         depth_material: null,
         supply_line: "",
         uom: "Select",
+        pack: "Select",
         created_by: auth.user,
         updated_by: ""
     })
@@ -73,6 +74,7 @@ const Material = () => {
         depth_material: 0,
         supply_line: "",
         uom: "Select",
+        pack: "Select",
         created_by: "",
         updated_by: auth.user
     }
@@ -88,6 +90,7 @@ const Material = () => {
             depth_material: data.depth_material,
             supply_line: data.supply_line,
             uom: data.uom,
+            pack: data.pack,
             created_by: data.created_by,
             updated_by: auth.user
         })
@@ -207,15 +210,20 @@ const Material = () => {
             addToast(templateToast("Error", "Please select Uom!"))
             return
         }
+        if(formData.pack == "Select"){
+            addToast(templateToast("Error", "Please select Pack!"))
+            return
+        }
         try {
             setLoading(true)
             const response = await createMaterialData('material', formData)
             addToast(templateToast("Success", response.data.message))
             setVisibleModalAdd(false)
+            setFormAddData({...formAddData, material_no: "", material_desc: "", plant: "Select", depth_material: 0, supply_line: "", uom: "Select", pack: "Select"})
             getMaterial()
+            
         } catch (error) {
             if (error.response) {
-                console.error("Error Response: ", error.response);
                 addToast(templateToast("Error", error.response.data.message));
             } 
             else {
@@ -341,6 +349,19 @@ const Material = () => {
                             </CDropdown>
                         </CCol>
                     </CRow>
+                    <CRow className='mb-3'>
+                        <CFormLabel className="col-sm-4 col-form-label">Pack<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CCol sm={8} className='d-flex align-items-center justify-content-between'>
+                            <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
+                                <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formAddData.pack}</CDropdownToggle>
+                                <CDropdownMenu className='cursor-pointer'>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormAddData((prev)=>({...prev, pack: "Drum"}))}>Drum</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormAddData((prev)=>({...prev, pack: "Bulk"}))}>Bulk</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormAddData((prev)=>({...prev, pack: "Tube"}))}>Tube</CDropdownItem>
+                                </CDropdownMenu>
+                            </CDropdown>
+                        </CCol>
+                    </CRow>
                 </CModalBody>
                 <CModalFooter>
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalAdd(false)}>
@@ -377,8 +398,8 @@ const Material = () => {
                     <CRow className='mb-3'>
                         <CFormLabel className="col-sm-4 col-form-label">Plant</CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
-                            <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
-                                <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.plant}</CDropdownToggle>
+                            <CDropdown disabled className="btn-group disabled-dropdown" style={{width: "100%"}} direction="center">
+                                <CDropdownToggle disabled width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.plant}</CDropdownToggle>
                                 <CDropdownMenu className='cursor-pointer'>
                                     <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, plant: "P2 - PLANT 2"}))} >P2 - PLANT 2</CDropdownItem>
                                     <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, plant: "P1 - PLANT 1"}))}>P1 - PLANT 1</CDropdownItem>
@@ -405,7 +426,7 @@ const Material = () => {
                         </CCol>
                     </CRow>
                     <CRow className='mb-3'>
-                        <CFormLabel className="col-sm-4 col-form-label">Uom<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CFormLabel className="col-sm-4 col-form-label">Uom</CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
                                 <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.uom}</CDropdownToggle>
@@ -414,6 +435,19 @@ const Material = () => {
                                     <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({...prev, uom: "Liter"}))}>Liter</CDropdownItem>
                                     <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({...prev, uom: "Meter"}))}>Meter</CDropdownItem>
                                     <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({...prev, uom: "Kilogram"}))}>Kilogram</CDropdownItem>
+                                </CDropdownMenu>
+                            </CDropdown>
+                        </CCol>
+                    </CRow>
+                    <CRow className='mb-3'>
+                        <CFormLabel className="col-sm-4 col-form-label">Pack</CFormLabel>
+                        <CCol sm={8} className='d-flex align-items-center justify-content-between'>
+                            <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
+                                <CDropdownToggle  width={400} className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.pack}</CDropdownToggle>
+                                <CDropdownMenu className='cursor-pointer'>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({...prev, pack: "Drum"}))}>Drum</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({...prev, pack: "Bulk"}))}>Bulk</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({...prev, pack: "Tube"}))}>Tube</CDropdownItem>
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
@@ -506,7 +540,7 @@ const Material = () => {
                 <CCol className='py-4 text-table-small '>
                     <CTable bordered striped responsive>
                         <CTableHead>
-                            <CTableRow color="dark">
+                            <CTableRow color="dark" style={{ verticalAlign: "middle", textAlign: "center" }}>
                                 <CTableHeaderCell scope="col" colSpan={2} className='text-center' >Action</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
@@ -515,6 +549,7 @@ const Material = () => {
                                 <CTableHeaderCell scope="col">Depth Material</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Supply Line</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Uom</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Pack</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Created By</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Created Date</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Changed By</CTableHeaderCell>
@@ -524,7 +559,7 @@ const Material = () => {
                         <CTableBody>
                             {paginatedData && paginatedData.map((material, index) => {
                                 return(
-                                    <CTableRow key={index} >
+                                    <CTableRow key={index} style={{ verticalAlign: "middle" }}>
                                         <CTableDataCell className='text-center'>
                                             <CButton className='btn-icon-edit' onClick={()=>handleOpenModalUpdate(material)}><CIcon icon={icon.cilColorBorder}/></CButton>
                                         </CTableDataCell>
@@ -538,6 +573,7 @@ const Material = () => {
                                         <CTableDataCell>{material.depth_material}</CTableDataCell>
                                         <CTableDataCell>{material.supply_line}</CTableDataCell>
                                         <CTableDataCell>{material.uom}</CTableDataCell>
+                                        <CTableDataCell>{material.pack}</CTableDataCell>
                                         <CTableDataCell>{material.created_by}</CTableDataCell>
                                         <CTableDataCell>{dayjs(material.createdAt).format('YYYY-MM-DD HH:mm:ss')}</CTableDataCell>
                                         <CTableDataCell>{material.updated_by}</CTableDataCell>

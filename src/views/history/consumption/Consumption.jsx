@@ -51,11 +51,12 @@ const Consumption = () => {
         setConsumptionData(response.data.data)
         setFilteredData(response.data.data)
     } catch (error) {
+        console.log("Error :", error)
         if(error.response){
-            addToast(templateToast("Error", error.response.message))
+            addToast(templateToast("Error", error.response.data.message))
         }
         else{
-            addToast(templateToast("Error", error.response.message))
+            addToast(templateToast("Error", error.message))
         }
     } finally{
         setLoading(false)
@@ -73,7 +74,8 @@ const Consumption = () => {
   const [filteredData, setFilteredData] = useState([])
   const [searchQuery, setSearchQuery] = useState({
     materialDescOrNo: "",
-    plant: "All"
+    plant: "All",
+    unit: "All"
   })
 
   const optionsMaterialDesc = Array.from(
@@ -114,11 +116,11 @@ const Consumption = () => {
   
   const handleSearch = () => {
     setLoading(true)
-    const { materialDescOrNo } = searchQuery;
-  
+    const { materialDescOrNo, plant, unit } = searchQuery;
     const filtered = consumptionData.filter((consumption) => {
         const matchesDescorNo = consumption.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase()) || consumption.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
-        //   const matchesPlant = plant === "All" || consumption.plant.toLowerCase().includes(plant.toLowerCase());
+        const matchesPlant = plant === "All" || consumption.plant.toLowerCase().includes(plant.toLowerCase())
+        const matchesUnit = unit === "All" || consumption.unit.toLowerCase().includes(unit.toLowerCase())
         
 
       // Parse the consumption_date and filter by date range
@@ -131,7 +133,7 @@ const Consumption = () => {
       const withinDateRange =
         (!fromDate || consumptionDate >= fromDate) &&
         (!toDate || consumptionDate <= toDate);
-      return matchesDescorNo && withinDateRange;
+      return matchesDescorNo && withinDateRange && matchesPlant && matchesUnit;
     });
     setFilteredData(filtered);
     setTotalPage(Math.ceil(filtered.length / itemPerPage));
@@ -141,7 +143,7 @@ const Consumption = () => {
   
 
   const handleClearSearch = () => {
-    setSearchQuery({ materialDescOrNo: "", plant: "All"})
+    setSearchQuery({ materialDescOrNo: "", plant: "All", unit: "All"})
     setPeriod(null)
     setFilteredData(consumptionData)
     setTotalPage(Math.ceil(consumptionData.length / itemPerPage))
@@ -218,20 +220,33 @@ const Consumption = () => {
             <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
 
             <CRow >
-                <CCol xl={4} xs={12} >
-                    <CRow className=''>
-                        <CFormLabel htmlFor="plant" className='col-form-label col-xl-2 col-md-2 col-3'>Material</CFormLabel>
-                        <CCol className="d-flex align-items-center justify-content-start gap-2 col-xl-9 col-9 col-md-10">
+                <CCol xl={3} md={6} sm={6} xs={12} >
+                    <CRow className='mb-3'>
+                        <CFormLabel htmlFor="plant" className='col-form-label col-xxl-12 col-md-12 col-3'>Material</CFormLabel>
+                        <CCol className="d-flex align-items-center justify-content-start gap-2 col-xxl-11 col-12 col-md-11">
                             <Select noOptionsMessage={() =>  "No material found" } options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol>
-                <CCol xl={8} xs={12}>
-                    <CRow className='mb-3 pt-xl-0 pt-3'>
-                        <CCol xl={1} xs={3} md={2} sm={3}>
-                            <CFormLabel className="col-xs-2 col-form-label">Period</CFormLabel>
+                <CCol xl={3} md={6} sm={6} xs={12} >
+                    <CRow className='mb-3'>
+                        <CFormLabel htmlFor="plant" className='col-form-label col-sm-12 col-xxl-12' >Plant</CFormLabel>
+                        <CCol className='d-flex align-items-center gap-2 col-xxl-11 col-12 col-md-12'>
+                            <CDropdown className='dropdown-search d-flex justify-content-between'>
+                                <CDropdownToggle width={400} className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
+                                <CDropdownMenu className='cursor-pointer'>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, plant: "All"})}>All</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, plant: "P1 - PLANT 1"})}>P1 - Plant 1</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, plant: "P2 - PLANT 2"})}>P2 - Plant 2</CDropdownItem>
+                                </CDropdownMenu>
+                            </CDropdown>
                         </CCol>
-                        <CCol xl={8} xs={9} md={8} sm={5} className='d-flex gap-1' >
+                    </CRow>
+                </CCol>
+                <CCol xl={2} md={6} sm={6} xs={6}>
+                    <CRow className='mb-3 pt-xl-0 pt-3'>
+                        <CFormLabel className="col-form-label col-sm-12 col-xxl-12">Period</CFormLabel>
+                        <CCol xl={11} xs={12} md={12} sm={12} className='d-flex gap-1' >
                             <DateRangePicker 
                                 placeholder="Select date period"
                                 placement='bottomEnd'
@@ -243,9 +258,27 @@ const Consumption = () => {
                                 format="MMMM dd, yyyy" 
                             />
                         </CCol>
-                    
-                        <CCol xl={3} xs={12} md={2} sm={4}>
-                            <CRow className='mb-xl-3 mb-md-3 mb-0 mt-xl-0 mt-md-0 mt-sm-0 mt-3'>
+                    </CRow>
+                </CCol>
+                <CCol xl={4} md={6} sm={6} xs={6}>
+                    <CRow className='mb-3 pt-xl-0 pt-3'>
+                        <CFormLabel className="col-form-label col-xxl-12 col-md-12 col-sm-12 ">Unit</CFormLabel>
+                        <CCol xl={8} xs={12} md={8} sm={12} className='d-flex align-items-start gap-2 '>
+                            <CDropdown className='dropdown-search d-flex justify-content-between align-items-end'>
+                                <CDropdownToggle  className='d-flex justify-content-between align-items-center'>{searchQuery.unit}</CDropdownToggle>
+                                <CDropdownMenu className='cursor-pointer'>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, unit: "All"})}>All</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, unit: "Fortuner"})}>Fortuner</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, unit: "Zenix"})}>Zenix</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, unit: "Innova"})}>Innova</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, unit: "Avanza"})}>Avanza</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, unit: "Yaris"})}>Yaris</CDropdownItem>
+                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({...searchQuery, unit: "Calya"})}>Calya</CDropdownItem>
+                                </CDropdownMenu>
+                            </CDropdown>
+                        </CCol>
+                        <CCol xl={4} xs={12} md={4} sm={12}>
+                            <CRow className='mb-xl-3 mb-md-3 mb-0 mt-xl-0 mt-md-0 mt-sm-3 mt-3'>
                                 <CCol className="d-flex justify-content-end gap-2 col-sm-12 col-xl-12 col-md-12">
                                     <CButton className='btn-search' onClick={()=>handleSearch()}>Search</CButton>
                                     <CButton color="secondary" onClick={()=>handleClearSearch()}>Clear</CButton>
@@ -267,12 +300,14 @@ const Consumption = () => {
                                 <CTableHeaderCell scope="col" className='text-center'>No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Plant</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Consumption Date</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Consumption Time</CTableHeaderCell>
                                 {/* <CTableHeaderCell scope="col">Katashiki</CTableHeaderCell> */}
                                 <CTableHeaderCell scope="col">Initial Stock</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Final Stock</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Qty</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Unit</CTableHeaderCell>
                             </CTableRow>
                         </CTableHead>
                         <CTableBody>
@@ -287,12 +322,14 @@ const Consumption = () => {
                                         <CTableDataCell className='text-center'>{index+1}</CTableDataCell>
                                         <CTableDataCell>{consumption.material_no}</CTableDataCell>
                                         <CTableDataCell>{consumption.material_desc}</CTableDataCell>
+                                        <CTableDataCell>{consumption.plant}</CTableDataCell>
                                         <CTableDataCell>{date}</CTableDataCell>
                                         <CTableDataCell>{time}</CTableDataCell>
                                         {/* <CTableDataCell>{consumption.katashiki}</CTableDataCell> */}
                                         <CTableDataCell>{consumption.initial_stock}</CTableDataCell>
                                         <CTableDataCell>{consumption.final_stock}</CTableDataCell>
                                         <CTableDataCell>{consumption.qty}</CTableDataCell>
+                                        <CTableDataCell>{consumption.unit}</CTableDataCell>
                                     </CTableRow>
                                 )
                             } )}

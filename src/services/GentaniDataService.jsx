@@ -52,6 +52,23 @@ const useGentaniDataService = () => {
             throw error 
         }
     }
+
+    const getRatioProductionData = async(api) => {
+        try {
+            const response = await axios.get(`${BACKEND_URL}/${api}`)
+            return response
+        } catch (error) {
+            throw error
+        }
+    }
+    const updateRatioProductionData = async(api, body, paramsId) => {
+        try {
+            const response = await axios.put(`${BACKEND_URL}/${api}/${paramsId}`, body)
+            return response
+        } catch (error) {
+            throw error
+        }
+    }
     
 
   return {
@@ -60,6 +77,8 @@ const useGentaniDataService = () => {
     createGentaniDataByUpload,
     updateGentaniData,
     deleteGentaniData,
+    getRatioProductionData,
+    updateRatioProductionData
   }
 }
 
