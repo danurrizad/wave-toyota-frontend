@@ -33,6 +33,7 @@ import {
     CModalFooter,
     CSpinner,
     CToaster,
+    CCardText,
   } from '@coreui/react'
 
 import CIcon from '@coreui/icons-react';
@@ -45,6 +46,7 @@ function Supplying() {
     const [showScanner, setShowScanner] = useState(false)
     const [visibleModalAdd, setVisibleModalAdd] = useState(false)
     const [visibleModalScanner, setVisibleModalScanner] = useState(false)
+    const [visibleModalTransaction, setVisibleModalTransaction] = useState(false)
     const [formData, setFormData] = useState({
         material_no: "",
         material_desc: "",
@@ -55,25 +57,31 @@ function Supplying() {
         qty_uom: 0,
         supply_by: ""
     })
+    const localSupplyQtyData = JSON.parse(localStorage.getItem('localSupplyQtyData'))
+    const localFilteredSupplyQtyData = JSON.parse(localStorage.getItem('localFilteredSupplyQtyData'))
+    const localTransactionData = JSON.parse(localStorage.getItem('localTransactionData'))
+
     const [defaultQty, setDefaultQty] = useState(0)
     const [loading, setLoading] = useState(false)
     const { getSupplyQtyData} = useSupplyQtyDataService()
     const { supplyingAndCreateHistory } = useHistoryDataService()
-    const [supplyQtyData, setSupplyQtyData] = useState([])
-    const [filteredData, setFilteredData] = useState([])
+
+    const [supplyQtyData, setSupplyQtyData] = useState(localSupplyQtyData)
+    const [filteredData, setFilteredData] = useState(localFilteredSupplyQtyData)
+    const [transactionData, setTransactionData] = useState(localTransactionData)
 
   const getSupplyQty = async() => {
     try {
         setLoading(true)
-      const response = await getSupplyQtyData('supply-qty')
-      const filtered = response.data.data.filter((data) => data.qty !== 0)
-      setSupplyQtyData(filtered)
-      setFilteredData(filtered)
-    } catch (error) {
-      console.log(error)
-    } finally{
-        setLoading(false)
-    }
+        const response = await getSupplyQtyData('supply-qty')
+        const filtered = response.data.data.filter((data) => data.qty !== 0)
+        setSupplyQtyData(filtered)
+        setFilteredData(filtered)
+        } catch (error) {
+        console.log(error)
+        } finally{
+            setLoading(false)
+        }
   }
 
   const handleSupplyAndCreateHistory = async(data) => {
@@ -82,8 +90,7 @@ function Supplying() {
             addToast(templateToast("Error", "Please insert your name!"))
             return
         }
-        const response = await supplyingAndCreateHistory(data)
-        addToast(templateToast("Success", response.data.message))
+        addToTransaction(data)
         setVisibleModalAdd(false)
         getSupplyQty()
     } catch (error) {
@@ -95,10 +102,48 @@ function Supplying() {
     }
   }
 
-    // Handler for when the input loses focus
+  const addToTransaction = (data) => {
+    const existingTransaction = localStorage.getItem('localTransactionData'); 
+    let dataArray = existingTransaction ? JSON.parse(existingTransaction) : []; 
+    dataArray.push(data); 
+    localStorage.setItem('localTransactionData', JSON.stringify(dataArray)); 
+    setTransactionData(JSON.parse(localStorage.getItem('localTransactionData')))
+    addToast(templateToast("Success", `Supply for Material No. ${data.material_no} in ${data.plant} added to list!`))
+  }
+
+  const removeTransaction = (data) => {
+    const existingTransaction = localStorage.getItem('localTransactionData'); 
+    let dataArray = existingTransaction ? JSON.parse(existingTransaction) : [];
+    dataArray.pop(data); 
+    localStorage.setItem('localTransactionData', JSON.stringify(dataArray)); 
+    setTransactionData(JSON.parse(localStorage.getItem('localTransactionData')))
+    addToast(templateToast("Success", `Supply for Material No. ${data.material_no} in ${data.plant} removed!`))
+  }
+
+  const handleSubmitTransaction = async(dataTransaction) => {
+    try {
+        const response = await supplyingAndCreateHistory(dataTransaction)
+        addToast(templateToast("Success", "All materials supply submitted!"))
+        setVisibleModalTransaction(false)
+        setTransactionData([])
+        getSupplyQty()
+    } catch (error) {
+        if(error.response){
+            addToast(templateToast("Error", error.response.data.message))
+        }
+        addToast(templateToast("Error", error.message))
+    } finally {
+        setLoading(false)
+    }
+  }
+
+  useEffect(()=>{
+    if(transactionData){
+        localStorage.setItem('localTransactionData', JSON.stringify(transactionData))
+    }
+  }, [transactionData])
+
   const handleBlur = () => {
-    // Round the value to the nearest step
-    
     const adjustedValuePack = Math.ceil(formData.qty_pack / 1) * 1;
     const adjustedValueUom = Math.ceil(formData.qty_uom / defaultQty) * defaultQty;
     setFormData({...formData, qty_pack: adjustedValuePack, qty_uom: adjustedValueUom});
@@ -107,6 +152,24 @@ function Supplying() {
   useEffect(()=>{
     getSupplyQty()
   }, [])
+
+  useEffect(()=>{
+    if(supplyQtyData){
+        localStorage.setItem('localSupplyQtyData', JSON.stringify(supplyQtyData))
+    }
+    if(filteredData){
+        localStorage.setItem('localFilteredSupplyQtyData', JSON.stringify(filteredData))
+    }
+  }, [supplyQtyData, filteredData])
+
+  useEffect(() => {
+        return () => {
+        localStorage.removeItem('localSupplyQtyData')
+        localStorage.removeItem('localFilteredSupplyQtyData')
+        localStorage.removeItem('localSupplyQty')
+        localStorage.removeItem('localFilteredSupplyQty')
+        }
+    }, [])
 
 
   const [totalPage, setTotalPage] = useState(0)
@@ -122,7 +185,7 @@ function Supplying() {
 
   const optionsMaterialDesc = Array.from(
     new Map(
-      supplyQtyData.map((material) => [material.material_desc, material]) // Use a Map to remove duplicates by material_desc
+      supplyQtyData?.map((material) => [material.material_desc, material]) // Use a Map to remove duplicates by material_desc
     ).values()
   ).map((material) => ({
     value: material.material_no, // Use material_desc as the value
@@ -166,6 +229,7 @@ function Supplying() {
     })
 
     setFilteredData(filtered)
+    // localStorage.setItem('localFilteredSupplyQty', filtered)
     setTotalPage(Math.ceil(filtered.length / itemPerPage))
     setCurrentPage(1); // Reset to the first page
 };
@@ -173,6 +237,7 @@ function Supplying() {
   const handleClearSearch = () => {
     setSearchQuery({materialDescOrNo: "", materialNo: "", plant: "All"})
     setFilteredData(supplyQtyData)
+    // localStorage.setItem('localFilteredSupplyQty', supplyQtyData)
     setTotalPage(Math.ceil(supplyQtyData.length / itemPerPage))
     setCurrentPage(1)
   }
@@ -183,10 +248,11 @@ function Supplying() {
   }
 
     useEffect(() => {
-        setTotalPage(Math.ceil(filteredData.length / itemPerPage));
+        setTotalPage(Math.ceil(filteredData?.length / itemPerPage));
     }, [filteredData, itemPerPage]);
 
-    const paginatedData = filteredData.slice((currentPage - 1) * itemPerPage, currentPage * itemPerPage);
+    const paginatedData = filteredData?.slice((currentPage - 1) * itemPerPage, currentPage * itemPerPage);
+    // const paginatedData = localFilteredSupplyQtyData.slice((currentPage - 1) * itemPerPage, currentPage * itemPerPage);
 
 
   const handleModalAdd = (data) => {
@@ -306,9 +372,9 @@ function Supplying() {
                 <CRow className="mb-">
                     <CFormLabel htmlFor="qty" className="col-sm-4 col-form-label">Quantity</CFormLabel>
                 </CRow>
-                <CRow className="mb-3">
+                <CRow className="mb-3  d-flex align-items-center">
                     <CFormLabel htmlFor="qty_pack" className="col-sm-4 col-form-label">By Pack<span style={{color: "red"}}>*</span></CFormLabel>
-                    <CCol sm={6}>
+                    <CCol sm={6} xs={9}>
                         <CInputGroup>
                             <CFormInput type="number" id="qty_pack" step={1} value={formData.qty_pack} onBlur={handleBlur} onChange={handleChangeQtyPack}/>
                             <div className='d-flex flex-column'>
@@ -317,13 +383,13 @@ function Supplying() {
                             </div>
                         </CInputGroup>
                     </CCol>
-                    <CCol sm={2}>
+                    <CCol sm={2} xs={3}>
                         <CFormLabel htmlFor="qty" className="col-sm-4 col-form-label">{formData.pack}</CFormLabel>
                     </CCol>
                 </CRow>
-                <CRow className="mb-3">
+                <CRow className="mb-3 d-flex align-items-center">
                     <CFormLabel htmlFor="qty" className="col-sm-4 col-form-label">By Uom<span style={{color: "red"}}>*</span></CFormLabel>
-                    <CCol sm={6}>
+                    <CCol sm={6} xs={9}>
                         <CInputGroup>
                             <CFormInput type="number" id="qty" step={defaultQty} value={formData.qty_uom} onBlur={handleBlur} onChange={handleChangeQtyUom}/>
                             <div className='d-flex flex-column'>
@@ -332,14 +398,16 @@ function Supplying() {
                             </div>
                         </CInputGroup>
                     </CCol>
-                    <CCol sm={2}>
+                    <CCol sm={2} xs={3}>
                         <CFormLabel htmlFor="qty" className="col-sm-4 col-form-label">{formData.uom}</CFormLabel>
                     </CCol>
                 </CRow>
+                {/* <p className='pb-4'><span style={{fontWeight: "bold"}}>Note</span>{`: A pack of ${formData.pack} is equal to ${formData.qty_uom} ${formData.uom}`}</p> */}
+
                 <CRow className="mb-3">
                     <CFormLabel htmlFor="supplyBy" className="col-sm-4 col-form-label">Supplier Name<span style={{color: "red"}}>*</span></CFormLabel>
                     <CCol sm={8}>
-                        <CFormInput type="text" id="supplyBy" value={formData.supply_by || ""} onChange={(e)=>setFormData({...formData, supply_by: e.target.value})}/>
+                        <CFormInput type="text" id="supplyBy" maxLength={20} value={formData.supply_by || ""} onChange={(e)=>setFormData({...formData, supply_by: e.target.value})}/>
                     </CCol>
                 </CRow>
             </CModalBody>
@@ -374,6 +442,73 @@ function Supplying() {
         </CContainer>
         )
     }
+
+    {/* Start of Modal Scanner */}
+    const renderModalTransaction = () => {
+        return(
+            <CContainer fluid>
+                <CModal
+                    size="xl"
+                    visible={visibleModalTransaction}
+                    onClose={() => setVisibleModalTransaction(false)}
+                    aria-labelledby="Transaction"
+                    scrollable
+                    >
+                    <CModalHeader>
+                        <CModalTitle id="Transaction">List Material Supplied</CModalTitle>
+                    </CModalHeader>
+                    <CModalBody>
+                        <CTable bordered striped style={{fontSize: "12px", verticalAlign: "middle"}}>
+                            <CTableHead>
+                                <CTableRow color='dark' className='table-head-row'>
+                                        <CTableHeaderCell scope="col" className="text-center">No</CTableHeaderCell>
+                                        <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
+                                        <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
+                                        <CTableHeaderCell scope="col">Plant</CTableHeaderCell>
+                                        <CTableHeaderCell scope="col">Supplied By Pack</CTableHeaderCell>
+                                        <CTableHeaderCell scope="col">Supplied By UoM</CTableHeaderCell>
+                                        <CTableHeaderCell scope="col">Action</CTableHeaderCell>
+                                </CTableRow>
+                            </CTableHead>
+                            <CTableBody>
+                                {transactionData && transactionData.map((transaction, index)=>{
+                                    return(
+                                        <CTableRow key={index}>
+                                            <CTableDataCell className="text-center">{index + 1}</CTableDataCell>
+                                            <CTableDataCell>{transaction.material_no}</CTableDataCell>
+                                            <CTableDataCell>{transaction.material_desc}</CTableDataCell>
+                                            <CTableDataCell>{transaction.plant}</CTableDataCell>
+                                            <CTableDataCell>{transaction.qty_pack}</CTableDataCell>
+                                            <CTableDataCell>{transaction.qty_uom}</CTableDataCell>
+                                            <CTableDataCell className='text-center' >
+                                                <CButton className='btn-icon-delete' onClick={()=>removeTransaction(transaction)}><CIcon icon={icon.cilTrash}/></CButton>
+                                            </CTableDataCell>
+                                        </CTableRow>
+                                    )
+                                })}
+                                { transactionData?.length === 0 && !loading && 
+                                    <CTableRow color="light">
+                                        <CTableDataCell color="light" colSpan={7}>
+                                            <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                                <CIcon icon={icon.cilFax} size='3xl'/>
+                                                <p className='pt-3'>No data found!</p>
+                                            </div>
+                                        </CTableDataCell>
+                                    </CTableRow>
+                                }
+                            </CTableBody>
+                        </CTable>
+                    </CModalBody>
+                    <CModalFooter>
+                        <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalTransaction(false)}>
+                            Close
+                        </CButton>
+                        <CButton className='btn-add-master' onClick={()=>handleSubmitTransaction(transactionData)}>Submit</CButton>
+                    </CModalFooter>
+                </CModal>
+        </CContainer>
+        )
+    }
     
 
   useEffect(() => {
@@ -396,19 +531,20 @@ function Supplying() {
 
         {renderModalUpdate()}
         {renderModalScanner()}
+        {renderModalTransaction()}
 
-        <CRow className='py-4 d-flex align-items-start'>
+        <CRow className='py-4 d-flex align-items-start mb-4'>
             <CCol className='text-center'>
                 <h1>Master Supplier Material</h1>
                 <h6>Input quantity to supply material</h6>
             </CCol>
         </CRow>
         
-        <CRow className='d-flex justify-between gap-xl-4 flex-column flex-xl-row'>
+        <CRow className='d-flex justify-between gap-xl-4 flex-column flex-xl-row '>
             <CCol xl={4}>
                 <CRow className="mb-3">
-                    <CFormLabel htmlFor="materialDesc" className='col-xl-2 col-form-label col-md-3'>Material</CFormLabel>
-                    <CCol className="d-flex align-items-center justify-content-start gap-2" >
+                    <CFormLabel htmlFor="materialDesc" className='col-xl-2 col-form-label col-md-3 col-sm-2'>Material</CFormLabel>
+                    <CCol className="d-flex align-items-center justify-content-start gap-2 " >
                         {/* <CFormInput type="text" id="materialDesc" value={searchQuery.materialDescOrNo} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e.target.value })} /> */}
                         <Select noOptionsMessage={() =>  "No material found" } options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                     </CCol>
@@ -417,8 +553,8 @@ function Supplying() {
             <CCol></CCol>
             <CCol className="" xl={4}>
                 <CRow className="mb-3">
-                    <CFormLabel htmlFor="plant" className='col-sm-2 col-form-label col-md-3' >Plant</CFormLabel>
-                    <CCol className='d-flex align-items-center gap-2 col-sm-8 col-md-6'>
+                    <CFormLabel htmlFor="plant" className='col-sm-2 col-form-label col-md-3 col-xl-2' >Plant</CFormLabel>
+                    <CCol className='d-flex align-items-center gap-2 col-sm-8 col-md-6 col-xl-7'>
                         <CDropdown className='dropdown-search d-flex justify-content-between'>
                             <CDropdownToggle width={400} className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
                             <CDropdownMenu className='cursor-pointer'>
@@ -437,17 +573,20 @@ function Supplying() {
         </CRow>
 
         <CRow>
-            <CCol>
+            <CCol xs={5} sm={5} md={4} lg={3} xxl={2}>
                 <CButton className='btn-add-master d-flex align-items-center gap-2' onClick={()=>setVisibleModalScanner(true)}><CIcon icon={icon.cilQrCode} size='lg'/>Input by QR-Code</CButton>
+            </CCol>
+            <CCol>
+                <CButton className='btn-add-master d-flex align-items-center gap-2' onClick={()=>setVisibleModalTransaction(true)}><CIcon icon={icon.cilFolderOpen} size='lg'/>List Material Supplied</CButton>
             </CCol>
         </CRow>
 
         {/* {showScanner && <QrReader setShowScanner={setShowScanner} setVisibleModalAdd={setVisibleModalAdd} setFormData={setFormData} setDefaultQty={setDefaultQty}/>} */}
 
        <CRow className='overflow-y-auto p-3'>
-        <CTable bordered striped style={{fontSize: "12px"}}>
+        <CTable bordered striped style={{fontSize: "12px", verticalAlign: "middle"}}>
             <CTableHead>
-                <CTableRow color='dark' className=''>
+                <CTableRow color='dark' className='table-head-row'>
                         <CTableHeaderCell scope="col" className="text-center">Action</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
@@ -473,7 +612,16 @@ function Supplying() {
                 })}
             </CTableBody>
         </CTable>
-        { paginatedData.length === 0 && !loading && <h2 className='text-center py-4'>No material found!</h2>}
+        { paginatedData?.length === 0 && !loading && 
+            <CTableRow color="light">
+                <CTableDataCell color="light" colSpan={7}>
+                    <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                        <CIcon icon={icon.cilFax} size='3xl'/>
+                        <p className='pt-3'>No data found!</p>
+                    </div>
+                </CTableDataCell>
+            </CTableRow>
+        }
         { loading && <h2 className='text-center py-4'>...</h2>}
        </CRow>
 
@@ -528,13 +676,13 @@ function Supplying() {
 
                     {/* Next Button */}
                     <CPaginationItem
-                        disabled={currentPage === totalPage || filteredData.length === 0}
+                        disabled={currentPage === totalPage || filteredData?.length === 0}
                         onClick={() => currentPage < totalPage && setCurrentPage(currentPage + 1)}
                     >
                         Next
                     </CPaginationItem>
                     <CPaginationItem
-                        disabled={currentPage === totalPage || filteredData.length === 0}
+                        disabled={currentPage === totalPage || filteredData?.length === 0}
                         onClick={() => currentPage < totalPage && setCurrentPage(totalPage)}
                     >
                         Last
