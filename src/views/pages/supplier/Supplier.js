@@ -70,6 +70,21 @@ function Supplying() {
     const [filteredData, setFilteredData] = useState(localFilteredSupplyQtyData)
     const [transactionData, setTransactionData] = useState(localTransactionData)
 
+    useEffect(() => {
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => {
+          window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+      }, []);
+      
+      const handleBeforeUnload = (e) => {
+        e.preventDefault();
+        const message =
+          "Are you sure you want to leave? All provided data will be lost.";
+        e.returnValue = message;
+        return message;
+      };
+
   const getSupplyQty = async() => {
     try {
         setLoading(true)
@@ -166,8 +181,7 @@ function Supplying() {
         return () => {
         localStorage.removeItem('localSupplyQtyData')
         localStorage.removeItem('localFilteredSupplyQtyData')
-        localStorage.removeItem('localSupplyQty')
-        localStorage.removeItem('localFilteredSupplyQty')
+        localStorage.removeItem('localTransactionData')
         }
     }, [])
 
