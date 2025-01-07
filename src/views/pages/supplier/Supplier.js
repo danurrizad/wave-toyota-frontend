@@ -145,8 +145,9 @@ function Supplying() {
     } catch (error) {
         if(error.response){
             addToast(templateToast("Error", error.response.data.message))
+        } else{
+            addToast(templateToast("Error", error.message))
         }
-        addToast(templateToast("Error", error.message))
     } finally {
         setLoading(false)
     }
@@ -166,6 +167,7 @@ function Supplying() {
   
   useEffect(()=>{
     getSupplyQty()
+    console.log("transactionData :", transactionData)
   }, [])
 
   useEffect(()=>{
@@ -500,7 +502,7 @@ function Supplying() {
                                         </CTableRow>
                                     )
                                 })}
-                                { transactionData?.length === 0 && !loading && 
+                                { (transactionData?.length === 0 || transactionData === null) && !loading && 
                                     <CTableRow color="light">
                                         <CTableDataCell color="light" colSpan={7}>
                                             <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
