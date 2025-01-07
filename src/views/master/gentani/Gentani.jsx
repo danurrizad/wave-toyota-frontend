@@ -459,6 +459,23 @@ const Gentani = () => {
     const handleUpdateRatio = async(body) =>{
         try {
             setLoading(true)
+            if(body.fortuner > 100 || body.zenix > 100 || body.innova > 100 || body.avanza > 100 || body.yaris > 100 || body.calya > 100){
+                addToast(templateToast("Error", "Rate production each unit can't be more than 100!"))
+                setLoading(false)
+                return
+            }
+            if(body.fortuner + body.zenix + body.innova > 100){
+                addToast(templateToast("Error", "Rate production in PLANT 1 can't be more than 100!"))
+                setLoading(false)
+                return
+                
+            }
+            if(body.avanza + body.yaris + body.calya > 100){
+                addToast(templateToast("Error", "Rate production in PLANT 2 can't be more than 100!"))
+                setLoading(false)
+                return
+            }
+            
             const response = await updateRatioProductionData('ratio-production', body, 1)
             addToast(templateToast("Success", response.data.message))
             setVisibleModalRatio(false)
@@ -1119,7 +1136,12 @@ const Gentani = () => {
                         </CTableBody>
                     </CTable>
                 </CCol>
-                    {paginatedData?.length === 0 && !loading && <h2 className='text-center py-4'>No gentani data found!</h2>}
+                    { paginatedData.length === 0 && !loading && 
+                        <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                            <CIcon icon={icon.cilFax} size='3xl'/>
+                            <p className='pt-3'>No data found!</p>
+                        </div>
+                    }
                     {loading && <h2 className='text-center py-4'>...</h2>}
             </CRow>
             <CRow>

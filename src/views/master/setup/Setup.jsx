@@ -248,6 +248,16 @@ const Setup = () => {
                     </CRow>
                 </CCol>
             </CRow>
+            <CRow className='pt-4'>
+                <CCol xxl={2} md={3} sm={4} xs={5} className='d-flex align-items-center gap-1'>
+                    <div style={{ width: "30px", height: "30px", backgroundColor: "#F2E4C6"}}></div>
+                    <p>Need to be supplied</p>
+                </CCol>
+                <CCol className='d-flex align-items-center gap-1'>
+                    <div style={{ width: "30px", height: "30px", backgroundColor: "#FADDDD"}}></div>
+                    <p>At critical stock</p>
+                </CCol>
+            </CRow>
             <CRow>
                 <CCol className='py-4 text-table-small'>
                     <CTable bordered striped responsive>
@@ -270,7 +280,7 @@ const Setup = () => {
                         <CTableBody>
                         { paginatedData && paginatedData.map((setup, index) => {
                                 return(
-                                    <CTableRow key={index} style={{ verticalAlign: "middle" }}>
+                                    <CTableRow color={setup.total < setup.standard_supply && setup.total > setup.critical_stock ? "warning" : setup.total < setup.critical_stock ? "danger" : ""} key={index} style={{ verticalAlign: "middle", backgroundColor: "black" }}>
                                         <CTableDataCell className='text-center'>
                                             <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(setup)}><CIcon icon={icon.cilColorBorder}/></CButton>
                                         </CTableDataCell>
@@ -290,7 +300,12 @@ const Setup = () => {
                             } )}
                         </CTableBody>
                     </CTable>
-                    {paginatedData?.length === 0 && !loading && <h2 className='text-center py-4'>No setup data found!</h2>}
+                    { paginatedData.length === 0 && !loading && 
+                        <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                            <CIcon icon={icon.cilFax} size='3xl'/>
+                            <p className='pt-3'>No data found!</p>
+                        </div>
+                    }
                     {loading && <h2 className='text-center py-4'>...</h2>}
                 </CCol>
             </CRow>

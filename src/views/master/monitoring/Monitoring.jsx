@@ -295,7 +295,12 @@ const Monitoring = () => {
                             } )}
                         </CTableBody>
                     </CTable>
-                    {paginatedData?.length === 0 && !loading && <h2 className='text-center py-4'>No monitoring data found!</h2>}
+                    { paginatedData.length === 0 && !loading && 
+                        <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                            <CIcon icon={icon.cilFax} size='3xl'/>
+                            <p className='pt-3'>No data found!</p>
+                        </div>
+                    }
                     {loading && <h2 className='text-center py-4'>...</h2>}
                 </CCol>
             </CRow>
