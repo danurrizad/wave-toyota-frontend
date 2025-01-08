@@ -19,7 +19,10 @@ import {
     CPagination,
     CPaginationItem,
     CToaster,
-    CSpinner
+    CSpinner,
+    CCard,
+    CCardBody,
+    CCardFooter
   } from '@coreui/react'
 
 import dayjs from 'dayjs';
@@ -41,15 +44,20 @@ const Consumption = () => {
   const [period, setPeriod] = useState(null)
   const [loading, setLoading] = useState(false)
   const [toast, addToast] = useState(0)
+
   const toaster = useRef()
 
   const [consumptionData, setConsumptionData] = useState([])
   const {getConsumptionHistory} = useHistoryDataService()
+  const [totalProductionPerUnit, setTotalProductionPerUnit] = useState([])
 
   const getConsumption = async() => {
     try {
         setLoading(true)
         const response = await getConsumptionHistory()
+        const totalUnit = calculateUnitsByUnitToday(response.data.data)
+        
+        setTotalProductionPerUnit(totalUnit)
         setConsumptionData(response.data.data)
         setFilteredData(response.data.data)
     } catch (error) {
@@ -68,6 +76,39 @@ const Consumption = () => {
   useEffect(()=>{
     getConsumption()
   }, [])
+
+  // Function to check if a timestamp is within today's date range
+    const isToday = (timestamp) => {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const endOfDay = new Date(startOfDay);
+        endOfDay.setDate(startOfDay.getDate() + 1);
+
+        return date >= startOfDay && date < endOfDay;
+    };
+
+    // Function to calculate total units produced per `unit` for today
+    const calculateUnitsByUnitToday = (data) => {
+        const unitsCount = {};
+        data.forEach((item) => {
+            if (isToday(item.consumption_time)) {
+                const key = `${item.consumption_time}-${item.unit}`;
+                if (!unitsCount[item.unit]) {
+                    unitsCount[item.unit] = new Set(); // Use Set to avoid duplicate `usedAt` values
+                }
+                unitsCount[item.unit].add(key);
+            }
+        });
+
+        // Convert the Set size to count of unique `usedAt` per unit
+        const result = {};
+        for (const unit in unitsCount) {
+            result[unit] = unitsCount[unit].size;
+        }
+
+        return result;
+    };
 
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -220,7 +261,75 @@ const Consumption = () => {
 
             {/* Toast */}
             <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
+            <CRow className='mb-3'>
+                <h3>{`Today's Unit Production Counter`}</h3>
+            </CRow>
+            <CRow className='pb-5'>
+                <CCol lg={2} xs={4}>
+                    <CCard className='text-center'>
+                        <CCardBody className='d-flex justify-content-center'>
+                            <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
+                                { totalProductionPerUnit.Fortuner ? totalProductionPerUnit.Fortuner : 0}
+                            </div>
+                        </CCardBody>
+                        <CCardFooter>Fortuner</CCardFooter>
+                    </CCard>
+                </CCol>
+                <CCol lg={2} xs={4}>
+                    <CCard className='text-center'>
+                        <CCardBody className='d-flex justify-content-center'>
+                            <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
+                                { totalProductionPerUnit.Zenix ? totalProductionPerUnit.Zenix : 0}
+                            </div>
+                        </CCardBody>
+                        <CCardFooter>Zenix</CCardFooter>
+                    </CCard>
+                </CCol>
+                <CCol lg={2} xs={4}>
+                    <CCard className='text-center'>
+                        <CCardBody className='d-flex justify-content-center'>
+                            <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
+                                { totalProductionPerUnit.Innova ? totalProductionPerUnit.Innova : 0}
+                            </div>
+                        </CCardBody>
+                        <CCardFooter>Innova</CCardFooter>
+                    </CCard>
+                </CCol>
+                <CCol lg={2} xs={4}>
+                    <CCard className='text-center'>
+                        <CCardBody className='d-flex justify-content-center'>
+                            <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
+                                { totalProductionPerUnit.Avanza ? totalProductionPerUnit.Avanza : 0}
+                            </div>
+                        </CCardBody>
+                        <CCardFooter>Avanza</CCardFooter>
+                    </CCard>
+                </CCol>
+                <CCol lg={2} xs={4}>
+                    <CCard className='text-center'>
+                        <CCardBody className='d-flex justify-content-center'>
+                            <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
+                                { totalProductionPerUnit.Yaris ? totalProductionPerUnit.Yaris : 0}
+                            </div>
+                        </CCardBody>
+                        <CCardFooter>Yaris</CCardFooter>
+                    </CCard>
+                </CCol>
+                <CCol lg={2} xs={4}>
+                    <CCard className='text-center'>
+                        <CCardBody className='d-flex justify-content-center'>
+                            <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
+                                { totalProductionPerUnit.Calya ? totalProductionPerUnit.Calya : 0 }
+                            </div>
+                        </CCardBody>
+                        <CCardFooter>Calya</CCardFooter>
+                    </CCard>
+                </CCol>
+            </CRow>
 
+            <CRow>
+                <h3>History</h3>
+            </CRow>
             <CRow >
                 <CCol xl={3} md={6} sm={6} xs={12} >
                     <CRow className='mb-3'>
