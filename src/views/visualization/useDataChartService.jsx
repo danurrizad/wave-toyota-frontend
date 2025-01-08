@@ -79,7 +79,7 @@ const useDataChartService = () => {
                     },
                     type: 'column',
                     height: (9 / 17 * 100) + '%',
-                    backgroundColor: option.yAxisSeries.data.green > option.yAxisSeries.data.yellow ? "#004C4E"  : option.yAxisSeries.data.green < option.yAxisSeries.data.red ? "#6B2000" : option.yAxisSeries.data.green < option.yAxisSeries.data.yellow && option.yAxisSeries.data.green > option.yAxisSeries.data.red ? "#663E00" : "",
+                    backgroundColor: option.yAxisSeries.data.green > option.yAxisSeries.data.yellow ? "#004C4E"  : option.yAxisSeries.data.green <= option.yAxisSeries.data.red ? "#6B2000" : option.yAxisSeries.data.green <= option.yAxisSeries.data.yellow && option.yAxisSeries.data.green > option.yAxisSeries.data.red ? "#663E00" : "",
                     style: {
                         color: 'white'
                     }
@@ -182,7 +182,7 @@ const useDataChartService = () => {
                             borderWidth: 0,
                             style: {
                               fontSize: '3em',
-                              textOutline : option.yAxisSeries.data.green > option.yAxisSeries.data.yellow ? "#31A093"  : option.yAxisSeries.data.green < option.yAxisSeries.data.red ? "#DD6F4F" : option.yAxisSeries.data.green < option.yAxisSeries.data.yellow && option.yAxisSeries.data.green > option.yAxisSeries.data.red ? "#EAC670" : "",
+                              textOutline : option.yAxisSeries.data.green > option.yAxisSeries.data.yellow ? "#31A093"  : option.yAxisSeries.data.green < option.yAxisSeries.data.red ? "#DD6F4F" : option.yAxisSeries.data.green <= option.yAxisSeries.data.yellow && option.yAxisSeries.data.green > option.yAxisSeries.data.red ? "#EAC670" : "",
                               color: 'white',
                               backgroundColor: '#4FD7CD',
                               borderWidth: '10px',
@@ -192,7 +192,7 @@ const useDataChartService = () => {
                           tooltip: {
                             valueSuffix: option.yAxisTitle,
                           },
-                          color: option.yAxisSeries.data.green > option.yAxisSeries.data.yellow ? "#4FD7CD"  : option.yAxisSeries.data.green < option.yAxisSeries.data.red ? "#D6531C" : option.yAxisSeries.data.green < option.yAxisSeries.data.yellow && option.yAxisSeries.data.green > option.yAxisSeries.data.red ? "#FBA21B" : "",
+                          color: option.yAxisSeries.data.green > option.yAxisSeries.data.yellow ? "#4FD7CD"  : option.yAxisSeries.data.green < option.yAxisSeries.data.red ? "#D6531C" : option.yAxisSeries.data.green <= option.yAxisSeries.data.yellow && option.yAxisSeries.data.green > option.yAxisSeries.data.red ? "#FBA21B" : "",
                         },
                         {
                           y: 0,
