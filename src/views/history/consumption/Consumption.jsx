@@ -295,7 +295,7 @@ const Consumption = () => {
                         <CCardFooter>Innova</CCardFooter>
                     </CCard>
                 </CCol>
-                <CCol lg={2} xs={4}>
+                <CCol lg={2} xs={4} className='pt-lg-0 pt-4'>
                     <CCard className='text-center'>
                         <CCardBody className='d-flex justify-content-center'>
                             <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
@@ -305,7 +305,7 @@ const Consumption = () => {
                         <CCardFooter>Avanza</CCardFooter>
                     </CCard>
                 </CCol>
-                <CCol lg={2} xs={4}>
+                <CCol lg={2} xs={4} className='pt-lg-0 pt-4'>
                     <CCard className='text-center'>
                         <CCardBody className='d-flex justify-content-center'>
                             <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
@@ -315,7 +315,7 @@ const Consumption = () => {
                         <CCardFooter>Yaris</CCardFooter>
                     </CCard>
                 </CCol>
-                <CCol lg={2} xs={4}>
+                <CCol lg={2} xs={4} className='pt-lg-0 pt-4'>
                     <CCard className='text-center'>
                         <CCardBody className='d-flex justify-content-center'>
                             <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
