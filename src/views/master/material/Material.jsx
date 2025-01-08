@@ -71,7 +71,7 @@ const Material = () => {
         material_desc: "",
         plant: "Select",
         andon_display: "",
-        depth_material: 0,
+        depth_material: null,
         supply_line: "",
         uom: "Select",
         pack: "Select",
@@ -87,7 +87,7 @@ const Material = () => {
             material_desc: data.material_desc,
             plant: data.plant,
             andon_display: data.andon_display,
-            depth_material: data.depth_material,
+            depth_material: null,
             supply_line: data.supply_line,
             uom: data.uom,
             pack: data.pack,
@@ -302,7 +302,7 @@ const Material = () => {
                     <CRow className="mb-3">
                         <CFormLabel htmlFor="materialDesc" className="col-sm-4 col-form-label">Material Desc<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8}>
-                            <CFormInput type="text" id="materialDesc" required onChange={(e) => setFormAddData((prev) => ({ ...prev, material_desc: e.target.value }))}/>
+                            <CFormInput type="text" id="materialDesc" required onChange={(e) => setFormAddData((prev) => ({ ...prev, material_desc: e.target.value, andon_display: e.target.value }))}/>
                         </CCol>
                     </CRow>
                     <CRow className='mb-3'>
@@ -317,18 +317,18 @@ const Material = () => {
                             </CDropdown>
                         </CCol>
                     </CRow>
-                    <CRow className="mb-3">
+                    {/* <CRow className="mb-3">
                         <CFormLabel htmlFor="depthMaterial" className="col-sm-4 col-form-label">Depth Material<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8}>
                             <CFormInput type="number" id="depthMaterial" onChange={(e) => setFormAddData((prev) => ({ ...prev, depth_material: e.target.value }))}/>
                         </CCol>
-                    </CRow>
-                    <CRow className="mb-3">
+                    </CRow> */}
+                    {/* <CRow className="mb-3">
                         <CFormLabel htmlFor="andonDisplay" className="col-sm-4 col-form-label">Andon Display<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8}>
                             <CFormInput type="text" id="andonDisplay" onChange={(e) => setFormAddData((prev) => ({ ...prev, andon_display: e.target.value }))}/>
                         </CCol>
-                    </CRow>
+                    </CRow> */}
                     <CRow className="mb-3">
                         <CFormLabel htmlFor="supplyLine" className="col-sm-4 col-form-label">Supply Line<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8}>
@@ -392,7 +392,7 @@ const Material = () => {
                     <CRow className="mb-3">
                         <CFormLabel htmlFor="materialDesc" className="col-sm-4 col-form-label">Material Desc</CFormLabel>
                         <CCol sm={8}>
-                            <CFormInput type="text" id="materialDesc" value={formUpdateData.material_desc || ""} onChange={(e) => setFormUpdateData((prev) => ({ ...prev, material_desc: e.target.value }))}/>
+                            <CFormInput type="text" id="materialDesc" value={formUpdateData.material_desc || ""} onChange={(e) => setFormUpdateData((prev) => ({ ...prev, material_desc: e.target.value, andon_display: e.target.value }))}/>
                         </CCol>
                     </CRow>
                     <CRow className='mb-3'>
@@ -407,18 +407,18 @@ const Material = () => {
                             </CDropdown>
                         </CCol>
                     </CRow>
-                    <CRow className="mb-3">
+                    {/* <CRow className="mb-3">
                         <CFormLabel htmlFor="depthMaterial" className="col-sm-4 col-form-label">Depth Material</CFormLabel>
                         <CCol sm={8}>
                             <CFormInput type="number" id="depthMaterial" value={formUpdateData.depth_material || ""} onChange={(e) => setFormUpdateData((prev) => ({ ...prev, depth_material: e.target.value }))}/>
                         </CCol>
-                    </CRow>
-                    <CRow className="mb-3">
+                    </CRow> */}
+                    {/* <CRow className="mb-3">
                         <CFormLabel htmlFor="andonDisplay" className="col-sm-4 col-form-label">Andon Display</CFormLabel>
                         <CCol sm={8}>
                             <CFormInput type="text" id="andonDisplay" value={formUpdateData.andon_display || ""} onChange={(e) => setFormUpdateData((prev) => ({ ...prev, andon_display: e.target.value }))}/>
                         </CCol>
-                    </CRow>
+                    </CRow> */}
                     <CRow className="mb-3">
                         <CFormLabel htmlFor="supplyLine" className="col-sm-4 col-form-label">Supply Line</CFormLabel>
                         <CCol sm={8}>
@@ -546,7 +546,7 @@ const Material = () => {
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Plant</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Andon Display</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Depth Material</CTableHeaderCell>
+                                {/* <CTableHeaderCell scope="col">Depth Material</CTableHeaderCell> */}
                                 <CTableHeaderCell scope="col">Supply Line</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Uom</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Pack</CTableHeaderCell>
@@ -570,7 +570,7 @@ const Material = () => {
                                         <CTableDataCell>{material.material_desc}</CTableDataCell>
                                         <CTableDataCell>{material.plant}</CTableDataCell>
                                         <CTableDataCell>{material.andon_display}</CTableDataCell>
-                                        <CTableDataCell>{material.depth_material}</CTableDataCell>
+                                        {/* <CTableDataCell>{material.depth_material}</CTableDataCell> */}
                                         <CTableDataCell>{material.supply_line}</CTableDataCell>
                                         <CTableDataCell>{material.uom}</CTableDataCell>
                                         <CTableDataCell>{material.pack}</CTableDataCell>
@@ -583,7 +583,7 @@ const Material = () => {
                             } )}
                             { paginatedData.length === 0 && !loading && 
                                 <CTableRow color="light">
-                                    <CTableDataCell color="light" colSpan={14}>
+                                    <CTableDataCell color="light" colSpan={13}>
                                         <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
                                             <CIcon icon={icon.cilFax} size='3xl'/>
                                             <p className='pt-3'>No data found!</p>
