@@ -32,6 +32,7 @@ import {
     CImage,
     CCardBody,
     CCard,
+    CCardHeader,
 } from '@coreui/react'
 
 import dayjs from 'dayjs';
@@ -85,20 +86,29 @@ const Gentani = () => {
         fortuner: 0,
         zenix: 0,
         innova: 0,
+        tact_time_1: 0,
+        efficiency_1: 0,
         avanza: 0,
         yaris: 0,
-        calya: 0
+        calya: 0,
+        tact_time_2: 0,
+        efficiency_2: 0
     })
 
     const handleModalRatio = (data) => {
         setVisibleModalRatio(true)
+        console.log(data)
         setFormUpdateRatio({
-            fortuner: data.data[0].fortuner,
-            zenix: data.data[0].zenix,
-            innova: data.data[0].innova,
-            avanza: data.data[0].avanza,
-            yaris: data.data[0].yaris,
-            calya: data.data[0].calya,
+            fortuner: data.data.fortuner,
+            zenix: data.data.zenix,
+            innova: data.data.innova,
+            tact_time_1: data.data.tact_time_1,
+            efficiency_1: data.data.efficiency_1,
+            avanza: data.data.avanza,
+            yaris: data.data.yaris,
+            calya: data.data.calya,
+            tact_time_2: data.data.tact_time_2,
+            efficiency_2: data.data.efficiency_2,
         })
     }
 
@@ -464,14 +474,20 @@ const Gentani = () => {
                 setLoading(false)
                 return
             }
-            if(body.fortuner + body.zenix + body.innova > 100){
+            if(+body.fortuner + +body.zenix + +body.innova > 100){
                 addToast(templateToast("Error", "Rate production in PLANT 1 can't be more than 100!"))
                 setLoading(false)
                 return
                 
             }
-            if(body.avanza + body.yaris + body.calya > 100){
+            if(+body.avanza + +body.yaris + +body.calya > 100){
                 addToast(templateToast("Error", "Rate production in PLANT 2 can't be more than 100!"))
+                setLoading(false)
+                return
+            }
+
+            if(body.efficiency_1 > 100 || body.efficiency_2 > 100){
+                addToast(templateToast("Error", "Efficiency can't be more than 100"))
                 setLoading(false)
                 return
             }
@@ -642,6 +658,7 @@ const Gentani = () => {
 
             {/* Start of Modal RATIO */}
             <CModal
+                scrollable
                 backdrop="static"
                 visible={visibleModalRatio}
                 onClose={() => setVisibleModalRatio(false)}
@@ -651,68 +668,250 @@ const Gentani = () => {
                     <CModalTitle id="Ratio">Ratio Production</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
-                    
+                    <CCard>
+                        <CCardHeader>PLANT 1</CCardHeader>
+                        <CCardBody>
+                            <CRow className="mb-">
+                                <CFormLabel className="col-form-label">Rate Production</CFormLabel>
+                            </CRow>
+                            <CRow className="mb-3">
+                                <CFormLabel htmlFor="ratioF" className="col-4 col-form-label">Fortuner</CFormLabel>
+                                <CCol xs={3} sm={3}>
+                                    <CFormInput 
+                                        type="number" 
+                                        inputMode='numeric' 
+                                        id="ratioF" 
+                                        value={formUpdateRatio.fortuner} 
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value.length <= 3) { // Enforce maxLength
+                                                setFormUpdateRatio((prev) => ({
+                                                    ...prev,
+                                                    fortuner: value
+                                                }));
+                                            }
+                                        }}    
+                                    />
+                                </CCol>
+                                <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                                    <p>%</p>
+                                </CCol>
+                            </CRow>
+                            <CRow className="mb-3">
+                                <CFormLabel htmlFor="ratioZ" className="col-4 col-form-label">Zenix</CFormLabel>
+                                <CCol xs={3} sm={3}>
+                                    <CFormInput 
+                                        type="number" 
+                                        inputMode='numeric' 
+                                        id="ratioZ" 
+                                        value={formUpdateRatio.zenix} 
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value.length <= 3) { // Enforce maxLength
+                                                setFormUpdateRatio((prev) => ({
+                                                    ...prev,
+                                                    zenix: value
+                                                }));
+                                            }
+                                        }}    
+                                    />
+                                </CCol>
+                                <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                                    <p>%</p>
+                                </CCol>
+                            </CRow>
+                            <CRow className="mb-4">
+                                <CFormLabel htmlFor="ratioI" className="col-4 col-form-label">Innova</CFormLabel>
+                                <CCol xs={3} sm={3}>
+                                    <CFormInput 
+                                        type="number" 
+                                        inputMode='numeric' 
+                                        id="ratioI" 
+                                        value={formUpdateRatio.innova} 
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value.length <= 3) { // Enforce maxLength
+                                                setFormUpdateRatio((prev) => ({
+                                                    ...prev,
+                                                    innova: value
+                                                }));
+                                            }
+                                        }}    
+                                    />
+                                </CCol>
+                                <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                                    <p>%</p>
+                                </CCol>
+                            </CRow>
+                            <CRow className="mb- mt-4">
+                                <CFormLabel className="col-form-label">Additional Variables</CFormLabel>
+                            </CRow>
+                            <CRow className="mb-3">
+                                <CFormLabel htmlFor="tact1" className="col-4 col-form-label">Tact Time</CFormLabel>
+                                <CCol xs={3} sm={3}>
+                                    <CFormInput 
+                                        type="number" 
+                                        inputMode='numeric' 
+                                        maxLength={3}
+                                        max={999} 
+                                        id="tact1" 
+                                        value={formUpdateRatio.tact_time_1}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value.length <= 3) { // Enforce maxLength
+                                                setFormUpdateRatio((prev) => ({
+                                                    ...prev,
+                                                    tact_time_1: value
+                                                }));
+                                            }
+                                        }}
+                                    />
+                                </CCol>
+                                <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                                    <p>seconds</p>
+                                </CCol>
+                            </CRow>
+                            <CRow className="mb-3">
+                                <CFormLabel htmlFor="eff1" className="col-4 col-form-label">Efficiency</CFormLabel>
+                                <CCol xs={3} sm={3}>
+                                    <CFormInput 
+                                        type="number" inputMode='numeric' id="eff1" value={formUpdateRatio.efficiency_1} 
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value.length <= 4) { // Enforce maxLength
+                                                setFormUpdateRatio((prev) => ({
+                                                    ...prev,
+                                                    efficiency_1: value
+                                                }));
+                                            }
+                                        }}    
+                                    />
+                                </CCol>
+                                <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                                    <p>%</p>
+                                </CCol>
+                            </CRow>
+
+                        </CCardBody>
+                    </CCard>
+                    <CCard className='mt-3'>
+                        <CCardHeader>PLANT 2</CCardHeader>
+                        <CCardBody>
+                            <CRow className="mb-3">
+                                <CFormLabel className="col-form-label">Rate Production</CFormLabel>
+                            </CRow>
+                            <CRow className="mb-3">
+                                <CFormLabel htmlFor="ratioF" className="col-4 col-form-label">Avanza</CFormLabel>
+                                <CCol xs={3} sm={3}>
+                                    <CFormInput 
+                                        type="number" inputMode='numeric' id="ratioF" value={formUpdateRatio.avanza} 
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value.length <= 3) { // Enforce maxLength
+                                                setFormUpdateRatio((prev) => ({
+                                                    ...prev,
+                                                    avanza: value
+                                                }));
+                                            }
+                                        }}   
+                                    />
+                                </CCol>
+                                <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                                    <p>%</p>
+                                </CCol>
+                            </CRow>
+                            <CRow className="mb-3">
+                                <CFormLabel htmlFor="ratioZ" className="col-4 col-form-label">Yaris</CFormLabel>
+                                <CCol xs={3} sm={3}>
+                                    <CFormInput 
+                                        type="number" inputMode='numeric' id="ratioZ" value={formUpdateRatio.yaris} 
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value.length <= 3) { // Enforce maxLength
+                                                setFormUpdateRatio((prev) => ({
+                                                    ...prev,
+                                                    yaris: value
+                                                }));
+                                            }
+                                        }}       
+                                    />
+                                </CCol>
+                                <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                                    <p>%</p>
+                                </CCol>
+                            </CRow>
+                            <CRow className="mb-3">
+                                <CFormLabel htmlFor="ratioI" className="col-4 col-form-label">Calya</CFormLabel>
+                                <CCol xs={3} sm={3}>
+                                    <CFormInput 
+                                        type="number" inputMode='numeric' id="ratioI" value={formUpdateRatio.calya} 
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value.length <= 3) { // Enforce maxLength
+                                                setFormUpdateRatio((prev) => ({
+                                                    ...prev,
+                                                    calya: value
+                                                }));
+                                            }
+                                        }}       
+                                    />
+                                </CCol>
+                                <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                                    <p>%</p>
+                                </CCol>
+                            </CRow>
+                            <CRow className="mb- mt-4">
+                                <CFormLabel className="col-form-label">Additional Variables</CFormLabel>
+                            </CRow>
+                            <CRow className="mb-3">
+                                <CFormLabel htmlFor="tact1" className="col-4 col-form-label">Tact Time</CFormLabel>
+                                <CCol xs={3} sm={3}>
+                                    <CFormInput 
+                                        type="number" 
+                                        inputMode='numeric' 
+                                        maxLength={3}
+                                        max={999} 
+                                        id="tact1" 
+                                        value={formUpdateRatio.tact_time_2}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value.length <= 3) { // Enforce maxLength
+                                                setFormUpdateRatio((prev) => ({
+                                                    ...prev,
+                                                    tact_time_2: value
+                                                }));
+                                            }
+                                        }}
+                                    />
+                                </CCol>
+                                <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                                    <p>seconds</p>
+                                </CCol>
+                            </CRow>
+                            <CRow className="mb-3">
+                                <CFormLabel htmlFor="eff1" className="col-4 col-form-label">Efficiency</CFormLabel>
+                                <CCol xs={3} sm={3}>
+                                    <CFormInput 
+                                        type="number" inputMode='numeric' id="eff1" value={formUpdateRatio.efficiency_2} 
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value.length <= 4) { // Enforce maxLength
+                                                setFormUpdateRatio((prev) => ({
+                                                    ...prev,
+                                                    efficiency_2: value
+                                                }));
+                                            }
+                                        }}    
+                                    />
+                                </CCol>
+                                <CCol xs={3} sm={2} className='d-flex align-items-center'>
+                                    <p>%</p>
+                                </CCol>
+                            </CRow>
+
+                        </CCardBody>
+                    </CCard>
                    
-                    <CRow className="mb-3">
-                        <CFormLabel className="col-form-label">PLANT 1 Production</CFormLabel>
-                    </CRow>
-                    <CRow className="mb-3">
-                        <CFormLabel htmlFor="ratioF" className="col-4 col-form-label">Fortuner</CFormLabel>
-                        <CCol xs={3} sm={2}>
-                            <CFormInput type="number" inputMode='numeric' id="ratioF" value={formUpdateRatio.fortuner} onChange={(e)=>setFormUpdateRatio((prev)=>({...prev, fortuner: e.target.value}))}/>
-                        </CCol>
-                        <CCol xs={3} sm={2} className='d-flex align-items-center'>
-                            <p>%</p>
-                        </CCol>
-                    </CRow>
-                    <CRow className="mb-3">
-                        <CFormLabel htmlFor="ratioZ" className="col-4 col-form-label">Zenix</CFormLabel>
-                        <CCol xs={3} sm={2}>
-                            <CFormInput type="number" inputMode='numeric' id="ratioZ" value={formUpdateRatio.zenix} onChange={(e)=>setFormUpdateRatio((prev)=>({...prev, zenix: e.target.value}))}/>
-                        </CCol>
-                        <CCol xs={3} sm={2} className='d-flex align-items-center'>
-                            <p>%</p>
-                        </CCol>
-                    </CRow>
-                    <CRow className="mb-3">
-                        <CFormLabel htmlFor="ratioI" className="col-4 col-form-label">Innova</CFormLabel>
-                        <CCol xs={3} sm={2}>
-                            <CFormInput type="number" inputMode='numeric' id="ratioI" value={formUpdateRatio.innova} onChange={(e)=>setFormUpdateRatio((prev)=>({...prev, innova: e.target.value}))}/>
-                        </CCol>
-                        <CCol xs={3} sm={2} className='d-flex align-items-center'>
-                            <p>%</p>
-                        </CCol>
-                    </CRow>
-                    <CRow className="mb-3">
-                        <CFormLabel className="col-form-label">PLANT 2 Production</CFormLabel>
-                    </CRow>
-                    <CRow className="mb-3">
-                        <CFormLabel htmlFor="ratioF" className="col-4 col-form-label">Avanza</CFormLabel>
-                        <CCol xs={3} sm={2}>
-                            <CFormInput type="number" inputMode='numeric' id="ratioF" value={formUpdateRatio.avanza} onChange={(e)=>setFormUpdateRatio((prev)=>({...prev, avanza: e.target.value}))}/>
-                        </CCol>
-                        <CCol xs={3} sm={2} className='d-flex align-items-center'>
-                            <p>%</p>
-                        </CCol>
-                    </CRow>
-                    <CRow className="mb-3">
-                        <CFormLabel htmlFor="ratioZ" className="col-4 col-form-label">Yaris</CFormLabel>
-                        <CCol xs={3} sm={2}>
-                            <CFormInput type="number" inputMode='numeric' id="ratioZ" value={formUpdateRatio.yaris} onChange={(e)=>setFormUpdateRatio((prev)=>({...prev, yaris: e.target.value}))}/>
-                        </CCol>
-                        <CCol xs={3} sm={2} className='d-flex align-items-center'>
-                            <p>%</p>
-                        </CCol>
-                    </CRow>
-                    <CRow className="mb-3">
-                        <CFormLabel htmlFor="ratioI" className="col-4 col-form-label">Calya</CFormLabel>
-                        <CCol xs={3} sm={2}>
-                            <CFormInput type="number" inputMode='numeric' id="ratioI" value={formUpdateRatio.calya} onChange={(e)=>setFormUpdateRatio((prev)=>({...prev, calya: e.target.value}))}/>
-                        </CCol>
-                        <CCol xs={3} sm={2} className='d-flex align-items-center'>
-                            <p>%</p>
-                        </CCol>
-                    </CRow>
                 </CModalBody>
                 <CModalFooter>
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalRatio(false)}>
@@ -1133,19 +1332,19 @@ const Gentani = () => {
                                     </CTableRow>
                                 )
                             } )}
+                            { paginatedData.length === 0 && !loading && 
+                                <CTableRow color="light">
+                                    <CTableDataCell color="light" colSpan={16}>
+                                        <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                            <CIcon icon={icon.cilFax} size='3xl'/>
+                                            <p className='pt-3'>No data found!</p>
+                                        </div>
+                                    </CTableDataCell>
+                                </CTableRow>
+                            }
                         </CTableBody>
                     </CTable>
                 </CCol>
-                    { paginatedData.length === 0 && !loading && 
-                        <CTableRow color="light">
-                            <CTableDataCell color="light" colSpan={7}>
-                                <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
-                                    <CIcon icon={icon.cilFax} size='3xl'/>
-                                    <p className='pt-3'>No data found!</p>
-                                </div>
-                            </CTableDataCell>
-                        </CTableRow>
-                    }
                     {loading && <h2 className='text-center py-4'>...</h2>}
             </CRow>
             <CRow>
