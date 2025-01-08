@@ -168,6 +168,7 @@ function Supplying() {
   useEffect(()=>{
     getSupplyQty()
     console.log("transactionData :", transactionData)
+    console.log("paginatedData :", paginatedData)
   }, [])
 
   useEffect(()=>{
@@ -626,19 +627,21 @@ function Supplying() {
                         </CTableRow>
                     )
                 })}
+                { (paginatedData?.length === 0 || !paginatedData) && !loading && 
+                    <CTableRow color="light">
+                        <CTableDataCell color="light" colSpan={5}>
+                            <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                <CIcon icon={icon.cilFax} size='3xl'/>
+                                <p className='pt-3'>No data found!</p>
+                            </div>
+                        </CTableDataCell>
+                    </CTableRow>
+                }
+                { loading && <h2 className='text-center py-4'>...</h2>}
+
             </CTableBody>
         </CTable>
-        { paginatedData?.length === 0 && !loading && 
-            <CTableRow color="light">
-                <CTableDataCell color="light" colSpan={7}>
-                    <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
-                        <CIcon icon={icon.cilFax} size='3xl'/>
-                        <p className='pt-3'>No data found!</p>
-                    </div>
-                </CTableDataCell>
-            </CTableRow>
-        }
-        { loading && <h2 className='text-center py-4'>...</h2>}
+        
        </CRow>
 
        <CRow>

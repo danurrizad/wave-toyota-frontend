@@ -278,38 +278,38 @@ const Setup = () => {
                             </CTableRow>
                         </CTableHead>
                         <CTableBody>
-                        { paginatedData && paginatedData.map((setup, index) => {
-                                return(
-                                    <CTableRow color={setup.total < setup.standard_supply && setup.total > setup.critical_stock ? "warning" : setup.total < setup.critical_stock ? "danger" : ""} key={index} style={{ verticalAlign: "middle", backgroundColor: "black" }}>
-                                        <CTableDataCell className='text-center'>
-                                            <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(setup)}><CIcon icon={icon.cilColorBorder}/></CButton>
-                                        </CTableDataCell>
-                                        <CTableDataCell>{setup.material_no}</CTableDataCell>
-                                        <CTableDataCell>{setup.material_desc}</CTableDataCell>
-                                        <CTableDataCell>{setup.plant}</CTableDataCell>
-                                        <CTableDataCell>{setup.supply_line}</CTableDataCell>
-                                        <CTableDataCell>{setup.standard_supply}</CTableDataCell>
-                                        <CTableDataCell>{setup.critical_stock}</CTableDataCell>
-                                        <CTableDataCell>{setup.total}</CTableDataCell>
-                                        <CTableDataCell>{setup.created_by}</CTableDataCell>
-                                        <CTableDataCell>{dayjs(setup.createdAt).format('YYYY-MM-DD HH:mm:ss')}</CTableDataCell>
-                                        <CTableDataCell>{setup.updated_by}</CTableDataCell>
-                                        <CTableDataCell>{dayjs(setup.updatedAt).format('YYYY-MM-DD HH:mm:ss')}</CTableDataCell>
-                                    </CTableRow>
-                                )
-                            } )}
+                            { paginatedData && paginatedData.map((setup, index) => {
+                                    return(
+                                        <CTableRow color={setup.total < setup.standard_supply && setup.total > setup.critical_stock ? "warning" : setup.total < setup.critical_stock ? "danger" : ""} key={index} style={{ verticalAlign: "middle", backgroundColor: "black" }}>
+                                            <CTableDataCell className='text-center'>
+                                                <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(setup)}><CIcon icon={icon.cilColorBorder}/></CButton>
+                                            </CTableDataCell>
+                                            <CTableDataCell>{setup.material_no}</CTableDataCell>
+                                            <CTableDataCell>{setup.material_desc}</CTableDataCell>
+                                            <CTableDataCell>{setup.plant}</CTableDataCell>
+                                            <CTableDataCell>{setup.supply_line}</CTableDataCell>
+                                            <CTableDataCell>{setup.standard_supply}</CTableDataCell>
+                                            <CTableDataCell>{setup.critical_stock}</CTableDataCell>
+                                            <CTableDataCell>{setup.total}</CTableDataCell>
+                                            <CTableDataCell>{setup.created_by}</CTableDataCell>
+                                            <CTableDataCell>{dayjs(setup.createdAt).format('YYYY-MM-DD HH:mm:ss')}</CTableDataCell>
+                                            <CTableDataCell>{setup.updated_by}</CTableDataCell>
+                                            <CTableDataCell>{dayjs(setup.updatedAt).format('YYYY-MM-DD HH:mm:ss')}</CTableDataCell>
+                                        </CTableRow>
+                                    )
+                                } )}
+                            { paginatedData.length === 0 && !loading && 
+                                <CTableRow color="light">
+                                    <CTableDataCell color="light" colSpan={12}>
+                                        <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                            <CIcon icon={icon.cilFax} size='3xl'/>
+                                            <p className='pt-3'>No data found!</p>
+                                        </div>
+                                    </CTableDataCell>
+                                </CTableRow>
+                            }
                         </CTableBody>
                     </CTable>
-                    { paginatedData.length === 0 && !loading && 
-                        <CTableRow color="light">
-                            <CTableDataCell color="light" colSpan={7}>
-                                <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
-                                    <CIcon icon={icon.cilFax} size='3xl'/>
-                                    <p className='pt-3'>No data found!</p>
-                                </div>
-                            </CTableDataCell>
-                        </CTableRow>
-                    }
                     {loading && <h2 className='text-center py-4'>...</h2>}
                 </CCol>
             </CRow>
