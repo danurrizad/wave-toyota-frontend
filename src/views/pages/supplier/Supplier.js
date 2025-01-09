@@ -539,9 +539,6 @@ function Supplying() {
       <div className='text-sm' style={{backgroundColor: "#F3F4F7", minHeight: "100vh"}} >
         <HeaderSupplier/>
         <CContainer>
-            
-        {/* Loading Spinner */}
-        { loading && <div className="loading"><CSpinner /></div>}
 
         {/* Toast */}
         <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
@@ -637,7 +634,16 @@ function Supplying() {
                         </CTableDataCell>
                     </CTableRow>
                 }
-                { loading && <h2 className='text-center py-4'>...</h2>}
+                 { loading && 
+                    <CTableRow color=''>
+                        <CTableDataCell colSpan={100}>
+                            <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                <CSpinner/>
+                                <p className='pt-3'>Loading data</p>
+                            </div>
+                        </CTableDataCell>
+                    </CTableRow>
+                    }
 
             </CTableBody>
         </CTable>

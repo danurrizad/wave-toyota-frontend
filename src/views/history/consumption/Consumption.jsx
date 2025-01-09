@@ -256,8 +256,6 @@ const Consumption = () => {
   return (
     <>
         <CContainer fluid >
-            {/* Loading Spinner */}
-            { loading && <div className="loading"><CSpinner /></div>}
 
             {/* Toast */}
             <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
@@ -269,7 +267,9 @@ const Consumption = () => {
                     <CCard className='text-center'>
                         <CCardBody className='d-flex justify-content-center'>
                             <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
-                                { totalProductionPerUnit.Fortuner ? totalProductionPerUnit.Fortuner : 0}
+                                { totalProductionPerUnit.Fortuner ? totalProductionPerUnit.Fortuner : 
+                                    loading ? <CSpinner variant="grow" style={{ backgroundColor: "gray"}} size='sm'/> :
+                                0 }
                             </div>
                         </CCardBody>
                         <CCardFooter>Fortuner</CCardFooter>
@@ -279,7 +279,9 @@ const Consumption = () => {
                     <CCard className='text-center'>
                         <CCardBody className='d-flex justify-content-center'>
                             <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
-                                { totalProductionPerUnit.Zenix ? totalProductionPerUnit.Zenix : 0}
+                                { totalProductionPerUnit.Zenix ? totalProductionPerUnit.Zenix : 
+                                    loading ? <CSpinner variant="grow" style={{ backgroundColor: "gray"}} size='sm'/> :
+                                0 }
                             </div>
                         </CCardBody>
                         <CCardFooter>Zenix</CCardFooter>
@@ -289,7 +291,9 @@ const Consumption = () => {
                     <CCard className='text-center'>
                         <CCardBody className='d-flex justify-content-center'>
                             <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
-                                { totalProductionPerUnit.Innova ? totalProductionPerUnit.Innova : 0}
+                                { totalProductionPerUnit.Innova ? totalProductionPerUnit.Innova : 
+                                    loading ? <CSpinner variant="grow" style={{ backgroundColor: "gray"}} size='sm'/> :
+                                0 }
                             </div>
                         </CCardBody>
                         <CCardFooter>Innova</CCardFooter>
@@ -299,7 +303,9 @@ const Consumption = () => {
                     <CCard className='text-center'>
                         <CCardBody className='d-flex justify-content-center'>
                             <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
-                                { totalProductionPerUnit.Avanza ? totalProductionPerUnit.Avanza : 0}
+                                { totalProductionPerUnit.Avanza ? totalProductionPerUnit.Avanza : 
+                                    loading ? <CSpinner variant="grow" style={{ backgroundColor: "gray"}} size='sm'/> :
+                                0 }
                             </div>
                         </CCardBody>
                         <CCardFooter>Avanza</CCardFooter>
@@ -309,7 +315,9 @@ const Consumption = () => {
                     <CCard className='text-center'>
                         <CCardBody className='d-flex justify-content-center'>
                             <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
-                                { totalProductionPerUnit.Yaris ? totalProductionPerUnit.Yaris : 0}
+                                { totalProductionPerUnit.Yaris ? totalProductionPerUnit.Yaris : 
+                                    loading ? <CSpinner variant="grow" style={{ backgroundColor: "gray"}} size='sm'/> :
+                                0 }
                             </div>
                         </CCardBody>
                         <CCardFooter>Yaris</CCardFooter>
@@ -319,7 +327,9 @@ const Consumption = () => {
                     <CCard className='text-center'>
                         <CCardBody className='d-flex justify-content-center'>
                             <div className='d-flex align-items-center justify-content-center' style={{ border: "2px solid gray", width: "50px", height: "50px", borderRadius: "100%"}}>
-                                { totalProductionPerUnit.Calya ? totalProductionPerUnit.Calya : 0 }
+                                { totalProductionPerUnit.Calya ? totalProductionPerUnit.Calya : 
+                                    loading ? <CSpinner variant="grow" style={{ backgroundColor: "gray"}} size='sm'/> :
+                                0 }
                             </div>
                         </CCardBody>
                         <CCardFooter>Calya</CCardFooter>
@@ -363,7 +373,6 @@ const Consumption = () => {
                                 placement='bottomEnd'
                                 showOneCalendar
                                 preventOverflow
-                                loading={loading}
                                 value={period}
                                 onChange={setPeriod}
                                 format="MMMM dd, yyyy" 
@@ -454,9 +463,18 @@ const Consumption = () => {
                                 </CTableDataCell>
                             </CTableRow>
                         }
+                        { loading && 
+                            <CTableRow color=''>
+                                <CTableDataCell colSpan={100}>
+                                    <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                        <CSpinner/>
+                                        <p className='pt-3'>Loading data</p>
+                                    </div>
+                                </CTableDataCell>
+                            </CTableRow>
+                            }
                         </CTableBody>
                     </CTable>
-                    {loading && <h2 className='text-center py-4'>...</h2>}
                 </CCol>
             </CRow>
             <CRow>

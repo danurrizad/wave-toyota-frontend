@@ -642,13 +642,6 @@ const Gentani = () => {
   return (
     <>
         <CContainer fluid >
-            {/* Loading Spinner */}
-            { loading && 
-            <div className="loading">
-                <CSpinner />
-            </div>
-            }
-
             {/* Toast */}
             {/* <CToaster className="position-static"> */}
                 <CToaster className="p-3 position-static" placement="top-end" push={toast} ref={toaster} />
@@ -1342,10 +1335,19 @@ const Gentani = () => {
                                     </CTableDataCell>
                                 </CTableRow>
                             }
+                            { loading && 
+                                <CTableRow color=''>
+                                    <CTableDataCell colSpan={16}>
+                                        <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                            <CSpinner/>
+                                            <p className='pt-3'>Loading data</p>
+                                        </div>
+                                    </CTableDataCell>
+                                </CTableRow>
+                            }
                         </CTableBody>
                     </CTable>
                 </CCol>
-                    {loading && <h2 className='text-center py-4'>...</h2>}
             </CRow>
             <CRow>
                 <CCol xs={8} xl={6} className='d-flex align-items-end'>

@@ -151,13 +151,6 @@ const Setup = () => {
   return (
     <>
         <CContainer fluid >
-            {/* Loading Spinner */}
-            { loading && 
-            <div className="loading">
-                <CSpinner />
-            </div>
-            }
-
             {/* Toast */}
             <CToaster key={setupData.material_no} className="p-3" placement="top-end" push={toast} ref={toaster} />
             
@@ -308,9 +301,18 @@ const Setup = () => {
                                     </CTableDataCell>
                                 </CTableRow>
                             }
+                            { loading && 
+                                <CTableRow color=''>
+                                    <CTableDataCell colSpan={100}>
+                                        <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                            <CSpinner/>
+                                            <p className='pt-3'>Loading data</p>
+                                        </div>
+                                    </CTableDataCell>
+                                </CTableRow>
+                            }
                         </CTableBody>
                     </CTable>
-                    {loading && <h2 className='text-center py-4'>...</h2>}
                 </CCol>
             </CRow>
             <CRow>
