@@ -59,7 +59,7 @@ const Material = () => {
         material_desc: "",
         plant: "Select",
         andon_display: "",
-        depth_material: null,
+        depth_material: 0,
         supply_line: "",
         uom: "Select",
         pack: "Select",
@@ -71,7 +71,7 @@ const Material = () => {
         material_desc: "",
         plant: "Select",
         andon_display: "",
-        depth_material: null,
+        depth_material: 0,
         supply_line: "",
         uom: "Select",
         pack: "Select",
@@ -87,7 +87,7 @@ const Material = () => {
             material_desc: data.material_desc,
             plant: data.plant,
             andon_display: data.andon_display,
-            depth_material: null,
+            depth_material: 0,
             supply_line: data.supply_line,
             uom: data.uom,
             pack: data.pack,
@@ -101,7 +101,7 @@ const Material = () => {
     const [totalPage, setTotalPage] = useState(0)
 
 
-    const [searchQuery, setSearchQuery] = useState({ materialDescOrNo: "", supplyLine: "", plant: "All" })
+    const [searchQuery, setSearchQuery] = useState({ materialDescOrNo: "", supplyLine: "All", plant: "All" })
     
     const optionsMaterialDesc = Array.from(
         new Map(
@@ -173,7 +173,7 @@ const Material = () => {
 
         const filtered = materialData.filter(material => {
             const matchesDescOrNo = material.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase()) || material.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase());
-            const matchesSupplyLine = material.supply_line.toLowerCase().includes(supplyLine.toLowerCase());
+            const matchesSupplyLine = supplyLine === "All" || material.supply_line.toLowerCase().includes(supplyLine.toLowerCase());
             const matchesPlant = plant === "All" || material.plant.toLowerCase().includes(plant.toLowerCase());
             return matchesDescOrNo && matchesSupplyLine && matchesPlant;
         });
@@ -184,7 +184,7 @@ const Material = () => {
     };
 
     const handleClearSearch = () => {
-        setSearchQuery({ materialDescOrNo: "", supplyLine: "", plant: "All" });
+        setSearchQuery({ materialDescOrNo: "", supplyLine: "All", plant: "All" });
         setFilteredData(materialData);
         setTotalPage(Math.ceil(materialData.length / itemPerPage));
         setCurrentPage(1);
@@ -364,7 +364,10 @@ const Material = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalAdd(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master' onClick={()=>handleCreateMaterial(formAddData)}>Add data</CButton>
+                    <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} onClick={()=>handleCreateMaterial(formAddData)}>
+                        { loading && <CSpinner size='sm'/> }
+                        Add data
+                    </CButton>
                 </CModalFooter>
             </CModal>
             {/* End of Modal Add */}
@@ -454,7 +457,10 @@ const Material = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalUpdate(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master' onClick={()=>handleUpdateMaterial(formUpdateData.material_no, formUpdateData)}>Save update</CButton>
+                    <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} onClick={()=>handleUpdateMaterial(formUpdateData.material_no, formUpdateData)}>
+                        { loading && <CSpinner size="sm"/> }
+                        Save update
+                    </CButton>
                 </CModalFooter>
             </CModal>
             {/* End of Modal Update */}
@@ -482,7 +488,10 @@ const Material = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalDelete({state: false, desc: "", plant: ""})}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master' onClick={()=>handleDeleteMaterial(visibleModalDelete.desc, visibleModalDelete.plant)}>Delete</CButton>
+                    <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} onClick={()=>handleDeleteMaterial(visibleModalDelete.desc, visibleModalDelete.plant)}>
+                        { loading && <CSpinner size='sm'/> }
+                        Delete
+                    </CButton>
                 </CModalFooter>
             </CModal>
             {/* End of Modal Delete */}
@@ -502,7 +511,7 @@ const Material = () => {
                     <CRow className="mb-3">
                         <CFormLabel htmlFor="supplyLine" className="col-form-label col-xl-12 col-lg-12 col-md-12 col-sm-2">Supply Line</CFormLabel>
                         <CCol className='d-flex align-items-center justify-content-end gap-2 col-xl-11 col-lg-11'>
-                            <Select noOptionsMessage={() =>  "No supply line found" } options={optionsSupplyLine} placeholder="All" isClearable value={optionsSupplyLine.find((option) => option.value === searchQuery.supplyLine) || null} onChange={(e) => setSearchQuery({ ...searchQuery, supplyLine: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
+                            <Select noOptionsMessage={() =>  "No supply line found" } options={optionsSupplyLine} placeholder="All" isClearable value={optionsSupplyLine.find((option) => option.value === searchQuery.supplyLine) || null} onChange={(e) => setSearchQuery({ ...searchQuery, supplyLine: e ? e.value : "All" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol>
@@ -554,7 +563,7 @@ const Material = () => {
                             </CTableRow>
                         </CTableHead>
                         <CTableBody>
-                            {paginatedData && paginatedData.map((material, index) => {
+                            { paginatedData && paginatedData.map((material, index) => {
                                 return(
                                     <CTableRow key={index} style={{ verticalAlign: "middle" }}>
                                         <CTableDataCell className='text-center'>
@@ -577,7 +586,8 @@ const Material = () => {
                                         <CTableDataCell>{dayjs(material.updatedAt).format('YYYY-MM-DD HH:mm:ss')}</CTableDataCell>
                                     </CTableRow>
                                 )
-                            } )}
+                            })}
+                             
                             { paginatedData.length === 0 && !loading && 
                                 <CTableRow color="light">
                                     <CTableDataCell color="light" colSpan={13}>
@@ -588,16 +598,17 @@ const Material = () => {
                                     </CTableDataCell>
                                 </CTableRow>
                             }
-                            { loading && 
-                                <CTableRow color=''>
+                            {loading &&
+                                (<CTableRow color=''>
                                     <CTableDataCell colSpan={13}>
                                         <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
                                             <CSpinner/>
                                             <p className='pt-3'>Loading data</p>
                                         </div>
                                     </CTableDataCell>
-                                </CTableRow>
-                            }
+                                </CTableRow>) 
+                                }
+                            
                         </CTableBody>
                     </CTable>
                 </CCol>
