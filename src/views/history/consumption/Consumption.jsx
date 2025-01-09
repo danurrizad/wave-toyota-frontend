@@ -43,6 +43,7 @@ import * as icon from "@coreui/icons";
 const Consumption = () => {
   const [period, setPeriod] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [loadingProcess, setLoadingProcess] = useState(false)
   const [toast, addToast] = useState(0)
 
   const toaster = useRef()
@@ -158,7 +159,7 @@ const Consumption = () => {
     };
   
   const handleSearch = () => {
-    setLoading(true)
+    setLoadingProcess(true)
     const { materialDescOrNo, plant, unit } = searchQuery;
     const filtered = consumptionData.filter((consumption) => {
         const matchesDescorNo = consumption.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase()) || consumption.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
@@ -181,7 +182,7 @@ const Consumption = () => {
     setFilteredData(filtered);
     setTotalPage(Math.ceil(filtered.length / itemPerPage));
     setCurrentPage(1);
-    setLoading(false)
+    setLoadingProcess(false)
 };
   
 
@@ -400,7 +401,10 @@ const Consumption = () => {
                         <CCol xl={4} xs={12} md={4} sm={12}>
                             <CRow className='mb-xl-3 mb-md-3 mb-0 mt-xl-0 mt-md-0 mt-sm-3 mt-3'>
                                 <CCol className="d-flex justify-content-end gap-2 col-sm-12 col-xl-12 col-md-12">
-                                    <CButton className='btn-search' onClick={()=>handleSearch()}>Search</CButton>
+                                    <CButton className='btn-search d-flex align-items-center gap-2' disabled={loadingProcess} onClick={()=>handleSearch()}>
+                                        { loadingProcess && paginatedData && <CSpinner size='sm'/>}
+                                        Search
+                                    </CButton>
                                     <CButton color="secondary" onClick={()=>handleClearSearch()}>Clear</CButton>
                                 </CCol >
                             </CRow>

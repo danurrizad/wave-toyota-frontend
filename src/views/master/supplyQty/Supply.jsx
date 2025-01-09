@@ -240,9 +240,12 @@ const Supply = () => {
                     Close
                     </CButton>
                     <CButton 
-                        className='btn-add-master'
+                        className='btn-add-master d-flex align-items-center gap-2' disabled={loading}
                         onClick={()=>updateSupplyQty(formUpdateData.material_no, formUpdateData)}
-                    >Save update</CButton>
+                    >
+                        { loading && <CSpinner size='sm'/>}
+                        Save update
+                    </CButton>
                 </CModalFooter>
             </CModal>
             {/* End of Modal Update */}

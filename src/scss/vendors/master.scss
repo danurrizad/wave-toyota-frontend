@@ -38,6 +38,10 @@
     background-color: rgb(41, 81, 155);
     color: white;
 }
+.btn-search:disabled{
+    background-color: rgb(138, 167, 223);
+    color: white;
+}
 
 .btn-add-master, .btn-add-master:focus, .btn-add-master:active, .btn-add-master:visited{
     background-color: rgb(46, 139, 46);
@@ -48,7 +52,10 @@
     background-color: rgb(39, 87, 39) ;
     color: white;
 }
-
+.btn-add-master:disabled{
+    background-color: rgb(160, 218, 160);
+    color: white;
+}
 input.form-control{
     outline-color: gray;
 }
@@ -236,12 +243,3 @@ video.qr-scanner{
     border: 2px solid #DBDFE6 !important;
     outline: none !important;
   }
-
-//   table .table-head-row{
-//     color: red !important;
-//     background-color: green ;
-//   }
-
-.text-not-found{
-    
-}

@@ -97,7 +97,6 @@ const Gentani = () => {
 
     const handleModalRatio = (data) => {
         setVisibleModalRatio(true)
-        console.log(data)
         setFormUpdateRatio({
             fortuner: data.data.fortuner,
             zenix: data.data.zenix,
@@ -170,7 +169,7 @@ const Gentani = () => {
         })
     }
 
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
     const [itemPerPage, setItemPerPage] = useState(10)
     const [totalPage, setTotalPage] = useState(0)
@@ -397,13 +396,13 @@ const Gentani = () => {
                 };
                 const response = await createGentaniDataByUpload('/gentani/upload', bodyFile);
                 addToastErr(templateToastMultipleMsg(response))
+                setVisibleModalUpload(false)
             } catch (error) {
                 // Handle errors
                 const errorMessage = error.response?.data?.message || error.message;
                 addToast(templateToast("Error", errorMessage));
             } finally{
                 setLoading()
-                setVisibleModalUpload(false)
                 getGentani()
             }
 
@@ -428,7 +427,7 @@ const Gentani = () => {
             const response = await updateGentaniData("gentani", gentaniId, body)
 
             addToast(templateToast("Success", response.data.message))
-            
+            setVisibleModalUpdate(false)
             
         } catch (error) {
           if (error.response) {
@@ -440,7 +439,6 @@ const Gentani = () => {
         } finally{
             setLoading(false)
             getGentani()
-            setVisibleModalUpdate(false)
         }
     }
 
@@ -910,7 +908,9 @@ const Gentani = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalRatio(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master' onClick={()=>handleUpdateRatio(formUpdateRatio)}>Save changes</CButton>
+                    <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} onClick={()=>handleUpdateRatio(formUpdateRatio)}>
+                        { loading && <CSpinner size="sm"/>}
+                        Save changes</CButton>
                 </CModalFooter>
             </CModal>
             {/* End of Modal RATIO */}
@@ -1005,7 +1005,10 @@ const Gentani = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalAdd(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master' onClick={()=>handleCreateGentani(formData)}>Add data</CButton>
+                    <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} onClick={()=>handleCreateGentani(formData)}>
+                        { loading && <CSpinner size="sm"/> }
+                        Add data
+                    </CButton>
                 </CModalFooter>
             </CModal>
             {/* End of Modal Add */}
@@ -1116,7 +1119,7 @@ const Gentani = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalUpdate(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master' 
+                    <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} 
                         onClick={()=> handleUpdateGentani(
                             formUpdateData.gentani_id, 
                             formUpdateData.quantity_fortuner,
@@ -1126,7 +1129,9 @@ const Gentani = () => {
                             formUpdateData.quantity_yaris,
                             formUpdateData.quantity_calya,
                         )}
-                        >Update data
+                        >
+                            { loading && <CSpinner size="sm"/> }
+                            Update data
                     </CButton>
                 </CModalFooter>
             </CModal>
@@ -1192,7 +1197,10 @@ const Gentani = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalUpload(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master' onClick={()=>handleCreateByUpload()}>Upload data</CButton>
+                    <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} onClick={()=>handleCreateByUpload()}>
+                        { loading && <CSpinner size='sm'/>}
+                        Upload data
+                    </CButton>
                 </CModalFooter>
             </CModal>
             {/* End of Modal Upload */}

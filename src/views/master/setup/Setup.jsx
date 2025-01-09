@@ -215,7 +215,9 @@ const Setup = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalUpdate(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master' onClick={()=>updateSetup(formUpdateData)}>Save update</CButton>
+                    <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} onClick={()=>updateSetup(formUpdateData)}>
+                        {loading && <CSpinner size='sm'/>}
+                        Save update</CButton>
                 </CModalFooter>
             </CModal>
             {/* End of Modal Update */}

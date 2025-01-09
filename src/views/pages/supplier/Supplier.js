@@ -101,6 +101,7 @@ function Supplying() {
 
   const handleSupplyAndCreateHistory = async(data) => {
     try {
+        setLoading(true)
         if(data.supply_by === "" || data.supply_by === null) {
             addToast(templateToast("Error", "Please insert your name!"))
             return
@@ -109,11 +110,12 @@ function Supplying() {
         setVisibleModalAdd(false)
         getSupplyQty()
     } catch (error) {
-        console.log(error)
         if(error.response){
             addToast(templateToast("Error", error.response.data.message))
         }
         addToast(templateToast("Error", error.message))
+    } finally{
+        setLoading(false)
     }
   }
 
@@ -137,6 +139,7 @@ function Supplying() {
 
   const handleSubmitTransaction = async(dataTransaction) => {
     try {
+        setLoading(true)
         const response = await supplyingAndCreateHistory(dataTransaction)
         addToast(templateToast("Success", "All materials supply submitted!"))
         setVisibleModalTransaction(false)
@@ -432,7 +435,10 @@ function Supplying() {
                 <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalAdd(false)}>
                 Close
                 </CButton>
-                <CButton className='btn-add-master' onClick={()=>handleSupplyAndCreateHistory(formData)}>Apply input</CButton>
+                <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} onClick={()=>handleSupplyAndCreateHistory(formData)}>
+                    { loading && <CSpinner size='sm'/>}
+                    Apply input
+                </CButton>
             </CModalFooter>
         </CModal>
         {/* End of Modal Update */}
@@ -513,6 +519,16 @@ function Supplying() {
                                         </CTableDataCell>
                                     </CTableRow>
                                 }
+                                {loading &&
+                                    (<CTableRow color=''>
+                                        <CTableDataCell colSpan={13}>
+                                            <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                                <CSpinner/>
+                                                <p className='pt-3'>Loading data</p>
+                                            </div>
+                                        </CTableDataCell>
+                                    </CTableRow>) 
+                                    }
                             </CTableBody>
                         </CTable>
                     </CModalBody>
@@ -520,7 +536,10 @@ function Supplying() {
                         <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalTransaction(false)}>
                             Close
                         </CButton>
-                        <CButton className='btn-add-master' onClick={()=>handleSubmitTransaction(transactionData)}>Submit</CButton>
+                        <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} onClick={()=>handleSubmitTransaction(transactionData)}>
+                            { loading && <CSpinner size='sm'/>}
+                            Submit
+                        </CButton>
                     </CModalFooter>
                 </CModal>
         </CContainer>
