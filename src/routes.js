@@ -9,9 +9,12 @@ const MasterSetup = React.lazy(() => import('./views/master/setup/Setup'))
 const MasterSupplyQty = React.lazy(() => import('./views/master/supplyQty/Supply'))
 const MasterMonitoring = React.lazy(() => import('./views/master/monitoring/Monitoring'))
 
-//History
+// History
 const HistoryConsumption = React.lazy(() => import('./views/history/consumption/Consumption'))
 const HistorySupply = React.lazy(() => import('./views/history/supply/Supply'))
+
+// Supplier
+const Supplier = React.lazy(() => import('./views/pages/supplier/Supplier'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -25,6 +28,8 @@ const routes = [
 
   { path: '/history/consumption', name: 'History Consumption', element: HistoryConsumption },
   { path: '/history/supply', name: 'History Supply', element: HistorySupply },
+
+  { path: '/supplier', name: 'Supplier Setup', element: Supplier },
 ]
 
 export default routes

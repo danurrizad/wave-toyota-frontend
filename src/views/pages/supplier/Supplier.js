@@ -34,15 +34,18 @@ import {
     CSpinner,
     CToaster,
     CCardText,
+    CCard,
   } from '@coreui/react'
 
 import CIcon from '@coreui/icons-react';
 import * as icon from "@coreui/icons";
 import QrReader from '../../../utils/ReaderQR'
 import Select from 'react-select'
+import { useAuth } from '../../../utils/context/authContext'
 
 
 function Supplying() {
+    const auth = useAuth()
     const [showScanner, setShowScanner] = useState(false)
     const [visibleModalAdd, setVisibleModalAdd] = useState(false)
     const [visibleModalScanner, setVisibleModalScanner] = useState(false)
@@ -55,7 +58,7 @@ function Supplying() {
         pack: "",
         qty_pack: 1,
         qty_uom: 0,
-        supply_by: ""
+        supply_by: auth.user
     })
     const localSupplyQtyData = JSON.parse(localStorage.getItem('localSupplyQtyData'))
     const localFilteredSupplyQtyData = JSON.parse(localStorage.getItem('localFilteredSupplyQtyData'))
@@ -103,7 +106,7 @@ function Supplying() {
     try {
         setLoading(true)
         if(data.supply_by === "" || data.supply_by === null) {
-            addToast(templateToast("Error", "Please insert your name!"))
+            addToast(templateToast("Error", "Unauthorized! Please try to relogin"))
             return
         }
         addToTransaction(data)
@@ -140,7 +143,8 @@ function Supplying() {
   const handleSubmitTransaction = async(dataTransaction) => {
     try {
         setLoading(true)
-        const response = await supplyingAndCreateHistory(dataTransaction)
+        console.log("transactions :", dataTransaction)
+        await supplyingAndCreateHistory(dataTransaction)
         addToast(templateToast("Success", "All materials supply submitted!"))
         setVisibleModalTransaction(false)
         setTransactionData([])
@@ -157,6 +161,7 @@ function Supplying() {
   }
 
   useEffect(()=>{
+    console.log("formData :", formData)
     if(transactionData){
         localStorage.setItem('localTransactionData', JSON.stringify(transactionData))
     }
@@ -170,8 +175,6 @@ function Supplying() {
   
   useEffect(()=>{
     getSupplyQty()
-    console.log("transactionData :", transactionData)
-    console.log("paginatedData :", paginatedData)
   }, [])
 
   useEffect(()=>{
@@ -285,7 +288,7 @@ function Supplying() {
         pack: data.pack,
         qty_pack: 1,
         qty_uom: data.qty,
-        supply_by: ""
+        supply_by: auth.user
     })
     setDefaultQty(data.qty)
   }
@@ -424,12 +427,12 @@ function Supplying() {
                 </CRow>
                 {/* <p className='pb-4'><span style={{fontWeight: "bold"}}>Note</span>{`: A pack of ${formData.pack} is equal to ${formData.qty_uom} ${formData.uom}`}</p> */}
 
-                <CRow className="mb-3">
+                {/* <CRow className="mb-3">
                     <CFormLabel htmlFor="supplyBy" className="col-sm-4 col-form-label">Supplier Name<span style={{color: "red"}}>*</span></CFormLabel>
                     <CCol sm={8}>
                         <CFormInput type="text" id="supplyBy" maxLength={20} value={formData.supply_by || ""} onChange={(e)=>setFormData({...formData, supply_by: e.target.value})}/>
                     </CCol>
-                </CRow>
+                </CRow> */}
             </CModalBody>
             <CModalFooter>
                 <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalAdd(false)}>
@@ -548,15 +551,70 @@ function Supplying() {
     
 
   useEffect(() => {
-    document.title = "Andon Visualization - Supplier"; // Set the document title
+    document.title = "Andon Visualization - Supplier"; 
     return () => {
-      document.title = "Andon Visualization"; // Optional: Reset the title on component unmount
+      document.title = "Andon Visualization"; 
     };
   }, []);
   
+
+    //  ----------------------------------------------------------- RENDER IF ROLE IS NOT LANE HEAD -------------------------------------------------------------
+
+  if(auth.userData.role_name !== "LANE HEAD"){
+    return(
+        <div className='text-sm' style={{backgroundColor: "#F3F4F7"}} >
+        {/* <HeaderSupplier/> */}
+        <CContainer>
+
+        {/* Toast */}
+        <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
+
+        {renderModalUpdate()}
+        {renderModalScanner()}
+        {renderModalTransaction()}
+
+        <CRow className='py-4 d-flex align-items-start mb-4'>
+            <CCol className='text-center'>
+                <h1>Master Supplier Material</h1>
+                <h6>Input quantity to supply material</h6>
+            </CCol>
+        </CRow>
+        
+        
+
+        <CRow>
+            <CCol xxl={6}>
+                <CCard>
+                    <CButton className='btn-add-master d-flex flex-column align-items-center gap-2 p-5' onClick={()=>setVisibleModalScanner(true)}>
+                        <CIcon icon={icon.cilQrCode} size='9xl'/>
+                        <h5>Input by QR-Code</h5>
+                    </CButton>
+                </CCard>
+            </CCol>
+            <CCol xxl={6} className='mt-xxl-0 mt-5'>
+                <CCard>
+                    <CButton className='btn-search d-flex flex-column align-items-center gap-2 p-5' onClick={()=>setVisibleModalTransaction(true)}>
+                        <CIcon icon={icon.cilFolderOpen} size='9xl'/>
+                        <h5>List Material Supplied</h5>
+                    </CButton>
+                </CCard>
+            </CCol>
+        </CRow>
+
+       
+
+       
+        </CContainer>
+    </div>
+    )
+  }
+    //  ----------------------------------------------------------- /RENDER IF ROLE IS NOT LANE HEAD -------------------------------------------------------------
+
+
+
   return (
       <div className='text-sm' style={{backgroundColor: "#F3F4F7", minHeight: "100vh"}} >
-        <HeaderSupplier/>
+        {/* <HeaderSupplier/> */}
         <CContainer>
 
         {/* Toast */}

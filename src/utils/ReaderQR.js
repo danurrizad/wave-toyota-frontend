@@ -31,7 +31,8 @@ const QrReader = ({setShowScanner, setVisibleModalAdd, setVisibleModalScanner, s
     }
 
     // ✅ Handle success.
-    setFormData({
+    setFormData((prev)=>({
+        ...prev,
         material_no: material_no,
         material_desc: material_desc,
         plant: plant,
@@ -39,7 +40,7 @@ const QrReader = ({setShowScanner, setVisibleModalAdd, setVisibleModalScanner, s
         pack: pack,
         qty_pack: Number(qty_pack),
         qty_uom: Number(qty_uom),
-    })
+    }))
     setDefaultQty(Number(qty_uom))
     setVisibleModalScanner(false)
     setShowScanner(false)

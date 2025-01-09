@@ -18,6 +18,8 @@ const Dashboard = () => {
       addToast(templateToast("Success", `Welcome, ${auth.user}`))
       localStorage.setItem('status', "LoggedIn")
     }
+    console.log("data user :", auth.userData)
+    console.log("user :", auth.user)
   }, [])
 
   return (

@@ -27,8 +27,10 @@ import {
 } from '@coreui/icons'
 
 import { AppBreadcrumb } from './index'
+import { useAuth } from '../utils/context/authContext'
 
 const AppHeader = () => {
+  const auth = useAuth()
   const headerRef = useRef()
   const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
 
@@ -84,6 +86,11 @@ const AppHeader = () => {
                 second: '2-digit',
                 hour12: true,
               })}
+            </CNavLink>
+          </CNavItem>
+          <CNavItem>
+            <CNavLink className="" style={{ textDecoration: 'none' }}>
+              Welcome, {auth.user} ( {auth.userData.role_name} )
             </CNavLink>
           </CNavItem>
         </CHeaderNav>

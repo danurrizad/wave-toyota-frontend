@@ -1266,25 +1266,27 @@ const Gentani = () => {
                 </CCol>
             </CRow>
             <CRow>
-                <CCol xs={12} xxl={12} className='mt-xl-0 mt-4 d-flex flex-wrap p-4 gap-3 gap-sm-1'>
-                    <CButton className='btn-add-master col-sm-auto col-5 ' onClick={()=>setVisibleModalAdd(true)}>Add Gentani</CButton>
-                    <CButton className='btn-add-master mx-0 mx-sm-2 col-sm-auto col-6' onClick={()=>handleModalRatio(ratioProdData)}>Production Rate</CButton>
-                    <CDropdown className="btn-group btn-download mx-0 mx-sm-2 col-sm-auto col-5">
-                        <CDropdownToggle  style={{color: "white"}}>Download</CDropdownToggle>
-                        <CDropdownMenu>
-                            <CDropdownItem className='cursor-pointer' style={{textDecoration: "none"}} onClick={()=>handleDownloadTemplate()}>Template</CDropdownItem>
-                            <CDropdownItem className='cursor-pointer' style={{textDecoration: "none"}} onClick={()=>handleDownload(paginatedData)}>Gentani Data Table</CDropdownItem>
-                        </CDropdownMenu>
-                    </CDropdown>
-                    <CButton className='btn-upload col-sm-auto col-6' onClick={()=>setVisibleModalUpload(true)}>Upload</CButton>
-                </CCol>
+                { auth.userData.role_name === "LANE HEAD" && 
+                    <CCol xs={12} xxl={12} className='mt-xl-0 mt-4 d-flex flex-wrap p-4 gap-3 gap-sm-1'>
+                        <CButton className='btn-add-master col-sm-auto col-5 ' onClick={()=>setVisibleModalAdd(true)}>Add Gentani</CButton>
+                        <CButton className='btn-add-master mx-0 mx-sm-2 col-sm-auto col-6' onClick={()=>handleModalRatio(ratioProdData)}>Production Rate</CButton>
+                        <CDropdown className="btn-group btn-download mx-0 mx-sm-2 col-sm-auto col-5">
+                            <CDropdownToggle  style={{color: "white"}}>Download</CDropdownToggle>
+                            <CDropdownMenu>
+                                <CDropdownItem className='cursor-pointer' style={{textDecoration: "none"}} onClick={()=>handleDownloadTemplate()}>Template</CDropdownItem>
+                                <CDropdownItem className='cursor-pointer' style={{textDecoration: "none"}} onClick={()=>handleDownload(paginatedData)}>Gentani Data Table</CDropdownItem>
+                            </CDropdownMenu>
+                        </CDropdown>
+                        <CButton className='btn-upload col-sm-auto col-6' onClick={()=>setVisibleModalUpload(true)}>Upload</CButton>
+                    </CCol>
+                }
             </CRow>
             <CRow>
                 <CCol className='py-4 text-table-small '>
                     <CTable bordered striped responsive>
                         <CTableHead>
                             <CTableRow color="dark" style={{ verticalAlign: "middle", textAlign: "center" }}>
-                                <CTableHeaderCell scope="col" colSpan={2} rowSpan={2} className='text-center'>Action</CTableHeaderCell>
+                                { auth.userData.role_name === "LANE HEAD" && <CTableHeaderCell scope="col" colSpan={2} rowSpan={2} className='text-center'>Action</CTableHeaderCell>}
                                 {/* <CTableHeaderCell scope="col">Katashiki</CTableHeaderCell> */}
                                 <CTableHeaderCell scope="col" rowSpan={2} >Material No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col" rowSpan={2} >Material Desc</CTableHeaderCell>
@@ -1309,12 +1311,17 @@ const Gentani = () => {
                             { paginatedData && paginatedData.map((gentani, index) => {
                                 return(
                                     <CTableRow key={index} style={{ verticalAlign: "middle" }}>
-                                        <CTableDataCell className='text-center'>
-                                            <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(gentani)}><CIcon icon={icon.cilColorBorder}/></CButton>
-                                        </CTableDataCell>
-                                        <CTableDataCell className='text-center'>
-                                            <CButton className='btn-icon-delete' onClick={()=>handleModalDelete(gentani)}><CIcon icon={icon.cilTrash}/></CButton>
-                                        </CTableDataCell>
+                                        { auth.userData.role_name === "LANE HEAD" && (
+                                            <CTableDataCell className='text-center'>
+                                                <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(gentani)}><CIcon icon={icon.cilColorBorder}/></CButton>
+                                            </CTableDataCell>
+                                        )}
+                                        {(
+                                          auth.userData.role_name === "LANE HEAD" &&
+                                            <CTableDataCell className='text-center'>
+                                                <CButton className='btn-icon-delete' onClick={()=>handleModalDelete(gentani)}><CIcon icon={icon.cilTrash}/></CButton>
+                                            </CTableDataCell>
+                                        )}
                                         {/* <CTableDataCell>{gentani.katashiki}</CTableDataCell> */}
                                         <CTableDataCell>{gentani.material_no}</CTableDataCell>
                                         <CTableDataCell>{gentani.material_desc}</CTableDataCell>

@@ -216,18 +216,21 @@ const Material = () => {
         }
         try {
             setLoading(true)
+            // console.log("formData add Material :", formData)
             const response = await createMaterialData('material', formData)
+            console.log("RESPONSE ADD MATERIAL : ", response)
             addToast(templateToast("Success", response.data.message))
             setVisibleModalAdd(false)
             setFormAddData({...formAddData, material_no: "", material_desc: "", plant: "Select", depth_material: 0, supply_line: "", uom: "Select", pack: "Select"})
             getMaterial()
             
         } catch (error) {
+            console.error("ERRORRRR : ",error)
             if (error.response) {
                 addToast(templateToast("Error", error.response.data.message));
             } 
             else {
-                addToast(templateToast("Error", "An unexpected error occurred."));
+                addToast(templateToast("Error", error.message));
             }
         } finally{
             setLoading(false)
@@ -537,7 +540,7 @@ const Material = () => {
             </CRow>
             <CRow>
                 <CCol>
-                    <CButton className='btn-add-master' onClick={()=>setVisibleModalAdd(true)}>Add Material Data</CButton>
+                    { auth.userData.role_name === "LANE HEAD" && <CButton className='btn-add-master' onClick={()=>setVisibleModalAdd(true)}>Add Material Data</CButton>}
                 </CCol>
             </CRow>
 
@@ -547,7 +550,7 @@ const Material = () => {
                     <CTable bordered striped responsive>
                         <CTableHead>
                             <CTableRow color="dark" style={{ verticalAlign: "middle", textAlign: "center" }}>
-                                <CTableHeaderCell scope="col" colSpan={2} className='text-center' >Action</CTableHeaderCell>
+                                { auth.userData.role_name === "LANE HEAD" && <CTableHeaderCell scope="col" colSpan={2} className='text-center' >Action</CTableHeaderCell>}
                                 <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Plant</CTableHeaderCell>
@@ -566,12 +569,16 @@ const Material = () => {
                             { paginatedData && paginatedData.map((material, index) => {
                                 return(
                                     <CTableRow key={index} style={{ verticalAlign: "middle" }}>
-                                        <CTableDataCell className='text-center'>
-                                            <CButton className='btn-icon-edit' onClick={()=>handleOpenModalUpdate(material)}><CIcon icon={icon.cilColorBorder}/></CButton>
-                                        </CTableDataCell>
-                                        <CTableDataCell className='text-center' >
-                                            <CButton className='btn-icon-delete' onClick={()=>setVisibleModalDelete({state: true, desc: material.material_no, plant: material.plant})}><CIcon icon={icon.cilTrash}/></CButton>
-                                        </CTableDataCell>
+                                        { auth.userData.role_name === "LANE HEAD" &&
+                                            <CTableDataCell className='text-center'>
+                                                <CButton className='btn-icon-edit' onClick={()=>handleOpenModalUpdate(material)}><CIcon icon={icon.cilColorBorder}/></CButton>
+                                            </CTableDataCell>
+                                        }
+                                        { auth.userData.role_name === "LANE HEAD" &&
+                                            <CTableDataCell className='text-center' >
+                                                <CButton className='btn-icon-delete' onClick={()=>setVisibleModalDelete({state: true, desc: material.material_no, plant: material.plant})}><CIcon icon={icon.cilTrash}/></CButton>
+                                            </CTableDataCell>
+                                        }
                                         <CTableDataCell>{material.material_no}</CTableDataCell>
                                         <CTableDataCell>{material.material_desc}</CTableDataCell>
                                         <CTableDataCell>{material.plant}</CTableDataCell>

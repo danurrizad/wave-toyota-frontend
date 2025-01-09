@@ -269,7 +269,7 @@ const Monitoring = () => {
                     <CTable bordered striped responsive>
                         <CTableHead>
                             <CTableRow color="dark" style={{ verticalAlign: "middle", textAlign: 'center' }}>
-                                <CTableHeaderCell scope="col" className='text-center'>Action</CTableHeaderCell>
+                                { auth.userData.role_name === "LANE HEAD" && <CTableHeaderCell scope="col" className='text-center'>Action</CTableHeaderCell> }
                                 <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Plant</CTableHeaderCell>
@@ -280,9 +280,11 @@ const Monitoring = () => {
                             { paginatedData && paginatedData.map((monitoring, index) => {
                                 return(
                                     <CTableRow key={index} style={{ verticalAlign: "middle" }}>
-                                        <CTableDataCell className='text-center'>
-                                            <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(monitoring)}><CIcon icon={icon.cilColorBorder}/></CButton>
-                                        </CTableDataCell>
+                                        { auth.userData.role_name === "LANE HEAD" && (
+                                            <CTableDataCell className='text-center'>
+                                                <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(monitoring)}><CIcon icon={icon.cilColorBorder}/></CButton>
+                                            </CTableDataCell>
+                                        )}
                                         <CTableDataCell>{monitoring.material_no}</CTableDataCell>
                                         <CTableDataCell>{monitoring.material_desc}</CTableDataCell>
                                         <CTableDataCell>{monitoring.plant}</CTableDataCell>

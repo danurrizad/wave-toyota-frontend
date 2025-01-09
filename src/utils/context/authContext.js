@@ -11,6 +11,7 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const { login, verifyToken } = useAuthDataService()
+  const [userData, setUserData] = useState(localStorage.getItem("userData") || "")
   const [user, setUser] = useState(localStorage.getItem("user") || "");
   const [token, setToken] = useState(localStorage.getItem("site") || "");
   const [errMsg, setErrMsg] = useState("")
@@ -31,11 +32,15 @@ const AuthProvider = ({ children }) => {
           if(responseToken.status === 200){
             setUser(responseToken.data.responseUser.username)
             localStorage.setItem("user", responseToken.data.responseUser.username)
+            setUserData(responseToken.data.responseUser)
+            localStorage.setItem("userData", JSON.stringify(responseToken.data.responseUser))
             setIsAuthenticated(true)
           } else{
             localStorage.removeItem("site");
             localStorage.removeItem("user");
+            localStorage.removeItem("userData");
             setUser(null)
+            setUserData(null)
             setToken(null)
           }
       }
@@ -46,7 +51,9 @@ const AuthProvider = ({ children }) => {
       // console.log("Error checking auth :", error)
       localStorage.removeItem("site");
       localStorage.removeItem("user");
+      localStorage.removeItem("userData");
       setUser(null)
+      setUserData(null)
       setToken(null)
     }
   }
@@ -62,6 +69,8 @@ const AuthProvider = ({ children }) => {
         if(responseToken.status === 200){
           setUser(responseToken.data.responseUser.username)
           localStorage.setItem("user", responseToken.data.responseUser.username)
+          setUserData(responseToken.data.responseUser)
+          localStorage.setItem("userData", JSON.stringify(responseToken.data.responseUser))
           setIsAuthenticated(true)
           localStorage.setItem("status", "Success")
           setStatusLogin("Success")
@@ -79,14 +88,16 @@ const AuthProvider = ({ children }) => {
 
   const logOut = () => {
     setUser(null);
+    setUserData(null);
     setToken("");
     localStorage.removeItem("site");
     localStorage.removeItem("user");
+    localStorage.removeItem("userData");
     navigate("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, isAuthenticated, errMsg, statusLogin, loginAction, logOut }}>
+    <AuthContext.Provider value={{ token, user, userData, isAuthenticated, errMsg, statusLogin, loginAction, logOut }}>
       {children}
     </AuthContext.Provider>
   );
