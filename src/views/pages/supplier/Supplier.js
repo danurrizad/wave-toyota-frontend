@@ -42,6 +42,7 @@ import * as icon from "@coreui/icons";
 import QrReader from '../../../utils/ReaderQR'
 import Select from 'react-select'
 import { useAuth } from '../../../utils/context/authContext'
+import useSetupDataService from './../../../services/SetupDataService';
 
 
 function Supplying() {
@@ -61,14 +62,17 @@ function Supplying() {
         supply_by: auth.user
     })
     const localSupplyQtyData = JSON.parse(localStorage.getItem('localSupplyQtyData'))
+    const localSetupData = JSON.parse(localStorage.getItem('localSetupData'))
     const localFilteredSupplyQtyData = JSON.parse(localStorage.getItem('localFilteredSupplyQtyData'))
     const localTransactionData = JSON.parse(localStorage.getItem('localTransactionData'))
 
     const [defaultQty, setDefaultQty] = useState(0)
     const [loading, setLoading] = useState(false)
+    const { getSetupData } = useSetupDataService()
     const { getSupplyQtyData} = useSupplyQtyDataService()
     const { supplyingAndCreateHistory } = useHistoryDataService()
 
+    const [setupData, setSetupData] = useState(localSetupData)
     const [supplyQtyData, setSupplyQtyData] = useState(localSupplyQtyData)
     const [filteredData, setFilteredData] = useState(localFilteredSupplyQtyData)
     const [transactionData, setTransactionData] = useState(localTransactionData)
@@ -88,6 +92,23 @@ function Supplying() {
         return message;
       };
 
+    const getSetup = async() => {
+        try {
+            setLoading(true)
+            const response = await getSetupData('setup')
+            setSetupData(response.data.data)
+        } catch (error) {
+            if(error.response){
+                addToast(templateToast("Error", error.response.data.message))
+            }
+            else{
+                addToast(templateToast("Error", error.message))
+            }
+        } finally{
+            setLoading(false)
+        }
+    }
+
   const getSupplyQty = async() => {
     try {
         setLoading(true)
@@ -96,7 +117,12 @@ function Supplying() {
         setSupplyQtyData(filtered)
         setFilteredData(filtered)
         } catch (error) {
-        console.log(error)
+            if(error.response){
+                addToast(templateToast("Error", error.response.data.message))
+            }
+            else{
+                addToast(templateToast("Error", error.message))
+            }
         } finally{
             setLoading(false)
         }
@@ -149,6 +175,7 @@ function Supplying() {
         setVisibleModalTransaction(false)
         setTransactionData([])
         getSupplyQty()
+        getSetup()
     } catch (error) {
         if(error.response){
             addToast(templateToast("Error", error.response.data.message))
@@ -161,7 +188,7 @@ function Supplying() {
   }
 
   useEffect(()=>{
-    console.log("formData :", formData)
+    // console.log("formData :", formData)
     if(transactionData){
         localStorage.setItem('localTransactionData', JSON.stringify(transactionData))
     }
@@ -174,6 +201,7 @@ function Supplying() {
   };
   
   useEffect(()=>{
+    getSetup()
     getSupplyQty()
   }, [])
 
@@ -560,54 +588,54 @@ function Supplying() {
 
     //  ----------------------------------------------------------- RENDER IF ROLE IS NOT LANE HEAD -------------------------------------------------------------
 
-  if(auth.userData.role_name !== "LANE HEAD"){
-    return(
-        <div className='text-sm' style={{backgroundColor: "#F3F4F7"}} >
-        {/* <HeaderSupplier/> */}
-        <CContainer>
+//   if(auth.userData.role_name !== "LANE HEAD"){
+//     return(
+//         <div className='text-sm' style={{backgroundColor: "#F3F4F7"}} >
+//         {/* <HeaderSupplier/> */}
+//         <CContainer>
 
-        {/* Toast */}
-        <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
+//         {/* Toast */}
+//         <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
 
-        {renderModalUpdate()}
-        {renderModalScanner()}
-        {renderModalTransaction()}
+//         {renderModalUpdate()}
+//         {renderModalScanner()}
+//         {renderModalTransaction()}
 
-        <CRow className='py-4 d-flex align-items-start mb-4'>
-            <CCol className='text-center'>
-                <h1>Master Supplier Material</h1>
-                <h6>Input quantity to supply material</h6>
-            </CCol>
-        </CRow>
+//         <CRow className='py-4 d-flex align-items-start mb-4'>
+//             <CCol className='text-center'>
+//                 <h1>Master Supplier Material</h1>
+//                 <h6>Input quantity to supply material</h6>
+//             </CCol>
+//         </CRow>
         
         
 
-        <CRow>
-            <CCol xxl={6}>
-                <CCard>
-                    <CButton className='btn-add-master d-flex flex-column align-items-center gap-2 p-5' onClick={()=>setVisibleModalScanner(true)}>
-                        <CIcon icon={icon.cilQrCode} size='9xl'/>
-                        <h5>Input by QR-Code</h5>
-                    </CButton>
-                </CCard>
-            </CCol>
-            <CCol xxl={6} className='mt-xxl-0 mt-5'>
-                <CCard>
-                    <CButton className='btn-search d-flex flex-column align-items-center gap-2 p-5' onClick={()=>setVisibleModalTransaction(true)}>
-                        <CIcon icon={icon.cilFolderOpen} size='9xl'/>
-                        <h5>List Material Supplied</h5>
-                    </CButton>
-                </CCard>
-            </CCol>
-        </CRow>
+//         <CRow>
+//             <CCol xxl={6}>
+//                 <CCard>
+//                     <CButton className='btn-add-master d-flex flex-column align-items-center gap-2 p-5' onClick={()=>setVisibleModalScanner(true)}>
+//                         <CIcon icon={icon.cilQrCode} size='9xl'/>
+//                         <h5>Input by QR-Code</h5>
+//                     </CButton>
+//                 </CCard>
+//             </CCol>
+//             <CCol xxl={6} className='mt-xxl-0 mt-5'>
+//                 <CCard>
+//                     <CButton className='btn-search d-flex flex-column align-items-center gap-2 p-5' onClick={()=>setVisibleModalTransaction(true)}>
+//                         <CIcon icon={icon.cilFolderOpen} size='9xl'/>
+//                         <h5>List Material Supplied</h5>
+//                     </CButton>
+//                 </CCard>
+//             </CCol>
+//         </CRow>
 
        
 
        
-        </CContainer>
-    </div>
-    )
-  }
+//         </CContainer>
+//     </div>
+//     )
+//   }
     //  ----------------------------------------------------------- /RENDER IF ROLE IS NOT LANE HEAD -------------------------------------------------------------
 
 
@@ -615,7 +643,7 @@ function Supplying() {
   return (
       <div className='text-sm' style={{backgroundColor: "#F3F4F7", minHeight: "100vh"}} >
         {/* <HeaderSupplier/> */}
-        <CContainer>
+        <CContainer fluid>
 
         {/* Toast */}
         <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
@@ -672,35 +700,65 @@ function Supplying() {
             </CCol>
         </CRow>
 
+         <CRow className='pt-5'>
+            <CCol xxl={2} md={3} sm={4} xs={5} className='d-flex align-items-center gap-1'>
+                <div style={{ width: "30px", height: "30px", backgroundColor: "#F2E4C6"}}></div>
+                <p>Need to be supplied</p>
+            </CCol>
+            <CCol className='d-flex align-items-center gap-1'>
+                <div style={{ width: "30px", height: "30px", backgroundColor: "#FADDDD"}}></div>
+                <p>At critical stock</p>
+            </CCol>
+        </CRow>
+
         {/* {showScanner && <QrReader setShowScanner={setShowScanner} setVisibleModalAdd={setVisibleModalAdd} setFormData={setFormData} setDefaultQty={setDefaultQty}/>} */}
 
        <CRow className='overflow-y-auto p-3'>
         <CTable bordered striped style={{fontSize: "12px", verticalAlign: "middle"}}>
             <CTableHead>
                 <CTableRow color='dark' className='table-head-row'>
-                        <CTableHeaderCell scope="col" className="text-center">Action</CTableHeaderCell>
+                        { auth.userData.role_name === "LANE HEAD" && <CTableHeaderCell scope="col" className="text-center">Action</CTableHeaderCell>}
                         <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Plant</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Uom</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Current Stock</CTableHeaderCell>
                 </CTableRow>
             </CTableHead>
             <CTableBody>
-                {paginatedData && paginatedData.map((supply, index)=>{
-                    return(
-                        <CTableRow key={index}>
-                            <CTableDataCell className="text-center">
-                                <CButton  onClick={()=>handleModalAdd(supply)} className="btn-icon-edit">
-                                    <CIcon icon={icon.cilInput} className=''/>
-                                </CButton>
-                            </CTableDataCell>
-                            <CTableDataCell>{supply.material_no}</CTableDataCell>
-                            <CTableDataCell>{supply.material_desc}</CTableDataCell>
-                            <CTableDataCell>{supply.plant}</CTableDataCell>
-                            <CTableDataCell>{supply.uom}</CTableDataCell>
-                        </CTableRow>
-                    )
+                {paginatedData && paginatedData.map((supply, supplyIndex) => {
+                    const matchingSetup = setupData && setupData.find(
+                        (setup) => setup.material_no === supply.material_no && setup.plant === supply.plant
+                    );
+
+                    if (matchingSetup) {
+                        return (
+                            <CTableRow key={supplyIndex} 
+                                color={`${
+                                        matchingSetup.total < matchingSetup.standard_supply && matchingSetup.total > matchingSetup.critical_stock ? "warning" : 
+                                        matchingSetup.total < matchingSetup.critical_stock ? "danger" :
+                                        ""
+                                    }`}
+                                >
+                                {auth.userData.role_name === "LANE HEAD" && (
+                                    <CTableDataCell className="text-center">
+                                        <CButton onClick={() => handleModalAdd(supply)} className="btn-icon-edit">
+                                            <CIcon icon={icon.cilInput} />
+                                        </CButton>
+                                    </CTableDataCell>
+                                )}
+                                <CTableDataCell>{supply.material_no}</CTableDataCell>
+                                <CTableDataCell>{supply.material_desc}</CTableDataCell>
+                                <CTableDataCell>{supply.plant}</CTableDataCell>
+                                <CTableDataCell>{supply.uom}</CTableDataCell>
+                                <CTableDataCell>{matchingSetup.total}</CTableDataCell>
+                            </CTableRow>
+                        );
+                    }
+
+                    return null; // Ensure a return value for every iteration
                 })}
+
                 { (paginatedData?.length === 0 || !paginatedData) && !loading && 
                     <CTableRow color="light">
                         <CTableDataCell color="light" colSpan={5}>
