@@ -196,6 +196,7 @@ const Monitoring = () => {
                                         { validateTotalVisualization("Visualization 1") && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 1"}))}>Visualization 1</CDropdownItem>}
                                         { validateTotalVisualization("Visualization 2") && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 2"}))}>Visualization 2</CDropdownItem>}
                                         { validateTotalVisualization("Visualization 3") && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 3"}))}>Visualization 3</CDropdownItem>}
+                                        <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: ""}))}>Remove</CDropdownItem>
                                     </CDropdownMenu>
                                 )}
                                 {formUpdateData.plant === "P2 - PLANT 2" && (
@@ -203,6 +204,7 @@ const Monitoring = () => {
                                         { validateTotalVisualization("Visualization 4") && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 4"}))}>Visualization 4</CDropdownItem>}
                                         { validateTotalVisualization("Visualization 5") && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 5"}))}>Visualization 5</CDropdownItem>}
                                         { validateTotalVisualization("Visualization 6") && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: "Visualization 6"}))}>Visualization 6</CDropdownItem>}
+                                        <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormUpdateData((prev)=>({ ...prev, visualization_name: ""}))}>Remove</CDropdownItem>
                                     </CDropdownMenu>
                                 )}
                             </CDropdown>
