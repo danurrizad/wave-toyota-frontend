@@ -14,7 +14,9 @@ import {
   CCol,  
   CRow,
   CButton,
-  CButtonGroup
+  CButtonGroup,
+  CCardHeader,
+  CCard
 } from '@coreui/react'
 
 import CIcon from '@coreui/icons-react'
@@ -24,7 +26,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import { Autoplay, Pagination, Navigation, Keyboard } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -132,13 +134,45 @@ const Visualization = () => {
       document.title = "Andon Visualization"; // Optional: Reset the title on component unmount
     };
   }, []);
+
+  const pagination = {
+    clickable: true,
+    // bulletClass: "bg-amber-400",
+    // bulletActiveClass: "bg-green-400",
+    // type: "bullets",
+    renderBullet: function (index, className) {
+      return `
+        <span class="${className}" 
+              style="display: flex;
+                     align-items: center;
+                     justify-content: center;
+                     width: 40px; 
+                     height: 40px; 
+                     line-height: 30px; 
+                     text-align: center; 
+                     font-size: 12px; 
+                     color: black; 
+                     opacity: 1; 
+                     background-color: black; 
+                     border-radius: 50%; 
+                     margin: 5px;
+                     cursor: pointer;">
+          ${index + 1}
+        </span>`;
+    },
+  }
+
   
 
   const renderCharts1 = () =>
    option.map((opt, index) => (
     opt.visualization_name === "Visualization 1" &&
-      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0" key={index}>
-          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray",  borderRadius: "10px"}}>
+      <CCol xl={4} md={12} xs={12} className=" px-4 pb-4 border-0" key={index}>
+        <CCard style={{ backgroundColor: 'transparent', border: '1px solid gray', overflow: 'hidden'}}>
+          <CCardHeader className='p-0 py-1' style={{ backgroundColor: opt.background_color}}>
+            <h6 className={`text-center text-white`}>{opt.material_name}</h6>
+          </CCardHeader>
+          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{borderTop: "1px solid gray",  borderRadius: "", padding: 0}}>
             <HighchartsReact
               highcharts={Highcharts}
               options={opt}
@@ -146,15 +180,19 @@ const Visualization = () => {
               constructorType="chart"
             />
           </CCardBody>
-        {/* <CCard xs={6} className="bg-transparent d-flex">
-        </CCard> */}
+        </CCard>
       </CCol>
     ));
-  const renderCharts2 = () =>
-    option.map((opt, index) => (
-      opt.visualization_name === "Visualization 2" && 
-      <CCol xl={4} md={12} xs={12} className="col-chart px-4 pb-4 border-0" key={index}>
-          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
+  
+    const renderCharts2 = () =>
+   option.map((opt, index) => (
+    opt.visualization_name === "Visualization 2" &&
+      <CCol xl={4} md={12} xs={12} className=" px-4 pb-4 border-0" key={index}>
+        <CCard style={{ backgroundColor: 'transparent', border: '1px solid gray', overflow: 'hidden'}}>
+          <CCardHeader className='p-0 py-1' style={{ backgroundColor: opt.background_color}}>
+            <h6 className={`text-center text-white`}>{opt.material_name}</h6>
+          </CCardHeader>
+          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{borderTop: "1px solid gray",  borderRadius: "", padding: 0}}>
             <HighchartsReact
               highcharts={Highcharts}
               options={opt}
@@ -162,15 +200,19 @@ const Visualization = () => {
               constructorType="chart"
             />
           </CCardBody>
-        {/* <CCard xs={6} className="bg-white d-flex">
-        </CCard> */}
+        </CCard>
       </CCol>
     ));
-  const renderCharts3 = () =>
-    option.map((opt, index) => (
-      opt.visualization_name === "Visualization 3" && 
-      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0" key={index}>
-          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
+    
+    const renderCharts3 = () =>
+   option.map((opt, index) => (
+    opt.visualization_name === "Visualization 3" &&
+      <CCol xl={4} md={12} xs={12} className=" px-4 pb-4 border-0" key={index}>
+        <CCard style={{ backgroundColor: 'transparent', border: '1px solid gray', overflow: 'hidden'}}>
+          <CCardHeader className='p-0 py-1' style={{ backgroundColor: opt.background_color}}>
+            <h6 className={`text-center text-white`}>{opt.material_name}</h6>
+          </CCardHeader>
+          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{borderTop: "1px solid gray",  borderRadius: "", padding: 0}}>
             <HighchartsReact
               highcharts={Highcharts}
               options={opt}
@@ -178,15 +220,19 @@ const Visualization = () => {
               constructorType="chart"
             />
           </CCardBody>
-        {/* <CCard xs={6} className="bg-white d-flex">
-        </CCard> */}
+        </CCard>
       </CCol>
     ));
-  const renderCharts4 = () =>
-    option.map((opt, index) => (
-      opt.visualization_name === "Visualization 4" && 
-      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0 "  key={index}>
-          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
+
+    const renderCharts4 = () =>
+   option.map((opt, index) => (
+    opt.visualization_name === "Visualization 4" &&
+      <CCol xl={4} md={12} xs={12} className=" px-4 pb-4 border-0" key={index}>
+        <CCard style={{ backgroundColor: 'transparent', border: '1px solid gray', overflow: 'hidden'}}>
+          <CCardHeader className='p-0 py-1' style={{ backgroundColor: opt.background_color}}>
+            <h6 className={`text-center text-white`}>{opt.material_name}</h6>
+          </CCardHeader>
+          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{borderTop: "1px solid gray",  borderRadius: "", padding: 0}}>
             <HighchartsReact
               highcharts={Highcharts}
               options={opt}
@@ -194,15 +240,19 @@ const Visualization = () => {
               constructorType="chart"
             />
           </CCardBody>
-        {/* <CCard xs={6} className="bg-white d-flex">
-        </CCard> */}
+        </CCard>
       </CCol>
     ));
-  const renderCharts5 = () =>
-    option.map((opt, index) => (
-      opt.visualization_name === "Visualization 5" && 
-      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0 "  key={index}>
-          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
+    
+    const renderCharts5 = () =>
+   option.map((opt, index) => (
+    opt.visualization_name === "Visualization 5" &&
+      <CCol xl={4} md={12} xs={12} className=" px-4 pb-4 border-0" key={index}>
+        <CCard style={{ backgroundColor: 'transparent', border: '1px solid gray', overflow: 'hidden'}}>
+          <CCardHeader className='p-0 py-1' style={{ backgroundColor: opt.background_color}}>
+            <h6 className={`text-center text-white`}>{opt.material_name}</h6>
+          </CCardHeader>
+          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{borderTop: "1px solid gray",  borderRadius: "", padding: 0}}>
             <HighchartsReact
               highcharts={Highcharts}
               options={opt}
@@ -210,15 +260,19 @@ const Visualization = () => {
               constructorType="chart"
             />
           </CCardBody>
-        {/* <CCard xs={6} className="bg-white d-flex">
-        </CCard> */}
+        </CCard>
       </CCol>
     ));
-  const renderCharts6 = () =>
-    option.map((opt, index) => (
-      opt.visualization_name === "Visualization 6" && 
-      <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0 "  key={index}>
-          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
+
+    const renderCharts6 = () =>
+   option.map((opt, index) => (
+    opt.visualization_name === "Visualization 6" &&
+      <CCol xl={4} md={12} xs={12} className=" px-4 pb-4 border-0" key={index}>
+        <CCard style={{ backgroundColor: 'transparent', border: '1px solid gray', overflow: 'hidden'}}>
+          <CCardHeader className='p-0 py-1' style={{ backgroundColor: opt.background_color}}>
+            <h6 className={`text-center text-white`}>{opt.material_name}</h6>
+          </CCardHeader>
+          <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{borderTop: "1px solid gray",  borderRadius: "", padding: 0}}>
             <HighchartsReact
               highcharts={Highcharts}
               options={opt}
@@ -226,10 +280,91 @@ const Visualization = () => {
               constructorType="chart"
             />
           </CCardBody>
-        {/* <CCard xs={6} className="bg-white d-flex">
-        </CCard> */}
+        </CCard>
       </CCol>
     ));
+
+
+  // const renderCharts2 = () =>
+  //   option.map((opt, index) => (
+  //     opt.visualization_name === "Visualization 2" && 
+  //     <CCol xl={4} md={12} xs={12} className="col-chart px-4 pb-4 border-0" key={index}>
+  //         <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
+  //           <HighchartsReact
+  //             highcharts={Highcharts}
+  //             options={opt}
+  //             allowChartUpdate={true}
+  //             constructorType="chart"
+  //           />
+  //         </CCardBody>
+  //       {/* <CCard xs={6} className="bg-white d-flex">
+  //       </CCard> */}
+  //     </CCol>
+  //   ));
+  // const renderCharts3 = () =>
+  //   option.map((opt, index) => (
+  //     opt.visualization_name === "Visualization 3" && 
+  //     <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0" key={index}>
+  //         <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
+  //           <HighchartsReact
+  //             highcharts={Highcharts}
+  //             options={opt}
+  //             allowChartUpdate={true}
+  //             constructorType="chart"
+  //           />
+  //         </CCardBody>
+  //       {/* <CCard xs={6} className="bg-white d-flex">
+  //       </CCard> */}
+  //     </CCol>
+  //   ));
+  // const renderCharts4 = () =>
+  //   option.map((opt, index) => (
+  //     opt.visualization_name === "Visualization 4" && 
+  //     <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0 "  key={index}>
+  //         <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
+  //           <HighchartsReact
+  //             highcharts={Highcharts}
+  //             options={opt}
+  //             allowChartUpdate={true}
+  //             constructorType="chart"
+  //           />
+  //         </CCardBody>
+  //       {/* <CCard xs={6} className="bg-white d-flex">
+  //       </CCard> */}
+  //     </CCol>
+  //   ));
+  // const renderCharts5 = () =>
+  //   option.map((opt, index) => (
+  //     opt.visualization_name === "Visualization 5" && 
+  //     <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0 "  key={index}>
+  //         <CCardBody className={`overflow-hidden ${opt.isCriticalTime ? "blink-critical" : opt.isSupplyTime ? "blink-supply-time" : ""}`} style={{border: "2px solid gray", borderRadius: "10px"}}>
+  //           <HighchartsReact
+  //             highcharts={Highcharts}
+  //             options={opt}
+  //             allowChartUpdate={true}
+  //             constructorType="chart"
+  //           />
+  //         </CCardBody>
+  //       {/* <CCard xs={6} className="bg-white d-flex">
+  //       </CCard> */}
+  //     </CCol>
+  //   ));
+  // const renderCharts6 = () =>
+  //   option.map((opt, index) => (
+  //     opt.visualization_name === "Visualization 6" && 
+  //     <CCol xl={4} md={12} xs={12} className="col-chart d-flex px-4 pb-4 border-0 "  key={index}>
+  //         <CCardBody className={`overflow-hidden `} style={{border: "2px solid gray", borderRadius: "10px"}}>
+  //           <HighchartsReact
+  //             highcharts={Highcharts}
+  //             options={opt}
+  //             allowChartUpdate={true}
+  //             constructorType="chart"
+  //           />
+  //         </CCardBody>
+  //       {/* <CCard xs={6} className="bg-white d-flex">
+  //       </CCard> */}
+  //     </CCol>
+  //   ));
 
 
     const [currentTitle, setCurrentTitle] = useState("")
@@ -260,26 +395,26 @@ const Visualization = () => {
   
       <CRow className='text-white p-4'>
         <CCol xs={{ order: 1}} xl={{ order: 0 }}  className='col-6 col-xl-3'>
-          <h1 className='text-section' style={{color: "#FF1F1F"}}>TOYOTA</h1>
+          <h4 className='text-section' style={{color: "#FF1F1F"}}>TOYOTA</h4>
           <CCardBody xs={4}>
             <div className='d-flex flex-column align-items-start ' style={{color: "white"}}>
-                <h4 className="text-section">
+                <h6 className="text-section">
                   {dateState.toLocaleString('en-US', {
                     dateStyle: 'full'
                   })} 
-                </h4>
-                <h4 className='text-section'>
+                </h6>
+                <h6 className='text-section'>
                   {dateState.toLocaleString('en-US', {
                     hour: 'numeric',
                     minute: 'numeric',
                     second: '2-digit',
                     hour12: true,
                   })}
-                </h4>
+                </h6>
               </div>
           </CCardBody>
-          <CCol className='d-flex align-items-end justify-content-start gap-2 pt-4'>
-            <h4 style={{color: "white", fontSize: "20px"}} className='text-section'>WARNING SOUND :</h4>
+          <CCol className='d-flex align-items-center justify-content-start gap-2 pt-4'>
+            <h6 style={{color: "white"}} className='text-section'>WARNING SOUND :</h6>
             <div className="thumbnail hidden" id="paparazzixxx">
               <CButtonGroup className="" onClick={()=> setAudioUnlocked(audioUnlocked ? false : true)} style={{border: 0}}>
                 <CButton className={`button-sound ${audioUnlocked ? "on" : "off"}`}>
@@ -305,17 +440,17 @@ const Visualization = () => {
           <CCardBody>
             <CCol className='d-flex flex-column align-items-end justify-content-end  gap-2' >
               <div className='d-flex align-items-center gap-2'>
-                <h4 className='text-section' style={{color: "#4FD7CD"}}>STANDARD</h4>
+                <h6 className='text-section' style={{color: "#4FD7CD"}}>STANDARD</h6>
                 <div className='box-green'></div>
               </div>
 
               <div className='d-flex align-items-center gap-2'>
-                <h4 className='text-section' style={{color: "#FBA21B"}}>TO BE SUPPLIED</h4>
+                <h6 className='text-section' style={{color: "#FBA21B"}}>TO BE SUPPLIED</h6>
                 <div className='box-yellow'></div>
               </div>
 
               <div className='d-flex align-items-center gap-2'>
-                <h4 className='text-section' style={{color: "#D6531C"}}>CRITICAL</h4>
+                <h6 className='text-section' style={{color: "#D6531C"}}>CRITICAL</h6>
                 <div className='box-red'></div>
               </div>
             </CCol>
@@ -327,19 +462,17 @@ const Visualization = () => {
           <Swiper
             spaceBetween={0}
             slidesPerView={1}
-            // onSlideChange={(swiper) => console.log('slide change into: ', swiper.activeIndex)}
-            // onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
             onSlideChange={handleSlideChange}
-            // onSwiper={(swiper) => console.log("swipe into :", swiper)}
-            pagination={{ clickable: true }}
+            pagination={pagination}
+            className="mySwiper"
             scrollbar={{ draggable: true }}
+            loop={true}
+            modules={[Autoplay, Pagination, Navigation]}
             autoplay={{
               delay: 13000,
               disableOnInteraction: false,
             }}
             navigation={true}
-            loop
-            modules={[Autoplay, Pagination, Navigation]}
           >
             {option.some(o => o.visualization_name === "Visualization 1") && (
                 <SwiperSlide id='chart1' className='d-flex flex-wrap'>{renderCharts1()}</SwiperSlide>

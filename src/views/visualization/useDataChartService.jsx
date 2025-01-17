@@ -6,7 +6,7 @@ const useDataChartService = () => {
         const dataFromMaterial = materialData.map((material, index)=>{
             return {
                 textTitle: material.andon_display,
-                xAxisCategory: material.supply_line,
+                xAxisCategory: material.material_no,
                 yAxisTitle: material.uom,
             }
         })
@@ -70,6 +70,8 @@ const useDataChartService = () => {
             
           return{
                 visualization_name: option.visualization_name,
+                material_name: option.textTitle,
+                background_color: option.yAxisSeries.data.green > option.yAxisSeries.data.yellow ? "#004C4E"  : option.yAxisSeries.data.green <= option.yAxisSeries.data.red ? "#6B2000" : option.yAxisSeries.data.green <= option.yAxisSeries.data.yellow && option.yAxisSeries.data.green > option.yAxisSeries.data.red ? "#663E00" : "",
                 isSupplyTime: option.yAxisSeries.data.green !== 0 ? option.yAxisSeries.data.red < option.yAxisSeries.data.green && option.yAxisSeries.data.green < option.yAxisSeries.data.yellow : false,
                 isCriticalTime: option.yAxisSeries.data.green !== 0 ? option.yAxisSeries.data.green < option.yAxisSeries.data.red : false, 
                 legend: {enabled: false},
@@ -78,16 +80,18 @@ const useDataChartService = () => {
                       thousandsSep: ','
                     },
                     type: 'column',
-                    height: (9 / 17 * 100) + '%',
+                    height: (9 / 18 * 100) + '%',
                     backgroundColor: option.yAxisSeries.data.green > option.yAxisSeries.data.yellow ? "#004C4E"  : option.yAxisSeries.data.green <= option.yAxisSeries.data.red ? "#6B2000" : option.yAxisSeries.data.green <= option.yAxisSeries.data.yellow && option.yAxisSeries.data.green > option.yAxisSeries.data.red ? "#663E00" : "",
                     style: {
                         color: 'white'
                     }
                 },
                 title: {
-                    text: option.textTitle,
+                    // text: option.textTitle,
+                    text: option.xAxisCategory,
                     style: {
                         color: 'white',
+                        fontSize: 12,
                         // align: 'center'
                     }
                 },
@@ -99,7 +103,7 @@ const useDataChartService = () => {
                             color: 'white'
                         }
                     },
-                    categories: ['', option.xAxisCategory, '']
+                    categories: ['', '', '']
                 },
                 yAxis: {
                     min: 0,
@@ -181,7 +185,7 @@ const useDataChartService = () => {
                             enabled: true,
                             borderWidth: 0,
                             style: {
-                              fontSize: '3em',
+                              fontSize: '2.5em',
                               textOutline : option.yAxisSeries.data.green > option.yAxisSeries.data.yellow ? "#31A093"  : option.yAxisSeries.data.green < option.yAxisSeries.data.red ? "#DD6F4F" : option.yAxisSeries.data.green <= option.yAxisSeries.data.yellow && option.yAxisSeries.data.green > option.yAxisSeries.data.red ? "#EAC670" : "",
                               color: 'white',
                               backgroundColor: '#4FD7CD',
