@@ -10,7 +10,7 @@ import axios from "axios";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const { login, verifyToken } = useAuthDataService()
+  const { login, verifyToken, refreshToken } = useAuthDataService()
   const [userData, setUserData] = useState(localStorage.getItem("userData") || "")
   const [user, setUser] = useState(localStorage.getItem("user") || "");
   const [token, setToken] = useState(localStorage.getItem("site") || "");

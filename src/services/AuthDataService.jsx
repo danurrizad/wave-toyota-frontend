@@ -33,9 +33,25 @@ const useAuthDataService = () => {
         }
     }
 
+    const refreshToken = async(token) => {
+        try {
+            const response = await axios.post(`${BACKEND_URL}/api/auth/refresh-token`, 
+            {},
+            {
+                headers: {
+                    'Authorization' : `Bearer ${token}`,
+                },
+            })
+            return response
+        } catch (error) {
+            throw error
+        }
+    }
+
     return{
         login,
-        verifyToken
+        verifyToken,
+        refreshToken
     }
 }
 
