@@ -16,6 +16,8 @@ import {
   CNavbarText,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import * as icon from '@coreui/icons';
+
 import {
   cilBell,
   cilContrast,
@@ -88,13 +90,31 @@ const AppHeader = () => {
               })}
             </CNavLink>
           </CNavItem>
-          <CNavItem>
-            <CNavLink className="" style={{ textDecoration: 'none' }}>
-              Welcome, {auth.user} ( {auth.userData.role_name} )
+        </CHeaderNav>
+        <li className="nav-item py-1" style={{ textDecoration: 'none', display: 'none' }}>
+          <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
+        </li>
+        <CHeaderNav>
+          <CNavItem className="d-flex align-items-center">
+            <CNavLink style={{ textDecoration: 'none' }}>
+              <div
+                className="d-flex align-items-center justify-content-center"
+                style={{
+                  border: '1px solid black',
+                  height: '30px',
+                  width: '30px',
+                  borderRadius: '100%',
+                }}
+              >
+                <CIcon icon={icon.cilUser} />
+              </div>
+            </CNavLink>
+            <CNavLink className="d-flex flex-column" style={{ textDecoration: 'none' }}>
+              <p style={{ fontSize: '12' }}>{auth.user}</p>
+              <p style={{ fontSize: '8px', marginTop: '0px' }}>{auth.userData.role_name}</p>
             </CNavLink>
           </CNavItem>
         </CHeaderNav>
-        <CHeaderNav></CHeaderNav>
       </CContainer>
       <CContainer className="px-4" fluid>
         <AppBreadcrumb />
