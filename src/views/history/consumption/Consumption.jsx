@@ -41,7 +41,7 @@ import CIcon from '@coreui/icons-react';
 import * as icon from "@coreui/icons";
 
 const Consumption = () => {
-  const [period, setPeriod] = useState(null)
+  const [period, setPeriod] = useState([new Date(), new Date()])
   const [loading, setLoading] = useState(false)
   const [loadingProcess, setLoadingProcess] = useState(false)
   const [toast, addToast] = useState(0)
@@ -57,10 +57,32 @@ const Consumption = () => {
         setLoading(true)
         const response = await getConsumptionHistory()
         const totalUnit = calculateUnitsByUnitToday(response.data.data)
+        console.log("TOTAL UNIT :", totalUnit)
+
+        const fromDate = period ? new Date(period[0]) : null;
+        const toDate = period ? new Date(period[1]) : null;
+        if(fromDate !== null){
+        fromDate.setHours(0, 0, 0, 1)
+        }
+        if(toDate !== null){
+        toDate.setHours(23, 59, 59, 999)    
+        }
         
+        const filtered = response.data.data.filter((consumption) => {
+    
+          // Parse the consumption_date and filter by date range
+          const consumptionDate = parseISO(consumption.consumption_date);
+    
+          const withinDateRange =
+            (!fromDate || consumptionDate >= fromDate) &&
+            (!toDate || consumptionDate <= toDate);
+          return withinDateRange
+        });
+
         setTotalProductionPerUnit(totalUnit)
         setConsumptionData(response.data.data)
-        setFilteredData(response.data.data)
+        setFilteredData(filtered)
+        
     } catch (error) {
         console.log("Error :", error)
         if(error.response){
@@ -76,6 +98,7 @@ const Consumption = () => {
 
   useEffect(()=>{
     getConsumption()
+    handleSearch()
   }, [])
 
   // Function to check if a timestamp is within today's date range
@@ -161,6 +184,16 @@ const Consumption = () => {
   const handleSearch = () => {
     setLoadingProcess(true)
     const { materialDescOrNo, plant, unit } = searchQuery;
+    const fromDate = period ? new Date(period[0]) : null;
+    const toDate = period ? new Date(period[1]) : null;
+    if(fromDate !== null){
+      fromDate.setHours(0, 0, 0, 1)
+    }
+    if(toDate !== null){
+      toDate.setHours(23, 59, 59, 999)    
+    }
+    console.log("fromDate :", fromDate)
+    console.log("toDate :", toDate)
     const filtered = consumptionData.filter((consumption) => {
         const matchesDescorNo = consumption.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase()) || consumption.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
         const matchesPlant = plant === "All" || consumption.plant.toLowerCase().includes(plant.toLowerCase())
@@ -169,11 +202,7 @@ const Consumption = () => {
 
       // Parse the consumption_date and filter by date range
       const consumptionDate = parseISO(consumption.consumption_date);
-      const fromDate = period ? new Date(period[0]) : null;
-      const toDate = period ? new Date(period[1]) : null;
-      if(toDate !== null){
-        toDate.setHours(23, 59, 59, 999)    
-      }
+
       const withinDateRange =
         (!fromDate || consumptionDate >= fromDate) &&
         (!toDate || consumptionDate <= toDate);
