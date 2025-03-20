@@ -33,6 +33,7 @@ import {
     CCardBody,
     CCard,
     CCardHeader,
+    CToastClose,
 } from '@coreui/react'
 
 import dayjs from 'dayjs';
@@ -48,6 +49,8 @@ import FileTemplateUpload from '/src/assets/files/template-upload-gentani.xlsx'
 import useGentaniDataService from './../../../services/GentaniDataService';
 import useMaterialDataService from './../../../services/MaterialDataService';
 import { useAuth } from '../../../utils/context/authContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faCheckCircle, faInfo, faQuestionCircle, faWarning, faX } from '@fortawesome/free-solid-svg-icons'
 
 const Gentani = () => {
     const {getGentaniData, createGentaniData, createGentaniDataByUpload, updateGentaniData, deleteGentaniData, getRatioProductionData, updateRatioProductionData} = useGentaniDataService()
@@ -340,7 +343,7 @@ const Gentani = () => {
         try {
           setLoading(true)
           const response = await createGentaniData("gentani", form);
-          addToast(templateToast("Success", response.data.message));
+          addToast(templateToast("success", response.data.message));
           
           setFormData((prev)=>({
             ...prev, 
@@ -426,7 +429,7 @@ const Gentani = () => {
             }
             const response = await updateGentaniData("gentani", gentaniId, body)
 
-            addToast(templateToast("Success", response.data.message))
+            addToast(templateToast("success", response.data.message))
             setVisibleModalUpdate(false)
             
         } catch (error) {
@@ -447,7 +450,7 @@ const Gentani = () => {
             setLoading(true)
 
             const responseDel = await deleteGentaniData("gentani", gentaniId)
-            addToast(templateToast("Success", responseDel.data.message))
+            addToast(templateToast("success", responseDel.data.message))
 
             setVisibleModalDelete(false)
             getGentani()
@@ -491,7 +494,7 @@ const Gentani = () => {
             }
             
             const response = await updateRatioProductionData('ratio-production', body, 1)
-            addToast(templateToast("Success", response.data.message))
+            addToast(templateToast("success", response.data.message))
             setVisibleModalRatio(false)
             getRatioProduction()
         } catch (error) {
@@ -512,23 +515,54 @@ const Gentani = () => {
     const toasterErr = useRef()
     const templateToast = (type, msg) => {
         return(
-            <CToast visible={true} autohide={true} key={Date.now()} ref={toaster}>
-                <CToastHeader closeButton>
-                    <svg
-                    className="rounded me-2 bg-black"
-                    width="20"
-                    height="20"
-                    xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                    role="img"
-                    >
-                    <rect width="100%" height="100%" fill={`${type === 'Success' ? "#29d93e" : "#e85454"}`}></rect>
-                    </svg>
-                    <div className="fw-bold me-auto">{type}</div>
-                    {/* <small>7 min ago</small> */}
-                </CToastHeader>
-                <CToastBody>{msg}</CToastBody>
+            // <CToast visible={true} autohide={true} key={Date.now()} ref={toaster}>
+            //     <CToastHeader closeButton>
+            //         <svg
+            //         className="bg-black rounded me-2"
+            //         width="20"
+            //         height="20"
+            //         xmlns="http://www.w3.org/2000/svg"
+            //         preserveAspectRatio="xMidYMid slice"
+            //         focusable="false"
+            //         role="img"
+            //         >
+            //         <rect width="100%" height="100%" fill={`${type === 'Success' ? "#29d93e" : "#e85454"}`}></rect>
+            //         </svg>
+            //         <div className="fw-bold me-auto">{type}</div>
+            //         {/* <small>7 min ago</small> */}
+            //     </CToastHeader>
+            //     <CToastBody>{msg}</CToastBody>
+            // </CToast>
+            <CToast
+                key={Date.now()}
+                autohide={true}
+                color={type} // Use the computed color instead of type
+                delay={5000}
+                visible={true}
+            >
+                <CToastBody className="d-flex align-items-center justify-content-between text-white" closeButton>
+                <div className="d-flex align-items-center gap-3">
+                    <FontAwesomeIcon
+                    icon={
+                        type === 'danger' || type === 'error'
+                        ? faWarning
+                        : type === 'success'
+                        ? faCheckCircle
+                        : type === 'warning'
+                        ? faWarning
+                        : type === 'info'
+                        ? faInfo
+                        : faQuestionCircle
+                    }
+                    size="lg"
+                    />
+                    {msg}
+                </div>
+                <div className="d-flex align-items-center gap-2">
+                    <div style={{ borderLeft: '2px solid white', height: '20px', width: '1px' }}></div>
+                    <CToastClose dark style={{ color: 'white', opacity: 1, boxShadow: 'none', fontSize: '10px' }} />
+                </div>
+                </CToastBody>
             </CToast>
         )
     }
@@ -537,48 +571,96 @@ const Gentani = () => {
         return(
            <CToaster className='position-static'>
                 {data.data.created.length > 0 && (
-                    <CToast visible={true} autohide={true} key={Date.now()} ref={toaster}>
-                        <CToastHeader closeButton>
-                            <svg
-                            className="rounded me-2 bg-black"
-                            width="20"
-                            height="20"
-                            xmlns="http://www.w3.org/2000/svg"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                            role="img"
-                            >
-                            <rect width="100%" height="100%" fill="#29d93e"></rect>
-                            </svg>
-                            <div className="fw-bold me-auto">Success</div>
-                            {/* <small>7 min ago</small> */}
-                        </CToastHeader>
-                        <CToastBody>{data.data.message}</CToastBody>
+                    <CToast
+                        key={Date.now()}
+                        autohide={true}
+                        color={'success'} // Use the computed color instead of type
+                        delay={5000}
+                        visible={true}
+                    >
+                        <CToastBody className="d-flex align-items-center justify-content-between text-white" closeButton>
+                        <div className="d-flex align-items-center gap-3">
+                            <FontAwesomeIcon
+                            icon={
+                                type === 'danger' || type === 'error'
+                                ? faWarning
+                                : type === 'success'
+                                ? faCheckCircle
+                                : type === 'warning'
+                                ? faWarning
+                                : type === 'info'
+                                ? faInfo
+                                : faQuestionCircle
+                            }
+                            size="lg"
+                            />
+                            {data.data.message}
+                        </div>
+                        <div className="d-flex align-items-center gap-2">
+                            <div style={{ borderLeft: '2px solid white', height: '20px', width: '1px' }}></div>
+                            <CToastClose dark style={{ color: 'white', opacity: 1, boxShadow: 'none', fontSize: '10px' }} />
+                        </div>
+                        </CToastBody>
                     </CToast>
                 )}
                 {data.data.errors.length > 0 && (
-                    <CToast visible={true} autohide={true} key={Date.now() + 1000} ref={toasterErr} style={{ overflow: "auto", maxHeight: "75vh"}}>
-                        <CToastHeader closeButton>
-                            <svg
-                            className="rounded me-2 bg-black"
-                            width="20"
-                            height="20"
-                            xmlns="http://www.w3.org/2000/svg"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                            role="img"
-                            >
-                            <rect width="100%" height="100%" fill="#e85454"></rect>
-                            </svg>
-                            <div className="fw-bold me-auto">Failed</div>
-                            {/* <small>7 min ago</small> */}
-                        </CToastHeader>
-                        <CToastBody style={{overflow: "auto"}}>
+                    // <CToast visible={true} autohide={true} key={Date.now() + 1000} ref={toasterErr} style={{ overflow: "auto", maxHeight: "75vh"}}>
+                    //     <CToastHeader closeButton>
+                    //         <svg
+                    //         className="bg-black rounded me-2"
+                    //         width="20"
+                    //         height="20"
+                    //         xmlns="http://www.w3.org/2000/svg"
+                    //         preserveAspectRatio="xMidYMid slice"
+                    //         focusable="false"
+                    //         role="img"
+                    //         >
+                    //         <rect width="100%" height="100%" fill="#e85454"></rect>
+                    //         </svg>
+                    //         <div className="fw-bold me-auto">Failed</div>
+                    //         {/* <small>7 min ago</small> */}
+                    //     </CToastHeader>
+                    //     <CToastBody style={{overflow: "auto"}}>
+                    //         {data.data.errors.map((error, index)=>{
+                    //             return(
+                    //                 <p key={index}>{error.message}</p>
+                    //             )
+                    //         })}
+                    //     </CToastBody>
+                    // </CToast>
+                    <CToast
+                        key={Date.now()}
+                        autohide={true}
+                        color={type} // Use the computed color instead of type
+                        delay={5000}
+                        visible={true}
+                    >
+                        <CToastBody className="d-flex align-items-center justify-content-between text-white" closeButton>
+                        <div className="d-flex align-items-center gap-3">
+                            <FontAwesomeIcon
+                            icon={
+                                type === 'danger' || type === 'error'
+                                ? faWarning
+                                : type === 'success'
+                                ? faCheckCircle
+                                : type === 'warning'
+                                ? faWarning
+                                : type === 'info'
+                                ? faInfo
+                                : faQuestionCircle
+                            }
+                            size="lg"
+                            />
                             {data.data.errors.map((error, index)=>{
                                 return(
                                     <p key={index}>{error.message}</p>
                                 )
                             })}
+                        </div>
+                        <div className="d-flex align-items-center gap-2">
+                            <div style={{ borderLeft: '2px solid white', height: '20px', width: '1px' }}></div>
+                            <CToastClose dark style={{ color: 'white', opacity: 1, boxShadow: 'none', fontSize: '10px' }} />
+                        </div>
                         </CToastBody>
                     </CToast>
                 )}
@@ -908,7 +990,7 @@ const Gentani = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalRatio(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} onClick={()=>handleUpdateRatio(formUpdateRatio)}>
+                    <CButton className='d-flex btn-add-master align-items-center gap-2' disabled={loading} onClick={()=>handleUpdateRatio(formUpdateRatio)}>
                         { loading && <CSpinner size="sm"/>}
                         Save changes</CButton>
                 </CModalFooter>
@@ -927,13 +1009,13 @@ const Gentani = () => {
                 </CModalHeader>
                 <CModalBody>
                     {/* <CRow className="mb-3">
-                        <CFormLabel htmlFor="katashiki" className="col-sm-4 col-form-label">Katashiki<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CFormLabel htmlFor="katashiki" className="col-form-label col-sm-4">Katashiki<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8}>
                             <CFormInput type="text" id="katashiki" onChange={(e)=>setFormData((prev)=>({...prev, katashiki: e.target.value}))}/>
                         </CCol>
                     </CRow> */}
                     <CRow className='mb-3'>
-                        <CFormLabel className="col-sm-4 col-form-label">Material No<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CFormLabel className="col-form-label col-sm-4">Material No<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <Select 
                                 noOptionsMessage={() =>  "No material found" }
@@ -955,10 +1037,10 @@ const Gentani = () => {
                         </CCol>
                     </CRow>
                     <CRow className='mb-3'>
-                        <CFormLabel className="col-sm-4 col-form-label">Plant<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CFormLabel className="col-form-label col-sm-4">Plant<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <CDropdown className="btn-group" style={{width: "100%"}} direction="center">
-                                <CDropdownToggle  width={400} disabled={formData.material_no === "Select"} className='d-flex justify-content-between align-items-center dropdown-search'>{formData.plant !="" ? formData.plant : "Select"}</CDropdownToggle>
+                                <CDropdownToggle  width={400} disabled={formData.material_no === "Select"} className='d-flex dropdown-search align-items-center justify-content-between'>{formData.plant !="" ? formData.plant : "Select"}</CDropdownToggle>
                                 <CDropdownMenu className='cursor-pointer'>
                                     <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormData({...formData, plant: "P1 - PLANT 1"})}>P1 - PLANT 1</CDropdownItem>
                                     {formData.plant2 !== "" && <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setFormData({...formData, plant: "P2 - PLANT 2"})}>P2 - PLANT 2</CDropdownItem>}
@@ -970,7 +1052,7 @@ const Gentani = () => {
                         <CFormLabel className="col-form-label">Consumption Quantity</CFormLabel>
                     </CRow>
                     <CRow className="mb-3">
-                        <CFormLabel htmlFor="quantityF" className="col-sm-4 col-form-label">{formData.plant === "P1 - PLANT 1" ? "Fortuner" : "Avanza"}<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CFormLabel htmlFor="quantityF" className="col-form-label col-sm-4">{formData.plant === "P1 - PLANT 1" ? "Fortuner" : "Avanza"}<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8}>
                             {formData.plant === "P1 - PLANT 1" ? 
                                 <CFormInput type="number" id="quantityF" onChange={(e)=>setFormData((prev)=>({...prev, quantity_fortuner: e.target.value}))}/>
@@ -980,7 +1062,7 @@ const Gentani = () => {
                         </CCol>
                     </CRow>
                     <CRow className="mb-3">
-                        <CFormLabel htmlFor="quantityZ" className="col-sm-4 col-form-label">{formData.plant === "P1 - PLANT 1" ? "Zenix" : "Yaris"}<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CFormLabel htmlFor="quantityZ" className="col-form-label col-sm-4">{formData.plant === "P1 - PLANT 1" ? "Zenix" : "Yaris"}<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8}>
                             {formData.plant === "P1 - PLANT 1" ? 
                                 <CFormInput type="number" id="quantityZ" onChange={(e)=>setFormData((prev)=>({...prev, quantity_zenix: e.target.value}))}/>
@@ -990,7 +1072,7 @@ const Gentani = () => {
                         </CCol>
                     </CRow>
                     <CRow className="mb-3">
-                        <CFormLabel htmlFor="quantityI" className="col-sm-4 col-form-label">{formData.plant === "P1 - PLANT 1" ? "Innova" : "Calya"}<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CFormLabel htmlFor="quantityI" className="col-form-label col-sm-4">{formData.plant === "P1 - PLANT 1" ? "Innova" : "Calya"}<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8}>
                             {formData.plant === "P1 - PLANT 1" ? 
                                 <CFormInput type="number" id="quantityI" onChange={(e)=>setFormData((prev)=>({...prev, quantity_innova: e.target.value}))}/>
@@ -1005,7 +1087,7 @@ const Gentani = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalAdd(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} onClick={()=>handleCreateGentani(formData)}>
+                    <CButton className='d-flex btn-add-master align-items-center gap-2' disabled={loading} onClick={()=>handleCreateGentani(formData)}>
                         { loading && <CSpinner size="sm"/> }
                         Add data
                     </CButton>
@@ -1025,32 +1107,32 @@ const Gentani = () => {
                 </CModalHeader>
                 <CModalBody>
                     {/* <CRow className="mb-3">
-                        <CFormLabel htmlFor="materialNo" className="col-sm-4 col-form-label">Katashiki</CFormLabel>
+                        <CFormLabel htmlFor="materialNo" className="col-form-label col-sm-4">Katashiki</CFormLabel>
                         <CCol sm={8}>
                             <CFormInput type="text" id="materialNo" disabled value={formUpdateData?.katashiki }/>
                         </CCol>
                     </CRow> */}
                     <CRow className='mb-3'>
-                        <CFormLabel className="col-sm-4 col-form-label">Material No</CFormLabel>
+                        <CFormLabel className="col-form-label col-sm-4">Material No</CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <CDropdown disabled className="btn-group disabled-dropdown" style={{width: "100%"}} direction="center">
-                                <CDropdownToggle  width={400} disabled className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.material_no}</CDropdownToggle>
+                                <CDropdownToggle  width={400} disabled className='d-flex dropdown-search align-items-center justify-content-between'>{formUpdateData.material_no}</CDropdownToggle>
                             </CDropdown>
                         </CCol>
                     </CRow>
                     <CRow className='mb-3'>
-                        <CFormLabel className="col-sm-4 col-form-label">Plant</CFormLabel>
+                        <CFormLabel className="col-form-label col-sm-4">Plant</CFormLabel>
                         <CCol sm={8} className='d-flex align-items-center justify-content-between'>
                             <CDropdown disabled className="btn-group disabled-dropdown" style={{width: "100%"}} direction="center">
-                                <CDropdownToggle  width={400} disabled className='d-flex justify-content-between align-items-center dropdown-search'>{formUpdateData.plant}</CDropdownToggle>
+                                <CDropdownToggle  width={400} disabled className='d-flex dropdown-search align-items-center justify-content-between'>{formUpdateData.plant}</CDropdownToggle>
                             </CDropdown>
                         </CCol>
                     </CRow>
                     <CRow className="mb-3">
-                        <CFormLabel className=" col-form-label">Consumption Quantity ({formUpdateData.uom})</CFormLabel>
+                        <CFormLabel className="col-form-label">Consumption Quantity ({formUpdateData.uom})</CFormLabel>
                     </CRow>
                     <CRow className="mb-3">
-                        <CFormLabel htmlFor="quantityFA" className="col-sm-4 col-form-label">{formUpdateData.plant === "P1 - PLANT 1" ? "Fortuner" : "Avanza"}</CFormLabel>
+                        <CFormLabel htmlFor="quantityFA" className="col-form-label col-sm-4">{formUpdateData.plant === "P1 - PLANT 1" ? "Fortuner" : "Avanza"}</CFormLabel>
                         <CCol sm={8}>
                             {formUpdateData.plant === "P1 - PLANT 1" ? 
                                 (
@@ -1071,7 +1153,7 @@ const Gentani = () => {
                         </CCol>
                     </CRow>
                     <CRow className="mb-3">
-                    <CFormLabel htmlFor="quantityZY" className="col-sm-4 col-form-label">{formUpdateData.plant === "P1 - PLANT 1" ? "Zenix" : "Yaris"}</CFormLabel>
+                    <CFormLabel htmlFor="quantityZY" className="col-form-label col-sm-4">{formUpdateData.plant === "P1 - PLANT 1" ? "Zenix" : "Yaris"}</CFormLabel>
                         <CCol sm={8}>
                             {formUpdateData.plant === "P1 - PLANT 1" ? 
                                 (
@@ -1093,7 +1175,7 @@ const Gentani = () => {
                         </CCol>
                     </CRow>
                     <CRow className="mb-3">
-                    <CFormLabel htmlFor="quantityIC" className="col-sm-4 col-form-label">{formUpdateData.plant === "P1 - PLANT 1" ? "Innova" : "Calya"}</CFormLabel>
+                    <CFormLabel htmlFor="quantityIC" className="col-form-label col-sm-4">{formUpdateData.plant === "P1 - PLANT 1" ? "Innova" : "Calya"}</CFormLabel>
                         <CCol sm={8}>
                             {formUpdateData.plant === "P1 - PLANT 1" ? 
                                 (
@@ -1119,7 +1201,7 @@ const Gentani = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalUpdate(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} 
+                    <CButton className='d-flex btn-add-master align-items-center gap-2' disabled={loading} 
                         onClick={()=> handleUpdateGentani(
                             formUpdateData.gentani_id, 
                             formUpdateData.quantity_fortuner,
@@ -1187,7 +1269,7 @@ const Gentani = () => {
                         </div>
                     </CRow>
                     <CRow className="mb-3">
-                        <CFormLabel htmlFor="quantitiy" className="col-sm-4 col-form-label">File (.xlsx)<span style={{color: "red"}}>*</span></CFormLabel>
+                        <CFormLabel htmlFor="quantitiy" className="col-form-label col-sm-4">File (.xlsx)<span style={{color: "red"}}>*</span></CFormLabel>
                         <CCol sm={8}>
                             <CFormInput type="file" accept='.xlsx' id="upload" onChange={(e)=>handleChangeUpload(e)}/>
                         </CCol>
@@ -1197,7 +1279,7 @@ const Gentani = () => {
                     <CButton color="secondary" className='btn-close-red' onClick={() => setVisibleModalUpload(false)}>
                     Close
                     </CButton>
-                    <CButton className='btn-add-master d-flex align-items-center gap-2' disabled={loading} onClick={()=>handleCreateByUpload()}>
+                    <CButton className='d-flex btn-add-master align-items-center gap-2' disabled={loading} onClick={()=>handleCreateByUpload()}>
                         { loading && <CSpinner size='sm'/>}
                         Upload data
                     </CButton>
@@ -1210,16 +1292,16 @@ const Gentani = () => {
             <CRow>
                 {/* <CCol xs={12} xl={3} xxl={4} lg={3} md={6} sm={12}>
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor="materialDesc" className='col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12  col-sm-2 '>Katashiki</CFormLabel>
-                        <CCol className="d-flex align-items-center justify-content-start gap-2 col-xxl-10 col-xl-10 col-lg-11 col-md-11" >
+                        <CFormLabel htmlFor="materialDesc" className='col-form-label col-lg-12 col-md-12 col-sm-2 col-xl-12 col-xxl-12'>Katashiki</CFormLabel>
+                        <CCol className="col-lg-11 col-md-11 col-xl-10 col-xxl-10 d-flex align-items-center justify-content-start gap-2" >
                             <Select options={optionsKatashiki} placeholder="All" isClearable value={optionsKatashiki.find((option) => option.value === searchQuery.katashiki) || null} onChange={(e) => setSearchQuery({ ...searchQuery, katashiki: e ? e.value : "" })} className='w-100' styles={colorStyles}/>
                         </CCol>
                     </CRow>
                 </CCol> */}
                 <CCol xs={12} xl={4} xxl={4} lg={4} md={4} sm={12}>
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor="supplyLine" className="col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ">Material</CFormLabel>
-                        <CCol className='d-flex align-items-center justify-content-start gap-2 col-xxl-10 col-xl-10 col-lg-11 col-md-12'>
+                        <CFormLabel htmlFor="supplyLine" className="col-form-label col-lg-12 col-md-12 col-sm-2 col-xl-12 col-xxl-12">Material</CFormLabel>
+                        <CCol className='col-lg-11 col-md-12 col-xl-10 col-xxl-10 d-flex align-items-center justify-content-start gap-2'>
                             {/* <CFormInput type="text" id="supplyLine" value={searchQuery.materialDescOrNo} onChange={(e)=>setSearchQuery((prev)=>({ ...prev, materialDescOrNo: e.target.value}))}/> */}
                             <Select noOptionsMessage={() =>  "No material found" } options={optionsMaterialDesc} placeholder="All" isClearable value={optionsMaterialDesc.find((option) => option.value === searchQuery.materialDescOrNo) || null} onChange={(e) => setSearchQuery({ ...searchQuery, materialDescOrNo: e ? e.value : "" })} className='w-100 cursor-pointer' styles={colorStyles}/>
                             
@@ -1228,10 +1310,10 @@ const Gentani = () => {
                 </CCol>
                 <CCol xs={12} xl={3} xxl={3} lg={3} md={3} sm={12}>
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor="plant" className='col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ' >Plant</CFormLabel>
-                        <CCol className='d-flex align-items-center gap-2 col-xxl-10 col-xl-10 col-lg-11 col-md-12 col-sm-8'>
-                            <CDropdown className='dropdown-search d-flex justify-content-between'>
-                                <CDropdownToggle className='d-flex justify-content-between align-items-center w-100'>{searchQuery.plant}</CDropdownToggle>
+                        <CFormLabel htmlFor="plant" className='col-form-label col-lg-12 col-md-12 col-sm-2 col-xl-12 col-xxl-12' >Plant</CFormLabel>
+                        <CCol className='col-lg-11 col-md-12 col-sm-8 col-xl-10 col-xxl-10 d-flex align-items-center gap-2'>
+                            <CDropdown className='d-flex dropdown-search justify-content-between'>
+                                <CDropdownToggle className='d-flex align-items-center justify-content-between w-100'>{searchQuery.plant}</CDropdownToggle>
                                 <CDropdownMenu className='cursor-pointer'>
                                 <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, plant: "All"}))}>All</CDropdownItem>
                                     <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, plant: "P1 - Plant 1"}))}>P1 - Plant 1</CDropdownItem>
@@ -1243,10 +1325,10 @@ const Gentani = () => {
                 </CCol>
                 <CCol xs={12} xl={5} xxl={5} lg={5} md={5} sm={12}>
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor="plant" className='col-form-label col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-2 ' >Unit</CFormLabel>
-                        <CCol className='d-flex align-items-center gap-2 col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8'>
-                            <CDropdown className='dropdown-search d-flex justify-content-between'>
-                                <CDropdownToggle className='d-flex justify-content-between align-items-center w-100'>{searchQuery.unit}</CDropdownToggle>
+                        <CFormLabel htmlFor="plant" className='col-form-label col-lg-12 col-md-12 col-sm-2 col-xl-12 col-xxl-12' >Unit</CFormLabel>
+                        <CCol className='col-lg-8 col-md-8 col-sm-8 col-xl-8 col-xxl-8 d-flex align-items-center gap-2'>
+                            <CDropdown className='d-flex dropdown-search justify-content-between'>
+                                <CDropdownToggle className='d-flex align-items-center justify-content-between w-100'>{searchQuery.unit}</CDropdownToggle>
                                 <CDropdownMenu className='cursor-pointer'>
                                     <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, unit: "All"}))}>All</CDropdownItem>
                                     <CDropdownItem style={{textDecoration: "none"}} onClick={() => setSearchQuery((prev)=>({...prev, unit: "Fortuner"}))}>Fortuner</CDropdownItem>
@@ -1258,7 +1340,7 @@ const Gentani = () => {
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
-                        <CCol className="d-flex justify-content-end gap-3 col-sm-2 col-xxl-4 col-xl-4 col-lg-4 col-md-4">
+                        <CCol className="col-lg-4 col-md-4 col-sm-2 col-xl-4 col-xxl-4 d-flex justify-content-end gap-3">
                             <CButton className="btn-search" onClick={()=>handleSearch()}>Search</CButton>
                             <CButton color="secondary" onClick={() => handleClearSearch()}>Clear</CButton>
                         </CCol >
@@ -1267,22 +1349,22 @@ const Gentani = () => {
             </CRow>
             <CRow>
                 { auth.userData.role_name === "LANE HEAD" && 
-                    <CCol xs={12} xxl={12} className='mt-xl-0 mt-4 d-flex flex-wrap p-4 gap-3 gap-sm-1'>
-                        <CButton className='btn-add-master col-sm-auto col-5 ' onClick={()=>setVisibleModalAdd(true)}>Add Gentani</CButton>
-                        <CButton className='btn-add-master mx-0 mx-sm-2 col-sm-auto col-6' onClick={()=>handleModalRatio(ratioProdData)}>Production Rate</CButton>
-                        <CDropdown className="btn-group btn-download mx-0 mx-sm-2 col-sm-auto col-5">
+                    <CCol xs={12} xxl={12} className='d-flex flex-wrap p-4 gap-3 gap-sm-1 mt-4 mt-xl-0'>
+                        <CButton className='col-5 col-sm-auto btn-add-master' onClick={()=>setVisibleModalAdd(true)}>Add Gentani</CButton>
+                        {/* <CButton className='col-6 col-sm-auto btn-add-master mx-0 mx-sm-2' onClick={()=>handleModalRatio(ratioProdData)}>Production Rate</CButton> */}
+                        <CDropdown className="col-5 col-sm-auto btn-download btn-group mx-0 mx-sm-2">
                             <CDropdownToggle  style={{color: "white"}}>Download</CDropdownToggle>
                             <CDropdownMenu>
                                 <CDropdownItem className='cursor-pointer' style={{textDecoration: "none"}} onClick={()=>handleDownloadTemplate()}>Template</CDropdownItem>
                                 <CDropdownItem className='cursor-pointer' style={{textDecoration: "none"}} onClick={()=>handleDownload(paginatedData)}>Gentani Data Table</CDropdownItem>
                             </CDropdownMenu>
                         </CDropdown>
-                        <CButton className='btn-upload col-sm-auto col-6' onClick={()=>setVisibleModalUpload(true)}>Upload</CButton>
+                        <CButton className='col-6 col-sm-auto btn-upload' onClick={()=>setVisibleModalUpload(true)}>Upload</CButton>
                     </CCol>
                 }
             </CRow>
             <CRow>
-                <CCol className='py-4 text-table-small '>
+                <CCol className='text-table-small py-4'>
                     <CTable bordered striped responsive>
                         <CTableHead>
                             <CTableRow color="dark" style={{ verticalAlign: "middle", textAlign: "center" }}>
@@ -1343,7 +1425,7 @@ const Gentani = () => {
                             { paginatedData.length === 0 && !loading && 
                                 <CTableRow color="light">
                                     <CTableDataCell color="light" colSpan={16}>
-                                        <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                        <div className='d-flex flex-column align-items-center justify-content-center text-black text-not-found py-2' style={{ opacity: "30%"}}>
                                             <CIcon icon={icon.cilFax} size='3xl'/>
                                             <p className='pt-3'>No data found!</p>
                                         </div>
@@ -1353,7 +1435,7 @@ const Gentani = () => {
                             { loading && 
                                 <CTableRow color=''>
                                     <CTableDataCell colSpan={16}>
-                                        <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                        <div className='d-flex flex-column align-items-center justify-content-center text-black text-not-found py-2' style={{ opacity: "30%"}}>
                                             <CSpinner/>
                                             <p className='pt-3'>Loading data</p>
                                         </div>
@@ -1380,7 +1462,7 @@ const Gentani = () => {
                         </CDropdownMenu>
                     </CDropdown>
                 </CCol>
-                <CCol sm={12} xl={12} className='d-flex align-items-center gap-4 justify-content-center flex-column flex-xl-row py-4'>
+                <CCol sm={12} xl={12} className='d-flex flex-column flex-xl-row align-items-center justify-content-center gap-4 py-4'>
                         {/* Custom Pagination Component */}
                         <CPagination className="justify-content-center">
                         {/* Previous Button */}

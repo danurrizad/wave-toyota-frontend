@@ -287,7 +287,7 @@ const Supply = () => {
                             value={`${dataQR.material_no}, ${dataQR.material_desc}, ${dataQR.plant}, ${dataQR.uom}, ${dataQR.pack}, ${dataQR.qty_pack}, ${dataQR.qty_uom}`}
                             bgColor="white"
                             fgColor="black"
-                            size={400}
+                            size={300}
                         />
                     </CRow>
                     <CRow className='px-4 pt-4'>

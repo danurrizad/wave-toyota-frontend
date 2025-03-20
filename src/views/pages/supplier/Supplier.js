@@ -692,8 +692,8 @@ function Supplying() {
         </CRow>
 
         <CRow>
-            <CCol xs={5} sm={5} md={4} lg={3} xxl={2}>
-                <CButton className='btn-add-master d-flex align-items-center gap-2' onClick={()=>setVisibleModalScanner(true)}><CIcon icon={icon.cilQrCode} size='lg'/>Input by QR-Code</CButton>
+            <CCol xs={5} sm={5} md={4} lg={3} xxl='auto'>
+                <CButton className='btn-add-master d-flex align-items-center gap-2 w-100' onClick={()=>setVisibleModalScanner(true)}><CIcon icon={icon.cilQrCode} size='lg'/>Input by QR-Code</CButton>
             </CCol>
             <CCol>
                 <CButton className='btn-add-master d-flex align-items-center gap-2' onClick={()=>setVisibleModalTransaction(true)}><CIcon icon={icon.cilFolderOpen} size='lg'/>List Material Supplied</CButton>
