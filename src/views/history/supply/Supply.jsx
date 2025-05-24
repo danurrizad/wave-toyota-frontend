@@ -31,7 +31,6 @@ import { saveAs } from "file-saver";
 
 import useHistoryDataService from '../../../services/HistoryDataService';
 import useMaterialDataService from './../../../services/MaterialDataService';
-import templateToast from '../../../components/ToasterComponent';
 
 import { DateRangePicker } from 'rsuite'
 import Select from 'react-select'
@@ -58,10 +57,10 @@ const Supply = () => {
         setFilteredData(response.data.data)
     } catch (error) {
         if (error.response){
-            addToast(templateToast("Error", error.response.message))
+            addToast(error.response.message, 'danger', 'error')
         }
         else{
-            addToast(templateToast("Error", error.message))
+            addToast(error.message, 'danger', 'error')
         }
     } finally {
         setLoading(false)
@@ -75,10 +74,10 @@ const Supply = () => {
         setMaterialData(response.data)
     } catch (error) {
         if (error.response){
-            addToast(templateToast("Error", error.response.message))
+            addToast(error.response.message, 'danger', 'error')
         }
         else{
-            addToast(templateToast("Error", error.message))
+            addToast(error.message, 'danger', 'error')
         }
     } finally {
         setLoading(false)
@@ -227,9 +226,6 @@ const Supply = () => {
     <>
         <CContainer fluid >
 
-        {/* Toast */}
-        <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
-
         <CRow>
             <CCol xl={3} sm={6} xs={12}>
                 <CRow className='mb-3'>
@@ -283,7 +279,7 @@ const Supply = () => {
         </CCol>
             <CRow>
                 <CCol className='py-4 text-table-small'>
-                    <CTable bordered striped>
+                    <CTable bordered striped responsive>
                         <CTableHead style={{ verticalAlign: "middle", textAlign: "center" }}>
                             <CTableRow color="dark">
                                 <CTableHeaderCell scope="col" rowSpan={2} className='text-center'>No</CTableHeaderCell>

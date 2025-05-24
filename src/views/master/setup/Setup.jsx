@@ -258,7 +258,7 @@ const Setup = () => {
                     <CTable bordered striped responsive>
                         <CTableHead>
                             <CTableRow color="dark" style={{backgroundColor: "blue", textAlign: "center", verticalAlign: "middle"}}>
-                                { auth.userData.role_name === "LANE HEAD" && <CTableHeaderCell scope="col" className='text-center'>Action</CTableHeaderCell> }
+                                { (auth.userData.role_name === "LANE HEAD" ||  auth.userData.role_name === "SUPER ADMIN") && <CTableHeaderCell scope="col" className='text-center'>Action</CTableHeaderCell> }
                                 <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Plant</CTableHeaderCell>
@@ -276,7 +276,7 @@ const Setup = () => {
                             { paginatedData && paginatedData.map((setup, index) => {
                                     return(
                                         <CTableRow color={setup.total < setup.standard_supply && setup.total > setup.critical_stock ? "warning" : setup.total < setup.critical_stock ? "danger" : ""} key={index} style={{ verticalAlign: "middle", backgroundColor: "black" }}>
-                                            { auth.userData.role_name === "LANE HEAD" && (
+                                            { (auth.userData.role_name === "LANE HEAD" ||  auth.userData.role_name === "SUPER ADMIN") && (
                                                 <CTableDataCell className='text-center'>
                                                     <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(setup)}><CIcon icon={icon.cilColorBorder}/></CButton>
                                                 </CTableDataCell>

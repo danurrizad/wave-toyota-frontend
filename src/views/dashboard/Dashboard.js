@@ -2,30 +2,10 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { CContainer, CCol, CRow, CImage, CButton, CToaster } from '@coreui/react'
 import ImageDashboard from '/src/assets/images/dashboard/dashboard_img_2.png'
-import templateToast from '../../components/ToasterComponent';
-
-import { useAuth } from '../../utils/context/authContext';
-
 
 const Dashboard = () => {
-  const auth = useAuth()
-  const [toast, addToast] = useState(0)
-  const toaster = useRef()
-
-  useEffect(()=>{
-    const status = localStorage.getItem('status')
-    if(auth.statusLogin === "Success" || status === "Success"){
-      addToast(templateToast("Success", `Welcome, ${auth.user}`))
-      localStorage.setItem('status', "LoggedIn")
-    }
-    console.log("data user :", auth.userData)
-    console.log("user :", auth.user)
-  }, [])
-
   return (
     <CContainer className='bg-white wrapper' fluid style={{overflowX:"hidden", position: "absolute", top: "0", left: "0", width: "100vw"}}>
-      {/* Toast */}
-      <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
 
       <CRow className='d-flex justify-content-center align-items-center flex-grow-1' style={{height: "100vh"}}>
         <CCol xxl={{order: 0, span: 6}} xs={{order: 1, span: 12}}>

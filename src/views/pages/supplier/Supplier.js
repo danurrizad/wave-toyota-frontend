@@ -654,7 +654,7 @@ function Supplying() {
 
         <CRow className='py-4 d-flex align-items-start mb-4'>
             <CCol className='text-center'>
-                <h1>Master Supplier Material</h1>
+                <h2>Master Supplier</h2>
                 <h6>Input quantity to supply material</h6>
             </CCol>
         </CRow>
@@ -693,10 +693,10 @@ function Supplying() {
 
         <CRow>
             <CCol xs={5} sm={5} md={4} lg={3} xxl='auto'>
-                <CButton className='btn-add-master d-flex align-items-center gap-2 w-100' onClick={()=>setVisibleModalScanner(true)}><CIcon icon={icon.cilQrCode} size='lg'/>Input by QR-Code</CButton>
+                <CButton className='btn-add-master d-flex align-items-center gap-2 w-100' onClick={()=>setVisibleModalScanner(true)}><CIcon icon={icon.cilQrCode} size='lg'/>QR Input</CButton>
             </CCol>
             <CCol>
-                <CButton className='btn-add-master d-flex align-items-center gap-2' onClick={()=>setVisibleModalTransaction(true)}><CIcon icon={icon.cilFolderOpen} size='lg'/>List Material Supplied</CButton>
+                <CButton className='btn-add-master d-flex align-items-center gap-2' onClick={()=>setVisibleModalTransaction(true)}><CIcon icon={icon.cilFolderOpen} size='lg'/>List Supplied</CButton>
             </CCol>
         </CRow>
 
@@ -717,7 +717,7 @@ function Supplying() {
         <CTable bordered striped style={{fontSize: "12px", verticalAlign: "middle"}}>
             <CTableHead>
                 <CTableRow color='dark' className='table-head-row'>
-                        { auth.userData.role_name === "LANE HEAD" && <CTableHeaderCell scope="col" className="text-center">Action</CTableHeaderCell>}
+                        { (auth.userData.role_name === "LANE HEAD" ||  auth.userData.role_name === "SUPER ADMIN") && <CTableHeaderCell scope="col" className="text-center">Action</CTableHeaderCell>}
                         <CTableHeaderCell scope="col">Material No</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Material Desc</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Plant</CTableHeaderCell>
@@ -740,7 +740,7 @@ function Supplying() {
                                         ""
                                     }`}
                                 >
-                                {auth.userData.role_name === "LANE HEAD" && (
+                                {(auth.userData.role_name === "LANE HEAD" ||  auth.userData.role_name === "SUPER ADMIN") && (
                                     <CTableDataCell className="text-center">
                                         <CButton onClick={() => handleModalAdd(supply)} className="btn-icon-edit">
                                             <CIcon icon={icon.cilInput} />

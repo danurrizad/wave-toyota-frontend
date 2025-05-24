@@ -31,35 +31,30 @@ import { cilLockLocked, cilUser } from '@coreui/icons'
 
 import useAuthDataService from './../../../services/AuthDataService';
 import { useAuth } from '../../../utils/context/authContext'
-import templateToast from '../../../components/ToasterComponent'
 import ImageEtios from '../../../assets/images/login/etios.jpg'
 import ImageInnova from '../../../assets/images/login/innova.jpg'
 import ImageVios from '../../../assets/images/login/vios.jpg'
 import ImageYaris from '../../../assets/images/login/yaris.jpg'
 import ImageLogo from '../../../assets/images/logo/app-logo.png'
+import { useToast } from '../../../App'
 
 const Login = () => {
   const auth = useAuth()
+  const addToast = useToast()
   const [showPass, setShowPass] = useState(false)
   const [ formData, setFormData ] = useState({
     email: "",
     password: ""
   })
-  const [toast, addToast] = useState(0)
-  const toaster = useRef()
   const [isLoading, setIsLoading] = useState(false)
 
   const handleLogin = async(form) => {
     try {
       setIsLoading(true)
       await auth.loginAction(form)
-      addToast(templateToast("Success", "Welcome!"))
+      addToast("Welcome!", 'success', 'success')
     } catch (error) {
-        if(error.response){
-          addToast(templateToast("Error", error.response.data.message))
-        }else{
-          addToast(templateToast("Error", error.message))
-        }
+        console.error(error)
     } finally{
       setIsLoading(false)
     }
@@ -67,7 +62,7 @@ const Login = () => {
 
   useEffect(()=>{
     if(auth.errMsg){
-      addToast(templateToast("Error", auth.errMsg))
+      addToast(auth.errMsg, 'danger', 'error')
     }
   }, [])
 
@@ -75,9 +70,6 @@ const Login = () => {
 
   return (
     <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
-      
-       {/* Toast */}
-       <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
       
       <CContainer>
         <CRow className="">

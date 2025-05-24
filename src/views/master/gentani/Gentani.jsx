@@ -221,7 +221,6 @@ const Gentani = () => {
 
     const handleSearch = () => {
         const { katashiki, materialDescOrNo, plant, unit } = searchQuery
-        console.log("unit query :", unit)
 
         const filtered = gentaniData.filter( gentani => {
             // const matchesKatashiki = !katashiki || gentani.katashiki.toLowerCase() === katashiki.toLowerCase()
@@ -230,7 +229,6 @@ const Gentani = () => {
             // Dynamically access the property based on `unit`
             const matchesUnit = unit === "All" || (gentani[`quantity_${unit.toLowerCase()}`] !== undefined && gentani[`quantity_${unit.toLowerCase()}`] !== null &&  gentani[`quantity_${unit.toLowerCase()}`] !== 0);
 
-            console.log("matchesUnit:", matchesUnit)
             return matchesDescOrNo && matchesPlant && matchesUnit
         })
         
@@ -1348,7 +1346,7 @@ const Gentani = () => {
                 </CCol>
             </CRow>
             <CRow>
-                { auth.userData.role_name === "LANE HEAD" && 
+                { (auth.userData.role_name === "LANE HEAD" ||  auth.userData.role_name === "SUPER ADMIN") && 
                     <CCol xs={12} xxl={12} className='d-flex flex-wrap p-4 gap-3 gap-sm-1 mt-4 mt-xl-0'>
                         <CButton className='col-5 col-sm-auto btn-add-master' onClick={()=>setVisibleModalAdd(true)}>Add Gentani</CButton>
                         {/* <CButton className='col-6 col-sm-auto btn-add-master mx-0 mx-sm-2' onClick={()=>handleModalRatio(ratioProdData)}>Production Rate</CButton> */}
@@ -1368,7 +1366,7 @@ const Gentani = () => {
                     <CTable bordered striped responsive>
                         <CTableHead>
                             <CTableRow color="dark" style={{ verticalAlign: "middle", textAlign: "center" }}>
-                                { auth.userData.role_name === "LANE HEAD" && <CTableHeaderCell scope="col" colSpan={2} rowSpan={2} className='text-center'>Action</CTableHeaderCell>}
+                                { (auth.userData.role_name === "LANE HEAD" ||  auth.userData.role_name === "SUPER ADMIN") && <CTableHeaderCell scope="col" colSpan={2} rowSpan={2} className='text-center'>Action</CTableHeaderCell>}
                                 {/* <CTableHeaderCell scope="col">Katashiki</CTableHeaderCell> */}
                                 <CTableHeaderCell scope="col" rowSpan={2} >Material No</CTableHeaderCell>
                                 <CTableHeaderCell scope="col" rowSpan={2} >Material Desc</CTableHeaderCell>
@@ -1393,13 +1391,13 @@ const Gentani = () => {
                             { paginatedData && paginatedData.map((gentani, index) => {
                                 return(
                                     <CTableRow key={index} style={{ verticalAlign: "middle" }}>
-                                        { auth.userData.role_name === "LANE HEAD" && (
+                                        { (auth.userData.role_name === "LANE HEAD" ||  auth.userData.role_name === "SUPER ADMIN") && (
                                             <CTableDataCell className='text-center'>
                                                 <CButton className='btn-icon-edit' onClick={()=>handleModalUpdate(gentani)}><CIcon icon={icon.cilColorBorder}/></CButton>
                                             </CTableDataCell>
                                         )}
                                         {(
-                                          auth.userData.role_name === "LANE HEAD" &&
+                                          (auth.userData.role_name === "LANE HEAD" ||  auth.userData.role_name === "SUPER ADMIN") &&
                                             <CTableDataCell className='text-center'>
                                                 <CButton className='btn-icon-delete' onClick={()=>handleModalDelete(gentani)}><CIcon icon={icon.cilTrash}/></CButton>
                                             </CTableDataCell>

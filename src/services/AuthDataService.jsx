@@ -1,9 +1,20 @@
 /* eslint-disable prettier/prettier */
 import axios from 'axios'
+import { useToast } from '../App'
 
 const useAuthDataService = () => {
-
+    const addToast = useToast()
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+
+    const handleError = (error, message) => {
+        if(error.response.data.message){
+            addToast(error.response.data.message, 'danger', 'error')
+        }else{
+            addToast(error.message, 'danger', 'error')
+        }
+        throw new Error(message + error.message)
+      }
+
 
     const login = async(body) => {
         try {
@@ -12,9 +23,10 @@ const useAuthDataService = () => {
                     withCredentials: true
                 }
             )
+            console.log("RESPONSE LOGIN: ", response)
             return response
         } catch (error) {
-            throw error
+            handleError(error, 'Login error: ')
         }
     }
 
@@ -29,7 +41,7 @@ const useAuthDataService = () => {
             })
             return response
         } catch (error) {
-            throw error
+            handleError(error, 'Error verrifying token: ')
         }
     }
 
@@ -44,7 +56,7 @@ const useAuthDataService = () => {
             })
             return response
         } catch (error) {
-            throw error
+            handleError(error, 'Error refreshing token: ')
         }
     }
 

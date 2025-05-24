@@ -16,7 +16,7 @@ import {
   CNavbarText,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import * as icon from '@coreui/icons';
+import * as icon from '@coreui/icons'
 
 import {
   cilBell,
@@ -30,6 +30,7 @@ import {
 
 import { AppBreadcrumb } from './index'
 import { useAuth } from '../utils/context/authContext'
+import AppHeaderDropdown from './header/AppHeaderDropdown'
 
 const AppHeader = () => {
   const auth = useAuth()
@@ -62,6 +63,7 @@ const AppHeader = () => {
         <CHeaderToggler
           onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
           style={{ marginInlineStart: '-14px' }}
+          className=""
         >
           <CIcon icon={cilMenu} size="lg" />
         </CHeaderToggler>
@@ -72,7 +74,8 @@ const AppHeader = () => {
             </CNavLink>
           </CNavItem>
         </CHeaderNav>
-        <CHeaderNav className="ms-auto">
+
+        <CHeaderNav className="ms-auto order-2 order-md-1">
           <CNavItem>
             <CNavLink className="" style={{ textDecoration: 'none' }}>
               {dateState.toLocaleString('en-US', {
@@ -86,36 +89,27 @@ const AppHeader = () => {
                 hour: 'numeric',
                 minute: 'numeric',
                 second: '2-digit',
-                hour12: true,
+                hourCycle: 'h24',
               })}
             </CNavLink>
           </CNavItem>
         </CHeaderNav>
+
         <li className="nav-item py-1" style={{ textDecoration: 'none', display: 'none' }}>
           <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
         </li>
-        <CHeaderNav>
+
+        <CHeaderNav className="col col-md-auto justify-content-end order-1">
           <CNavItem className="d-flex align-items-center">
-            <CNavLink style={{ textDecoration: 'none' }}>
-              <div
-                className="d-flex align-items-center justify-content-center"
-                style={{
-                  border: '1px solid black',
-                  height: '30px',
-                  width: '30px',
-                  borderRadius: '100%',
-                }}
-              >
-                <CIcon icon={icon.cilUser} />
-              </div>
-            </CNavLink>
-            <CNavLink className="d-flex flex-column" style={{ textDecoration: 'none' }}>
-              <p style={{ fontSize: '12' }}>{auth.user}</p>
-              <p style={{ fontSize: '8px', marginTop: '0px' }}>{auth.userData.role_name}</p>
-            </CNavLink>
+            <AppHeaderDropdown
+              imgProfile={auth.imgProfile}
+              name={auth.user}
+              roleName={auth.userData.role_name}
+            />
           </CNavItem>
         </CHeaderNav>
       </CContainer>
+
       <CContainer className="px-4" fluid>
         <AppBreadcrumb />
       </CContainer>

@@ -34,62 +34,49 @@ import { DateRangePicker } from 'rsuite'
 import Select from 'react-select'
 
 import useHistoryDataService from './../../../services/HistoryDataService';
-import templateToast from '../../../components/ToasterComponent';
 
 import { parseISO } from "date-fns";
 import CIcon from '@coreui/icons-react';
 import * as icon from "@coreui/icons";
+import { useToast } from './../../../App';
 
 const Consumption = () => {
+  const addToast = useToast()
   const [period, setPeriod] = useState([new Date(), new Date()])
   const [loading, setLoading] = useState(false)
   const [loadingProcess, setLoadingProcess] = useState(false)
-  const [toast, addToast] = useState(0)
 
-  const toaster = useRef()
 
   const [consumptionData, setConsumptionData] = useState([])
-  const {getConsumptionHistory} = useHistoryDataService()
+  const {getConsumptionHistory, getTotalUnitConsumption, getConsumptionHistoryOnRange} = useHistoryDataService()
   const [totalProductionPerUnit, setTotalProductionPerUnit] = useState([])
 
   const getConsumption = async() => {
     try {
         setLoading(true)
-        const response = await getConsumptionHistory()
-        const totalUnit = calculateUnitsByUnitToday(response.data.data)
-        console.log("TOTAL UNIT :", totalUnit)
-
         const fromDate = period ? new Date(period[0]) : null;
         const toDate = period ? new Date(period[1]) : null;
         if(fromDate !== null){
-        fromDate.setHours(0, 0, 0, 1)
+            fromDate.setHours(0, 0, 0, 1)
         }
         if(toDate !== null){
-        toDate.setHours(23, 59, 59, 999)    
+            toDate.setHours(23, 59, 59, 999)    
         }
+        const startDate = fromDate?.toLocaleDateString('en-CA') || ""
+        const endDate = toDate?.toLocaleDateString('en-CA') || ""
         
-        const filtered = response.data.data.filter((consumption) => {
-    
-          // Parse the consumption_date and filter by date range
-          const consumptionDate = parseISO(consumption.consumption_date);
-    
-          const withinDateRange =
-            (!fromDate || consumptionDate >= fromDate) &&
-            (!toDate || consumptionDate <= toDate);
-          return withinDateRange
-        });
-
-        setTotalProductionPerUnit(totalUnit)
+        const response = await getConsumptionHistoryOnRange(startDate, endDate)
+        
         setConsumptionData(response.data.data)
-        setFilteredData(filtered)
+        setFilteredData(response.data.data)
         
     } catch (error) {
         console.log("Error :", error)
         if(error.response){
-            addToast(templateToast("Error", error.response.data.message))
+            addToast(error.response.data.message, 'error')
         }
         else{
-            addToast(templateToast("Error", error.message))
+            addToast(error.message, 'danger', 'error')
         }
     } finally{
         setLoading(false)
@@ -99,40 +86,25 @@ const Consumption = () => {
   useEffect(()=>{
     getConsumption()
     handleSearch()
+    calculateUnitsByUnitToday()
   }, [])
 
-  // Function to check if a timestamp is within today's date range
-    const isToday = (timestamp) => {
-        const date = new Date(timestamp);
-        const now = new Date();
-        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const endOfDay = new Date(startOfDay);
-        endOfDay.setDate(startOfDay.getDate() + 1);
+  useEffect(()=>{
+    getConsumption()
+  }, [period])
 
-        return date >= startOfDay && date < endOfDay;
-    };
+  
 
-    // Function to calculate total units produced per `unit` for today
-    const calculateUnitsByUnitToday = (data) => {
-        const unitsCount = {};
-        data.forEach((item) => {
-            if (isToday(item.consumption_time)) {
-                const key = `${item.consumption_time}-${item.unit}`;
-                if (!unitsCount[item.unit]) {
-                    unitsCount[item.unit] = new Set(); // Use Set to avoid duplicate `usedAt` values
-                }
-                unitsCount[item.unit].add(key);
-            }
-        });
-
-        // Convert the Set size to count of unique `usedAt` per unit
-        const result = {};
-        for (const unit in unitsCount) {
-            result[unit] = unitsCount[unit].size;
-        }
-
-        return result;
-    };
+// Function to calculate total units produced per `unit` for today
+const calculateUnitsByUnitToday = async() => {
+    try {
+        const dateNow = new Date().toLocaleDateString('en-CA')
+        const response = await getTotalUnitConsumption(dateNow, dateNow)
+        setTotalProductionPerUnit(response.data.data)
+    } catch (error) {
+        console.error(error)
+    }
+};
 
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -145,9 +117,13 @@ const Consumption = () => {
     unit: "All"
   })
 
+  useEffect(()=>{
+    handleSearch()
+  }, [searchQuery])
+
   const optionsMaterialDesc = Array.from(
     new Map(
-      consumptionData.map((consumption) => [consumption.material_desc, consumption]) // Use a Map to remove duplicates by material_desc
+      consumptionData?.map((consumption) => [consumption.material_desc, consumption]) // Use a Map to remove duplicates by material_desc
     ).values()
   ).map((consumption) => ({
     value: consumption.material_no, // Use material_desc as the value
@@ -192,21 +168,12 @@ const Consumption = () => {
     if(toDate !== null){
       toDate.setHours(23, 59, 59, 999)    
     }
-    console.log("fromDate :", fromDate)
-    console.log("toDate :", toDate)
-    const filtered = consumptionData.filter((consumption) => {
+    const filtered = consumptionData?.filter((consumption) => {
         const matchesDescorNo = consumption.material_desc.toLowerCase().includes(materialDescOrNo.toLowerCase()) || consumption.material_no.toLowerCase().includes(materialDescOrNo.toLowerCase())
         const matchesPlant = plant === "All" || consumption.plant.toLowerCase().includes(plant.toLowerCase())
         const matchesUnit = unit === "All" || consumption.unit.toLowerCase().includes(unit.toLowerCase())
-        
-
-      // Parse the consumption_date and filter by date range
-      const consumptionDate = parseISO(consumption.consumption_date);
-
-      const withinDateRange =
-        (!fromDate || consumptionDate >= fromDate) &&
-        (!toDate || consumptionDate <= toDate);
-      return matchesDescorNo && withinDateRange && matchesPlant && matchesUnit;
+    
+      return matchesDescorNo  && matchesPlant && matchesUnit;
     });
     setFilteredData(filtered);
     setTotalPage(Math.ceil(filtered.length / itemPerPage));
@@ -214,14 +181,6 @@ const Consumption = () => {
     setLoadingProcess(false)
 };
   
-
-  const handleClearSearch = () => {
-    setSearchQuery({ materialDescOrNo: "", plant: "All", unit: "All"})
-    setPeriod(null)
-    setFilteredData(consumptionData)
-    setTotalPage(Math.ceil(consumptionData.length / itemPerPage))
-    setCurrentPage(1)
-  }
 
   const handleSetItemPerPage = (item) => {
     setItemPerPage(item)
@@ -232,7 +191,7 @@ const Consumption = () => {
     setTotalPage(Math.ceil(filteredData.length / itemPerPage))
   }, [filteredData, itemPerPage])
 
-  const paginatedData = filteredData.slice((currentPage - 1) * itemPerPage, currentPage * itemPerPage)
+  const paginatedData = filteredData?.slice((currentPage - 1) * itemPerPage, currentPage * itemPerPage)
 
     const handleDownload = (data) => {
         const dateData = data.map((data)=>{
@@ -287,8 +246,6 @@ const Consumption = () => {
     <>
         <CContainer fluid >
 
-            {/* Toast */}
-            <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
             <CRow className='mb-3'>
                 <h3>{`Today's Unit Production Counter`}</h3>
             </CRow>
@@ -399,13 +356,14 @@ const Consumption = () => {
                         <CFormLabel className="col-form-label col-sm-12 col-xxl-12">Period</CFormLabel>
                         <CCol xl={11} xs={12} md={12} sm={12} className='d-flex gap-1' >
                             <DateRangePicker 
-                                placeholder="Select date period"
+                                placeholder="All period"
                                 placement='bottomEnd'
                                 showOneCalendar
                                 preventOverflow
                                 value={period}
                                 onChange={setPeriod}
-                                format="MMMM dd, yyyy" 
+                                // format="MMMM dd, yyyy" 
+                                format="yyyy-MM-dd" 
                             />
                         </CCol>
                     </CRow>
@@ -427,17 +385,7 @@ const Consumption = () => {
                                 </CDropdownMenu>
                             </CDropdown>
                         </CCol>
-                        <CCol xl={4} xs={12} md={4} sm={12}>
-                            <CRow className='mb-xl-3 mb-md-3 mb-0 mt-xl-0 mt-md-0 mt-sm-3 mt-3'>
-                                <CCol className="d-flex justify-content-end gap-2 col-sm-12 col-xl-12 col-md-12">
-                                    <CButton className='btn-search d-flex align-items-center gap-2' disabled={loadingProcess} onClick={()=>handleSearch()}>
-                                        { loadingProcess && paginatedData && <CSpinner size='sm'/>}
-                                        Search
-                                    </CButton>
-                                    <CButton color="secondary" onClick={()=>handleClearSearch()}>Clear</CButton>
-                                </CCol >
-                            </CRow>
-                        </CCol>
+                        
                     </CRow>
                 </CCol>
             </CRow>
@@ -447,7 +395,7 @@ const Consumption = () => {
             </CCol>
             <CRow>
                 <CCol className='py-4 text-table-small overflow-x-hidden'>
-                    <CTable bordered striped>
+                    <CTable bordered striped responsive>
                         <CTableHead>
                             <CTableRow color="dark">
                                 <CTableHeaderCell scope="col" className='text-center'>No</CTableHeaderCell>
@@ -464,7 +412,7 @@ const Consumption = () => {
                             </CTableRow>
                         </CTableHead>
                         <CTableBody>
-                        { paginatedData && paginatedData.map((consumption, index) => {
+                        { paginatedData && !loading && paginatedData.map((consumption, index) => {
                             const dateString = new Date(consumption.consumption_time)
                             const timeWIB = dateString.setMinutes(dateString.getMinutes() + (7 * 60))
 
@@ -486,7 +434,7 @@ const Consumption = () => {
                                     </CTableRow>
                                 )
                             } )}
-                        { paginatedData.length === 0 && !loading && 
+                        { paginatedData?.length === 0 && !loading && 
                             <CTableRow color="light">
                                 <CTableDataCell color="light" colSpan={10}>
                                     <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
@@ -531,13 +479,13 @@ const Consumption = () => {
                         <CPagination className="justify-content-center">
                         {/* Previous Button */}
                         <CPaginationItem
-                            disabled={currentPage === 1 || filteredData.length === 0}
+                            disabled={currentPage === 1 || filteredData?.length === 0}
                             onClick={() => currentPage > 1 && setCurrentPage(1)}
                         >
                             First
                         </CPaginationItem>
                         <CPaginationItem
-                            disabled={currentPage === 1 || filteredData.length === 0}
+                            disabled={currentPage === 1 || filteredData?.length === 0}
                             onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
                         >
                             Previous
@@ -561,13 +509,13 @@ const Consumption = () => {
 
                         {/* Next Button */}
                         <CPaginationItem
-                            disabled={currentPage === totalPage || filteredData.length === 0}
+                            disabled={currentPage === totalPage || filteredData?.length === 0}
                             onClick={() => currentPage < totalPage && setCurrentPage(currentPage + 1)}
                         >
                             Next
                         </CPaginationItem>
                         <CPaginationItem
-                            disabled={currentPage === totalPage || filteredData.length === 0}
+                            disabled={currentPage === totalPage || filteredData?.length === 0}
                             onClick={() => currentPage < totalPage && setCurrentPage(totalPage)}
                         >
                             Last

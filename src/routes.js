@@ -16,6 +16,10 @@ const HistorySupply = React.lazy(() => import('./views/history/supply/Supply'))
 // Supplier
 const Supplier = React.lazy(() => import('./views/pages/supplier/Supplier'))
 
+// Superadmin
+const Role = React.lazy(() => import('./views/superadmin/role/Role'))
+const User = React.lazy(() => import('./views/superadmin/user/User'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
@@ -30,6 +34,9 @@ const routes = [
   { path: '/history/supply', name: 'History Supply', element: HistorySupply },
 
   { path: '/supplier', name: 'Supplier Setup', element: Supplier },
+
+  { path: '/role', name: 'Role', element: Role },
+  { path: '/user', name: 'User', element: User },
 ]
 
 export default routes

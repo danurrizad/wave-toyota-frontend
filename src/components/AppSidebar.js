@@ -34,15 +34,17 @@ import { cilAccountLogout } from '@coreui/icons'
 import { AppSidebarNav } from './AppSidebarNav'
 
 // sidebar nav config
-import navigation from '../_nav'
+// import navigation from '../_nav'
 
 import { useAuth } from '../utils/context/authContext'
+import useNavigation from './../_nav';
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
   const auth = useAuth()
+  const navigation = useNavigation()
 
   const handleLogout = () =>{
     auth.logOut()
@@ -105,15 +107,6 @@ const AppSidebar = () => {
       </CSidebarHeader>
       
       <AppSidebarNav items={navigation} />
-
-      {/* <CSidebarHeader className='p-0'>
-        <CSidebarNav>
-          <CNavGroup className='btn-group-logout px-3' style={{ cursor: "pointer", width: "100%"}} onClick={()=>handleLogout()}>
-            <CIcon className='icon-logout' icon={cilAccountLogout} style={{backgroundColor: "red", width: "10%"}}/>
-            <CButton className='btn-logout' style={{backgroundColor: "green", width: "10px"}}>Logout</CButton>
-          </CNavGroup>
-        </CSidebarNav>
-      </CSidebarHeader> */}
       
       <CSidebarHeader className='p-0'>
         <CSidebarNav>

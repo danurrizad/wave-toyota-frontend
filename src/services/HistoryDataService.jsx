@@ -15,6 +15,23 @@ const useHistoryDataService = () => {
         }
     }
 
+    const getConsumptionHistoryOnRange = async(startDate, endDate) => {
+        try {
+            const response = await axios.get(`${BACKEND_URL}/api/consumption-history?startDate=${startDate}&endDate=${endDate}`)
+            return response   
+        } catch (error) {
+            throw error
+        } 
+    }
+
+    const getTotalUnitConsumption = async(startDate, endDate) => {
+        try {
+            const response = await axios.get(`${BACKEND_URL}/api/total-units?startDate=${startDate}&endDate=${endDate}`)
+            return response
+        } catch (error) {
+            throw error
+        }
+    }
     const createConsumptionHistory = async(body) => {
         try {
             const response = await axios.post(`${BACKEND_URL}/api/consumption`, body)
@@ -45,7 +62,9 @@ const useHistoryDataService = () => {
 
     return{
         getConsumptionHistory,
+        getConsumptionHistoryOnRange,
         createConsumptionHistory,
+        getTotalUnitConsumption,
         getSupplyHistory,
         supplyingAndCreateHistory
     }

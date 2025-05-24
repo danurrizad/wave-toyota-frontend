@@ -42,19 +42,18 @@ const AuthProvider = ({ children }) => {
             setUser(null)
             setUserData(null)
             setToken(null)
+            navigate("/login");
           }
       }
-    } catch (error) {
-      if(error.response.data){
-        setErrMsg("Token expired!")
-      }
-      // console.log("Error checking auth :", error)
+    } catch (error) {   
       localStorage.removeItem("site");
       localStorage.removeItem("user");
       localStorage.removeItem("userData");
+
       setUser(null)
       setUserData(null)
       setToken(null)
+      navigate("/login");
     }
   }
 

@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "wave-toyota"
-  }
+    "default": "tmmin-andon-supply",
+    "production": "tmmin-andon-supply"
+  },
+  "targets": {},
+  "etags": {}
 }

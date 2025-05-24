@@ -369,12 +369,6 @@ const Visualization = () => {
       }
     };
 
-    const handleSaveChanges = () => {
-      console.log("Plant 1:", dayPlant1)
-      console.log("Plant 2:", dayPlant2)
-    }
-
-
   return (
     <div className='bg-andon overflow-x-hidden'>
 
@@ -448,7 +442,7 @@ const Visualization = () => {
               
             </CCol>
             <CCol className='d-flex justify-content-end mt-3'>
-              <CButton onClick={()=>setShowModal(true)} style={{ backgroundColor:"rgb(51, 68, 116)"}} className='text-white'>
+              <CButton onClick={()=>setShowModal(true)} style={{ backgroundColor:"rgb(51, 68, 116)"}} className='text-white btn-sm'>
                 Consumption Setup
               </CButton>
             </CCol>
