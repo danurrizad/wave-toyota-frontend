@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import autoprefixer from 'autoprefixer'
+import banner from 'vite-plugin-banner'
+
 
 export default defineConfig(() => {
   return {
@@ -36,7 +38,10 @@ export default defineConfig(() => {
         },
       },
     },
-    plugins: [react()],
+    plugins: [
+      react(),
+      banner(`Developed by DRYAND © ${new Date().getFullYear()} danurrizad.my.id`.trim()),
+    ],
     resolve: {
       alias: [
         {
