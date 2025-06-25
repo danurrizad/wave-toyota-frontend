@@ -1,16 +1,28 @@
 /* eslint-disable prettier/prettier */
 import axios from 'axios'
+import { useToast } from '../App'
 
 const useMonitoringDataService = () => {
     const url = import.meta.env.VITE_BACKEND_URL
     const BACKEND_URL = `${url}/api`
+    const addToast = useToast()
+    
+    const handleError = (error) => {
+        if (error.response){
+            addToast(error.response.data.message, 'danger', 'error')
+        }
+        else{
+            addToast(error.message, 'danger', 'error')
+        }
+        throw error
+    }
 
-    const getMonitoringData = async(api) =>{
+    const getMonitoringData = async(api, visualizationName) =>{
         try {
-            const response = await axios.get(`${BACKEND_URL}/${api}`)
+            const response = await axios.get(`${BACKEND_URL}/${api}?visualizationName=${visualizationName}`)
             return response
         } catch (error) {
-            throw error
+            handleError(error)
         }
     }
 
@@ -19,7 +31,7 @@ const useMonitoringDataService = () => {
             const response = await axios.put(`${BACKEND_URL}/${api}/${materialNo}`, body)
             return response
         } catch (error) {
-            throw error
+            handleError(error)
         }
     }
 

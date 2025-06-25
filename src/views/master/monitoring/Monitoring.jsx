@@ -28,6 +28,7 @@ import {
     CToaster,
     CSpinner
 } from '@coreui/react'
+import Select from "react-select"
 
 import CIcon from '@coreui/icons-react';
 import * as icon from "@coreui/icons";
@@ -35,6 +36,8 @@ import * as icon from "@coreui/icons";
 import useMonitoringDataService from '../../../services/MonitoringDataService'
 import { useAuth } from '../../../utils/context/authContext';
 import templateToast from '../../../components/ToasterComponent';
+import SizePage from '../../../components/pagination/SizePage';
+import Pagination from '../../../components/pagination/Pagination';
 
 const Monitoring = () => {
     const auth = useAuth()
@@ -44,6 +47,18 @@ const Monitoring = () => {
 
     const [ visibleModalUpdate, setVisibleModalUpdate ] = useState(false)
     const [ formUpdateData, setFormUpdateData ] = useState({})
+    // Handle search functionality
+    const [searchQuery, setSearchQuery] = useState({
+        visualization_name: ""
+    });
+    const optionsVisualizationName = [
+        { label: "Visualization 1 [Plant 1]", value: "Visualization 1" },
+        { label: "Visualization 2 [Plant 1]", value: "Visualization 2" },
+        { label: "Visualization 3 [Plant 1]", value: "Visualization 3" },
+        { label: "Visualization 4 [Plant 2]", value: "Visualization 4" },
+        { label: "Visualization 5 [Plant 2]", value: "Visualization 5" },
+        { label: "Visualization 6 [Plant 2]", value: "Visualization 6" },
+    ]
 
     const handleModalUpdate = (dataMonitor) =>{
         setVisibleModalUpdate(true)
@@ -58,16 +73,17 @@ const Monitoring = () => {
     const getMonitoring = async() => {
         try {
             setLoading(true)
-            const response = await getMonitoringData('monitoring')
+            const response = await getMonitoringData('monitoring', searchQuery.visualization_name)
             setMonitoringData(response.data.data)
             setFilteredData(response.data.data)
-
+            setTotalPage(Math.ceil(response.data.data.length / itemPerPage))
+            setCurrentPage(1)
         } catch (error) {
-            if(error.response){
-                addToast(templateToast("Error", error.response.data.message))
-            } else{
-                addToast(templateToast("Error", error.message))
-            }
+            console.error(error)
+            setMonitoringData([])
+            setFilteredData([])
+            setTotalPage(0)
+            setCurrentPage(1)
         } finally{
             setLoading(false)
         }
@@ -82,11 +98,7 @@ const Monitoring = () => {
             addToast(templateToast("Success", response.data.message))
             validateTotalVisualization()
         } catch (error) {
-            if(error.response){
-                addToast(templateToast("Error", error.response.data.message))
-            } else {
-                addToast(templateToast("Error", error.message))
-            }
+            console.error(error)
         } finally {
             setLoading(false)
         }
@@ -94,7 +106,7 @@ const Monitoring = () => {
 
     useEffect(()=>{
         getMonitoring()
-    }, [])
+    }, [searchQuery])
 
     const validateTotalVisualization = (name) => {
         const total = monitoringData.filter(
@@ -109,33 +121,6 @@ const Monitoring = () => {
     const [itemPerPage, setItemPerPage] = useState(10)
     const [totalPage, setTotalPage] = useState(0)
     const [filteredData, setFilteredData] = useState([])
-    const [toast, addToast] = useState(0)
-    const toaster = useRef()
-
-    // Handle search functionality
-    const [searchQuery, setSearchQuery] = useState({
-        visualization_name: "All"
-    });
-
-    const handleSearch = () => {
-        const { visualization_name } = searchQuery
-         const filtered = monitoringData.filter(monitoring => {
-            const matchesViz = visualization_name === "All" || monitoring.visualization_name.toLowerCase().includes(visualization_name.toLowerCase())
-            return matchesViz
-        })
-        setFilteredData(filtered);
-        setTotalPage(Math.ceil(filtered.length / itemPerPage))
-        setCurrentPage(1); // Reset to the first page
-    };
-
-    const handleClearSearch = () => {
-        setSearchQuery({visualization_name: "All"})
-
-        setFilteredData(monitoringData)
-        setTotalPage(Math.ceil(monitoringData.length / itemPerPage))
-        setCurrentPage(1)
-    }
-
 
     useEffect(()=>{
         setTotalPage(Math.ceil(filteredData.length / itemPerPage))
@@ -232,10 +217,6 @@ const Monitoring = () => {
   return (
     <>
         <CContainer fluid >
-
-            {/* Toast */}
-            <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
-
             {renderModalUpdate()}
 
             <CRow>
@@ -243,23 +224,15 @@ const Monitoring = () => {
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor="plant" className='col-form-label col-sm-2 col-xxl-2 col-xl-3' >Visualization</CFormLabel>
                         <CCol className='d-flex align-items-center gap-2 col-sm-8 col-xl-6'>
-                            <CDropdown className='dropdown-search d-flex justify-content-between'>
-                                <CDropdownToggle className='d-flex justify-content-between align-items-center dropdown-search'>{searchQuery.visualization_name}</CDropdownToggle>
-                                <CDropdownMenu className='cursor-pointer'>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "All"})}>All</CDropdownItem>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 1"})}>Visualization 1 (Plant 1)</CDropdownItem>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 2"})}>Visualization 2 (Plant 1)</CDropdownItem>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 3"})}>Visualization 3 (Plant 1)</CDropdownItem>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 4"})}>Visualization 4 (Plant 2)</CDropdownItem>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 5"})}>Visualization 5 (Plant 2)</CDropdownItem>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ visualization_name: "Visualization 6"})}>Visualization 6 (Plant 2)</CDropdownItem>
-                                </CDropdownMenu>
-                            </CDropdown>
+                            <Select
+                                options={optionsVisualizationName}
+                                value={optionsVisualizationName.find((opt)=>opt.value === searchQuery.visualization_name) || ""}
+                                onChange={(e)=>setSearchQuery({ ...searchQuery, visualization_name: e!== null ? e.value : ""})}
+                                isClearable
+                                className='w-100'
+                                placeholder="All"
+                            />
                         </CCol>
-                        <CCol className="d-flex justify-content-end gap-2 col-sm-2 col-xl-2">
-                            <CButton className="btn-search" onClick={()=>handleSearch()}>Search</CButton>
-                            <CButton color="secondary" onClick={()=>handleClearSearch()}>Clear</CButton>
-                        </CCol >
                     </CRow>
                 </CCol>
             </CRow>
@@ -279,7 +252,7 @@ const Monitoring = () => {
                             </CTableRow>
                         </CTableHead>
                         <CTableBody>
-                            { paginatedData && paginatedData.map((monitoring, index) => {
+                            { (paginatedData.length > 0 && !loading) && paginatedData.map((monitoring, index) => {
                                 return(
                                     <CTableRow key={index} style={{ verticalAlign: "middle" }}>
                                         { (auth.userData.role_name === "LANE HEAD" ||  auth.userData.role_name === "SUPER ADMIN") && (
@@ -323,64 +296,19 @@ const Monitoring = () => {
                     <CFormLabel>Showing {totalPage === 0 ? "0" : currentPage} to {totalPage} of {paginatedData?.length} row(s)</CFormLabel>
                 </CCol>
                 <CCol xs={4} xl={6} className='d-flex align-items-center justify-content-end gap-4'>
-                    <CFormLabel htmlFor="size" className='col-form-label' >Size</CFormLabel>
-                    <CDropdown>
-                        <CDropdownToggle color="white">{itemPerPage}</CDropdownToggle>
-                        <CDropdownMenu className='cursor-pointer'>
-                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
-                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
-                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
-                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
-                        </CDropdownMenu>
-                    </CDropdown>
+                    <SizePage
+                        itemPerPage={itemPerPage}
+                        setItemPerPage={setItemPerPage}
+                        setCurrentPage={setCurrentPage}
+                    />
                 </CCol>
                 <CCol sm={12} xl={12} className='d-flex align-items-center gap-4 justify-content-center flex-column flex-xl-row py-4'>
-                        {/* Custom Pagination Component */}
-                        <CPagination className="justify-content-center">
-                        {/* Previous Button */}
-                        <CPaginationItem
-                            disabled={currentPage === 1 || filteredData.length === 0}
-                            onClick={() => currentPage > 1 && setCurrentPage(1)}
-                        >
-                            First
-                        </CPaginationItem>
-                        <CPaginationItem
-                            disabled={currentPage === 1 || filteredData.length === 0}
-                            onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
-                        >
-                            Previous
-                        </CPaginationItem>
-
-                        {/* Page Numbers */}
-                        {Array.from({ length: totalPage }, (_, i) => i + 1)
-                            .slice(
-                            Math.max(0, currentPage - 2), // Start index for slicing
-                            Math.min(totalPage, currentPage + 1) // End index for slicing
-                            )
-                            .map((page) => (
-                            <CPaginationItem
-                                key={page}
-                                active={page === currentPage}
-                                onClick={() => setCurrentPage(page)}
-                            >
-                                {page}
-                            </CPaginationItem>
-                            ))}
-
-                        {/* Next Button */}
-                        <CPaginationItem
-                            disabled={currentPage === totalPage || filteredData.length === 0}
-                            onClick={() => currentPage < totalPage && setCurrentPage(currentPage + 1)}
-                        >
-                            Next
-                        </CPaginationItem>
-                        <CPaginationItem
-                            disabled={currentPage === totalPage || filteredData.length === 0}
-                            onClick={() => currentPage < totalPage && setCurrentPage(totalPage)}
-                        >
-                            Last
-                        </CPaginationItem>
-                    </CPagination>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPage={totalPage}
+                        setCurrentPage={setCurrentPage}
+                        data={filteredData}
+                    />
                 </CCol>
             </CRow>
         </CContainer>
