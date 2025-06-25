@@ -13,7 +13,7 @@ const AppFooter = () => {
         >
           Andon Visualization
         </a>
-        <span className="ms-1">&copy; 2024 Toyota Motor Manufacturing Indonesia</span>
+        <span className="ms-1">&copy; 2024 TMMIN DX Warehouse</span>
       </div>
     </CFooter>
   )
