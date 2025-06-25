@@ -17,9 +17,9 @@ const useSupplyLocationService = () =>{
         throw new Error(error.message || '')
     }
 
-    const getSupplyLocationAll = async() => {
+    const getSupplyLocationAll = async(locationName, plant) => {
         try {
-            const response = await axios.get(`${BACKEND_URL}/supply-location`)
+            const response = await axios.get(`${BACKEND_URL}/supply-location?locationName=${locationName}&plant=${plant}`)
             return response
         } catch (error) {
             handleError(error)

@@ -36,7 +36,6 @@ import useSupplyLocationService from '../../../services/SupplyLocation';
 import useMaterialDataService from '../../../services/MaterialDataService';
 import { useAuth } from '../../../utils/context/authContext';
 import { useToast } from '../../../App';
-import { useNavigate } from 'react-router-dom';
 
 const SupplyLocation = () => {
     const auth = useAuth()
@@ -52,7 +51,6 @@ const SupplyLocation = () => {
         delete: false
     })
     const [showModalQR, setShowModalQR] = useState(false)
-    const navigate = useNavigate()
 
     const { getSupplyLocationAll, createSupplyLocation, updateSupplyLocation, deleteSupplyLocationByName } = useSupplyLocationService()
     const { getMaterialData } = useMaterialDataService()
@@ -66,6 +64,9 @@ const SupplyLocation = () => {
         updated_by: auth?.user
     })
     const [dataQR, setDataQR] = useState({})
+    const [query, setQuery] = useState({
+        plant: ""
+    })
 
     const optionPlants = [
         { label: "P1 - PLANT 1", value: "P1 - PLANT 1"},
@@ -73,10 +74,12 @@ const SupplyLocation = () => {
     ]
     const fetchSupplyLocation = async() => {
         try {
-            const response = await getSupplyLocationAll()
+            setLoading({ ...loading, fetch: true})
+            const response = await getSupplyLocationAll("", query.plant)
             setLocationData(response.data.data)
         } catch (error) {
             console.error(error)
+            setLocationData([])
         }
     }
 
@@ -97,7 +100,7 @@ const SupplyLocation = () => {
         fetchSupplyLocation()
         fetchOptionMaterials()
         setLoading({ ...loading, fetch: false})
-    }, [])
+    }, [query])
 
     
 
@@ -177,7 +180,8 @@ const SupplyLocation = () => {
         }else if(type==='delete'){
             setForm({
                 ...form,
-                id: data.id
+                id: data.id,
+                location_name: data.location_name
             })
         }else{
             setForm({
@@ -374,11 +378,21 @@ const SupplyLocation = () => {
   return (
     <>
         <CContainer fluid >
-            {/* Toast */}
-            {/* <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} /> */}
             { renderModal(showModal.type) }
             { renderModalQR() }
             <CRow>
+                <CCol>
+                    <CFormLabel>Plant</CFormLabel>
+                    <Select
+                        options={optionPlants}
+                        onChange={(e)=>setQuery({ ...query, plant: e!==null ? e.value : ""})}
+                        value={optionPlants.find((opt)=>opt.value === query.plant) || ""}
+                        isClearable
+                        placeholder="All"
+                    />
+                </CCol>
+            </CRow>
+            <CRow className='mt-3'>
                 <CCol>
                     <CButton className='btn-success text-white' onClick={()=>handleOpenModal('add', form)}>Add Location</CButton>
                 </CCol>
@@ -427,12 +441,31 @@ const SupplyLocation = () => {
                                             })}
                                         </CTableDataCell>
                                         <CTableDataCell>
-                                            {/* <CButton onClick={()=>navigate(`/supplier-location/${item.location_name}/${item.plant}`)} color='info' className='h-100 justify-content-center d-flex align-items-center'><CIcon size='sm' className='text-white' icon={icon.cilQrCode}/></CButton> */}
                                             <CButton onClick={()=>handleOpenModalQR(item)} color='info' className='h-100 justify-content-center d-flex align-items-center'><CIcon size='sm' className='text-white' icon={icon.cilQrCode}/></CButton>
                                         </CTableDataCell>
                                     </CTableRow>
                                 )
                             })}
+                            { paginatedData.length === 0 && !loading.fetch && 
+                                <CTableRow color="light">
+                                    <CTableDataCell color="light" colSpan={100}>
+                                        <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                            <CIcon icon={icon.cilFax} size='3xl'/>
+                                            <p className='pt-3'>No data found!</p>
+                                        </div>
+                                    </CTableDataCell>
+                                </CTableRow>
+                            }
+                            { loading.fetch && 
+                                <CTableRow color=''>
+                                    <CTableDataCell colSpan={100}>
+                                        <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
+                                            <CSpinner/>
+                                            <p className='pt-3'>Loading data</p>
+                                        </div>
+                                    </CTableDataCell>
+                                </CTableRow>
+                            }
                         </CTableBody>
                     </CTable>
                 </CCol>
