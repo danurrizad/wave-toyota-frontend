@@ -26,7 +26,8 @@ const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
 const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
 
 const Visualization = React.lazy(() => import('./views/visualization/page/Visualization'))
-const Supplier = React.lazy(()=> import('./views/pages/supplier/Supplier'))
+const HomeLocation = React.lazy(()=> import('./views/pages/supplierLocation/HomeSupplier'))
+const SupplierLocation = React.lazy(()=> import('./views/pages/supplierLocation/SupplierLocation'))
 
 // Create a context for toast
 const ToastContext = createContext()
@@ -100,6 +101,8 @@ const App = () => {
                 <Route path="*" name="Home" element={<DefaultLayout />} />
                 <Route exact path="/visualization" name="Visualization" element={<Visualization />} />
               </Route>
+              <Route path="/supplier-location" name="Supply by Location" element={<HomeLocation/>}/>
+              <Route path="/supplier-location/:locationName/:locationPlant" name="Supply at Location" element={<SupplierLocation/>}/>
             </Routes>
           </Suspense>
         </AuthProvider>

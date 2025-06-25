@@ -7,6 +7,9 @@ const MasterMaterial = React.lazy(() => import('./views/master/material/Material
 const MasterGentani = React.lazy(() => import('./views/master/gentani/Gentani'))
 const MasterSetup = React.lazy(() => import('./views/master/setup/Setup'))
 const MasterSupplyQty = React.lazy(() => import('./views/master/supplyQty/Supply'))
+const MasterSupplyLocation = React.lazy(
+  () => import('./views/master/supplyLocation/SupplyLocation'),
+)
 const MasterMonitoring = React.lazy(() => import('./views/master/monitoring/Monitoring'))
 
 // History
@@ -28,6 +31,11 @@ const routes = [
   { path: '/master/gentani', name: 'Master Gentai', element: MasterGentani },
   { path: '/master/setup', name: 'Master Setup', element: MasterSetup },
   { path: '/master/supply-qty', name: 'Master Supply Qty', element: MasterSupplyQty },
+  {
+    path: '/master/supply-location',
+    name: 'Master Supply Location',
+    element: MasterSupplyLocation,
+  },
   { path: '/master/monitoring', name: 'Master Monitoring', element: MasterMonitoring },
 
   { path: '/history/consumption', name: 'History Consumption', element: HistoryConsumption },

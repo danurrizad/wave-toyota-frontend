@@ -52,6 +52,11 @@ const useNavigation = () => {
         },
         {
           component: CNavItem,
+          name: 'Master Supply Location',
+          to: '/master/supply-location',
+        },
+        {
+          component: CNavItem,
           name: 'Master Monitoring',
           to: '/master/monitoring',
         },
