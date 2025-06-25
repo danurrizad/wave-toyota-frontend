@@ -7,7 +7,7 @@ const useAuthDataService = () => {
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
     const handleError = (error, message) => {
-        if(error.response.data.message){
+        if(error.response){
             addToast(error.response.data.message, 'danger', 'error')
         }else{
             addToast(error.message, 'danger', 'error')
@@ -23,7 +23,6 @@ const useAuthDataService = () => {
                     withCredentials: true
                 }
             )
-            console.log("RESPONSE LOGIN: ", response)
             return response
         } catch (error) {
             handleError(error, 'Login error: ')

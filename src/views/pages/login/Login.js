@@ -54,7 +54,8 @@ const Login = () => {
       await auth.loginAction(form)
       addToast("Welcome!", 'success', 'success')
     } catch (error) {
-        console.error(error)
+      console.error(error)
+      // addToast("Network error!", 'danger', 'error')
     } finally{
       setIsLoading(false)
     }
@@ -170,8 +171,8 @@ const Login = () => {
             </CCardGroup>
             <CCard>
               <CCardBody className='d-flex justify-content-center'>
-                <CButton className='' href='/#/supplier'>
-                  Go to Master Supply Quantity
+                <CButton className='' href='/#/supplier-location'>
+                  Go to Supplying by QR
                 </CButton>
               </CCardBody>
             </CCard>
