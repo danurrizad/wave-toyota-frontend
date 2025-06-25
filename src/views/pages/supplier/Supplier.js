@@ -97,7 +97,7 @@ function Supplying() {
     const getSetup = async() => {
         try {
             setLoading(true)
-            const response = await getSetupData('setup')
+            const response = await getSetupData('setup', "")
             setSetupData(response.data.data)
         } catch (error) {
             if(error.response){
@@ -114,7 +114,7 @@ function Supplying() {
   const getSupplyQty = async() => {
     try {
         setLoading(true)
-        const response = await getSupplyQtyData('supply-qty')
+        const response = await getSupplyQtyData('supply-qty', "")
         const filtered = response.data.data.filter((data) => data.qty !== 0)
         setSupplyQtyData(filtered)
         setFilteredData(filtered)
@@ -526,7 +526,7 @@ function Supplying() {
                                 </CTableRow>
                             </CTableHead>
                             <CTableBody>
-                                {(transactionData.length > 0 && !loading) && transactionData.map((transaction, index)=>{
+                                {(transactionData?.length > 0 && !loading) && transactionData?.map((transaction, index)=>{
                                     return(
                                         <CTableRow key={index}>
                                             <CTableDataCell className="text-center">{index + 1}</CTableDataCell>
