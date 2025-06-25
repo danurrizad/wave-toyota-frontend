@@ -131,7 +131,7 @@ const Visualization = () => {
     try {
       const materialSetup = await getMaterialData('material')
       const responseSetup = await getSetupData('setup', '')
-      const responseMonitoring = await getMonitoringData('monitoring')
+      const responseMonitoring = await getMonitoringData('monitoring', "")
       
       const response = createDataChartOptions(materialSetup.data, responseSetup.data.data, responseMonitoring.data.data)
       
