@@ -1,10 +1,21 @@
 /* eslint-disable prettier/prettier */
 import axios from "axios";
+import { useToast } from "../App";
 
 const useSupplyQtyDataService = () => {
     
     const url = import.meta.env.VITE_BACKEND_URL
     const BACKEND_URL = `${url}/api`
+    const addToast = useToast()
+        
+    const handleError = (error) => {
+        if (error.response?.data) {
+            addToast(error.response?.data?.message, 'danger', 'error')
+        } else {
+            addToast(error.message, 'danger', 'error')
+        }
+        throw new Error(error.message || '')
+    }
 
     const getSupplyQtyData = async(api) => {
         try {
@@ -12,6 +23,15 @@ const useSupplyQtyDataService = () => {
             return response
         } catch (error) {
             throw error
+        }
+    }
+
+    const getSupplyQtyDataByNoPlant = async(material_no, plant) => {
+        try {
+            const response = await axios.get(`${BACKEND_URL}/supply-qty/${material_no}/${plant}`)
+            return response
+        } catch (error) {
+            handleError(error)
         }
     }
 
@@ -26,6 +46,7 @@ const useSupplyQtyDataService = () => {
 
     return {
         getSupplyQtyData,
+        getSupplyQtyDataByNoPlant,
         updateSupplyQtyData
     }
 }
