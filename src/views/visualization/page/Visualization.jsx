@@ -5,6 +5,7 @@ import useSetupDataService from '../../../services/SetupDataService';
 import useMonitoringDataService from '../../../services/MonitoringDataService';
 import useDaysDataService from '../../../services/DaysDataService';
 import useDataChartService from '../useDataChartService';
+import dayjs from 'dayjs';
 
 import warningSoundCritical from '../../../assets/sounds/warning-2.mp3';
 import warningSoundSupply from '../../../assets/sounds/warning-1.mp3';
@@ -409,7 +410,7 @@ const Visualization = () => {
 
     const fetchScheduleByMonth = async() => {
       try {
-        const dateFormatted = new Date(setupDate).toLocaleDateString('en-CA').slice(0, 7)
+        const dateFormatted = new Date(`01 ${setupDate}`).toLocaleDateString('en-CA').slice(0, 7)
         const response = await getScheduleByMonth(dateFormatted)
         setSchedulesPlant(response.data.data)
       } catch (error) {
@@ -496,7 +497,11 @@ const Visualization = () => {
               
             </CCol>
             <CCol className='d-flex justify-content-end mt-3'>
-              <CButton onClick={()=>setShowModal(true)} style={{ backgroundColor:"rgb(51, 68, 116)"}} className='text-white btn-sm'>
+              <CButton 
+                onClick={()=>{
+                  setShowModal(true)
+                }} 
+                style={{ backgroundColor:"rgb(51, 68, 116)"}} className='text-white btn-sm'>
                 Consumption Setup
               </CButton>
             </CCol>
@@ -608,7 +613,7 @@ const Visualization = () => {
               <DatePicker 
                 oneTap
                 format='MMMM yyyy' 
-                value={new Date(setupDate)}
+                value={new Date(`01 ${setupDate}`)}
                 onChange={(e)=>{
                   if (e!==null){
                     setSetupDate(e.toLocaleDateString('en-CA', {
