@@ -35,6 +35,7 @@ import {
     CToaster,
     CCardText,
     CCard,
+    CHeader,
   } from '@coreui/react'
 
 import CIcon from '@coreui/icons-react';
@@ -47,6 +48,7 @@ import useSetupDataService from './../../../services/SetupDataService';
 
 function Supplying() {
     const auth = useAuth()
+    const notifRef = useRef(null)
     const [showScanner, setShowScanner] = useState(false)
     const [visibleModalAdd, setVisibleModalAdd] = useState(false)
     const [visibleModalScanner, setVisibleModalScanner] = useState(false)
@@ -169,7 +171,6 @@ function Supplying() {
   const handleSubmitTransaction = async(dataTransaction) => {
     try {
         setLoading(true)
-        console.log("transactions :", dataTransaction)
         await supplyingAndCreateHistory(dataTransaction)
         addToast(templateToast("Success", "All materials supply submitted!"))
         setVisibleModalTransaction(false)
@@ -525,7 +526,7 @@ function Supplying() {
                                 </CTableRow>
                             </CTableHead>
                             <CTableBody>
-                                {transactionData && transactionData.map((transaction, index)=>{
+                                {(transactionData.length > 0 && !loading) && transactionData.map((transaction, index)=>{
                                     return(
                                         <CTableRow key={index}>
                                             <CTableDataCell className="text-center">{index + 1}</CTableDataCell>
@@ -584,66 +585,30 @@ function Supplying() {
       document.title = "Andon Visualization"; 
     };
   }, []);
-  
 
-    //  ----------------------------------------------------------- RENDER IF ROLE IS NOT LANE HEAD -------------------------------------------------------------
-
-//   if(auth.userData.role_name !== "LANE HEAD"){
-//     return(
-//         <div className='text-sm' style={{backgroundColor: "#F3F4F7"}} >
-//         {/* <HeaderSupplier/> */}
-//         <CContainer>
-
-//         {/* Toast */}
-//         <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
-
-//         {renderModalUpdate()}
-//         {renderModalScanner()}
-//         {renderModalTransaction()}
-
-//         <CRow className='py-4 d-flex align-items-start mb-4'>
-//             <CCol className='text-center'>
-//                 <h1>Master Supplier Material</h1>
-//                 <h6>Input quantity to supply material</h6>
-//             </CCol>
-//         </CRow>
-        
-        
-
-//         <CRow>
-//             <CCol xxl={6}>
-//                 <CCard>
-//                     <CButton className='btn-add-master d-flex flex-column align-items-center gap-2 p-5' onClick={()=>setVisibleModalScanner(true)}>
-//                         <CIcon icon={icon.cilQrCode} size='9xl'/>
-//                         <h5>Input by QR-Code</h5>
-//                     </CButton>
-//                 </CCard>
-//             </CCol>
-//             <CCol xxl={6} className='mt-xxl-0 mt-5'>
-//                 <CCard>
-//                     <CButton className='btn-search d-flex flex-column align-items-center gap-2 p-5' onClick={()=>setVisibleModalTransaction(true)}>
-//                         <CIcon icon={icon.cilFolderOpen} size='9xl'/>
-//                         <h5>List Material Supplied</h5>
-//                     </CButton>
-//                 </CCard>
-//             </CCol>
-//         </CRow>
-
-       
-
-       
-//         </CContainer>
-//     </div>
-//     )
-//   }
-    //  ----------------------------------------------------------- /RENDER IF ROLE IS NOT LANE HEAD -------------------------------------------------------------
-
-
+  useEffect(() => {
+      document.addEventListener('scroll', () => {
+        notifRef.current &&
+          notifRef.current.classList.toggle('shadow-sm', document.documentElement.scrollTop > 0)
+      })
+    }, [])
 
   return (
-      <div className='text-sm' style={{backgroundColor: "#F3F4F7", minHeight: "100vh"}} >
+      <div className='text-sm p-0' style={{backgroundColor: "#F3F4F7", minHeight: "100vh"}} >
+
         {/* <HeaderSupplier/> */}
         <CContainer fluid>
+
+        {/* notification when there is an unsubmitted transaction */}
+        { transactionData && transactionData?.length  !== 0 && (
+           <div className='overflow-x-hidden position-fixed bg-black' style={{ zIndex: 999, transform: "translate(-40px, -40px)"}}>
+             <CHeader ref={notifRef}  className=' vw-100 d-flex justify-content-start align-items-center gap-4 p-4 position-sticky' style={{ background: "#FFFAA0", borderBottom: "5px solid #FFAA33", top: "150px"}}>
+                 <CIcon size='xl' icon={icon.cilInfo}/>
+                 <div style={{ border: "1px solid black", height: "25px"}}></div>
+                 <h5>Supply material belum masuk ke dalam sistem. Lakukan submit pada tombol &quot;List Supplied&quot; berwarna hijau.</h5>
+             </CHeader>
+           </div>
+        )}
 
         {/* Toast */}
         <CToaster className="p-3" placement="top-end" push={toast} ref={toaster} />
@@ -711,7 +676,6 @@ function Supplying() {
             </CCol>
         </CRow>
 
-        {/* {showScanner && <QrReader setShowScanner={setShowScanner} setVisibleModalAdd={setVisibleModalAdd} setFormData={setFormData} setDefaultQty={setDefaultQty}/>} */}
 
        <CRow className='overflow-y-auto p-3'>
         <CTable bordered striped style={{fontSize: "12px", verticalAlign: "middle"}}>
