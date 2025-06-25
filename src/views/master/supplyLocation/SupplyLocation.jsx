@@ -99,16 +99,20 @@ const SupplyLocation = () => {
         setLoading({ ...loading, fetch: false})
     }, [])
 
+    
+
     // Pagination and Table Date
-    const [filteredData, setFilteredData] = useState([])
-    const [paginatedData, setPaginatedData] = useState([])
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPage, setTotalPage] = useState(0)
     const [itemPerPage, setItemPerPage] = useState(10)
+    const paginatedData = locationData.slice((currentPage - 1) * itemPerPage, currentPage * itemPerPage)
+    
+    useEffect(()=>{
+        setTotalPage(Math.ceil(locationData.length / itemPerPage))
+    }, [locationData, itemPerPage])
 
 
-
-
+    // print/download QR code
     const handlePrint = async (data) => {
         const modalElement = document.getElementById("qr-content");
 
@@ -395,7 +399,7 @@ const SupplyLocation = () => {
                             </CTableRow>
                         </CTableHead>
                         <CTableBody>
-                            {locationData?.map((item, index)=>{
+                            {(paginatedData.length > 0 && !loading.fetch) && paginatedData?.map((item, index)=>{
                                 return(
                                     <CTableRow key={index}>
                                         { (auth.userData.role_name === "LANE HEAD" ||  auth.userData.role_name === "SUPER ADMIN") &&
@@ -450,7 +454,7 @@ const SupplyLocation = () => {
                         currentPage={currentPage}
                         totalPage={totalPage}
                         setCurrentPage={setCurrentPage}
-                        data={filteredData}
+                        data={locationData}
                     />
                 </CCol>
             </CRow>
