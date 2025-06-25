@@ -27,7 +27,13 @@ import {
   CModalTitle,
   CModal,
   CFormText,
-  CToaster
+  CToaster,
+  CTable,
+  CTableHead,
+  CTableHeaderCell,
+  CTableBody,
+  CTableDataCell,
+  CTableRow
 } from '@coreui/react'
 
 import CIcon from '@coreui/icons-react'
@@ -46,18 +52,20 @@ import ImageCar1Left from '../../../assets/images/visualization/car-1-left.png'
 import ImageCar2Left from '../../../assets/images/visualization/car-2-left.png'
 import ImageCar1Right from '../../../assets/images/visualization/car-1-right.png'
 import ImageCar2Right from '../../../assets/images/visualization/car-2-right.png'
-import { Checkbox, CheckboxGroup } from 'rsuite';
+import { Checkbox, CheckboxGroup, DatePicker } from 'rsuite';
 import templateToast from '../../../components/ToasterComponent';
+import "react-datepicker/dist/react-datepicker.css";
+import useScheduleDataService from '../../../services/ScheduleDataService';
 
 const Visualization = () => {
   const [toast, addToast] = useState(0)
   const toaster = useRef()
   const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const [dayPlant1, setDayPlant1] = useState([])
-  const [dayPlant2, setDayPlant2] = useState([])
+  const [showModalConfirmation, setShowModalConfirmation] = useState(false)
+  const [scheduleChanged, setScheduleChanged] = useState(false)
 
-  const { getDays, updateDays } = useDaysDataService()
+  const { getScheduleByMonth, upsertSchedules } = useScheduleDataService()
   const { getMaterialData } = useMaterialDataService()
   const { getSetupData } = useSetupDataService()  
   const { getMonitoringData } = useMonitoringDataService()
@@ -70,8 +78,47 @@ const Visualization = () => {
   const audioRefSupply = useRef(null);
   const audioRefCritical = useRef(null);
 
-  const [dateState, setDateState] = useState(new Date())
 
+  function getAllDatesByMonth(dateString) {
+    const dates = []
+    const schedules = []
+    const date = new Date(dateString);
+    
+    const year = date.getFullYear();
+    const month = date.getMonth(); // 0-indexed: January = 0
+    
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    for (let day = 2; day <= daysInMonth + 1; day++) {
+      const dateThis = new Date(year, month, day);
+      const iso = dateThis.toISOString().split('T')[0]; // format: yyyy-mm-dd
+      schedules.push({
+        date: iso,
+        plant1: false,
+        plant2: true
+      })
+
+      // const dateOnlyString = iso.split("-")[2]
+      dates.push(iso);
+    }
+    // setSchedulesPlant(schedules)
+
+    return dates;
+  }
+
+  const [setupDate, setSetupDate] = useState(new Date().toLocaleDateString('en-CA', {
+    month: "long",
+    year: "numeric"
+  }))
+  const [datesByMonth, setDaysByMonth] = useState([])
+  const [schedulesPlant, setSchedulesPlant] = useState([])
+
+  useEffect(()=>{
+    setDaysByMonth(getAllDatesByMonth(setupDate))
+  }, [setupDate])
+
+
+  const [dateState, setDateState] = useState(new Date())
   const t = new Date()
   const c = t.getHours() - 12
   useEffect(() => {
@@ -103,54 +150,10 @@ const Visualization = () => {
       addToast(templateToast("Error", error.message))
     }
   }
-  
-  const fetchDays = async () => {
-    try {
-      const response = await getDays();
-      const data = response.data.data;
-  
-      // Extract plant1 and plant2 data
-      const plant1 = Object.fromEntries(Object.entries(data).filter(([key]) => key.includes("plant1")));
-      const plant2 = Object.fromEntries(Object.entries(data).filter(([key]) => key.includes("plant2")));
-  
-      // Get only the available keys dynamically
-      const plant1entry = Object.keys(plant1).filter((key) => plant1[key]);
-      const plant2entry = Object.keys(plant2).filter((key) => plant2[key]);
-  
-      setDayPlant1(plant1entry);
-      setDayPlant2(plant2entry);
-    } catch (error) {
-      console.error("Error fetching:", error);
-    }
-  };
 
-  const updateConsumptionDays = async() => {
-    try {
-      const plant1body = dayPlant1.reduce((acc, key) => {
-        acc[key] = true;
-        return acc;
-      }, {});
-      const plant2body = dayPlant2.reduce((acc, key) => {
-        acc[key] = true;
-        return acc;
-      }, {});
-      const updateBody = { ...plant1body, ...plant2body }
-      const response = await updateDays(updateBody)
-
-      if(response){
-        addToast(templateToast("success", response.data.message))
-        fetchDays()
-        setShowModal(false)
-      }
-    } catch (error) {
-      console.error("Error updating:", error)
-      addToast(templateToast("Error", error.message))
-    }
-  }
 
   useEffect(()=>{
     getChartOptions()
-    fetchDays()
   },[])
   
   Highcharts.setOptions({
@@ -369,6 +372,56 @@ const Visualization = () => {
       }
     };
 
+
+    // Date Schedules
+    const handleChangeSchedulePlant1 = (value, checked, event) => {
+      setScheduleChanged(true)
+      setSchedulesPlant(prev =>
+        prev.map(item => item.date === value ? { ...item, plant1: checked } : item)
+      );
+    }
+
+
+    const handleChangeSchedulePlant2 = (value, checked, event) => {
+      setScheduleChanged(true)
+      setSchedulesPlant(prev =>
+        prev.map(item => item.date === value ? { ...item, plant2: checked} : item)
+      );
+    }
+
+    const handleUpdateSchedules = async() => { 
+      try {
+        setLoading(true)
+        const response = await upsertSchedules(schedulesPlant)
+        console.log("Response upsert: ", response)
+        if(response){
+          addToast(templateToast("success", response.data.message))
+          fetchScheduleByMonth()
+          setShowModal(false)
+          setScheduleChanged(false)
+        }
+      } catch (error) {
+        console.error(error)
+      } finally{
+        setLoading(false)
+      }
+    }
+
+    const fetchScheduleByMonth = async() => {
+      try {
+        const dateFormatted = new Date(setupDate).toLocaleDateString('en-CA').slice(0, 7)
+        const response = await getScheduleByMonth(dateFormatted)
+        setSchedulesPlant(response.data.data)
+      } catch (error) {
+        console.error(error)
+        console.error(error?.response?.data?.error)
+      }
+    }
+
+    useEffect(()=>{
+      fetchScheduleByMonth()
+    }, [setupDate])
+
   return (
     <div className='bg-andon overflow-x-hidden'>
 
@@ -399,6 +452,7 @@ const Visualization = () => {
               </div>
           </CCardBody>
           <CCol className='d-flex align-items-center justify-content-start gap-2 pt-4'>
+            <span style={{ display: 'none' }} data-dev="DRYAND" />
             <h6 style={{color: "white"}} className='text-section'>WARNING SOUND :</h6>
             <div className="hidden thumbnail" id="paparazzixxx">
               <CButtonGroup className="" onClick={()=> setAudioUnlocked(audioUnlocked ? false : true)} style={{border: 0}}>
@@ -489,76 +543,149 @@ const Visualization = () => {
         </CCol>
       </CRow>
 
-      {/* Start of Modal RATIO */}
-                  <CModal
-                      scrollable
-                      backdrop="static"
-                      visible={showModal}
-                      onClose={() => setShowModal(false)}
-                      aria-labelledby="SetupDay"
-                      >
-                      <CModalHeader>
-                          <CModalTitle id="setupDay">Consumption Day Setup</CModalTitle>
-                      </CModalHeader>
-                      <CModalBody>
-                        <CRow>
-                          <CCol>
-                            <CCard>
-                                <CCardHeader>PLANT 1</CCardHeader>
-                                <CCardBody>
-                                  <CheckboxGroup
-                                    name="plant1-days"
-                                    value={dayPlant1}
-                                    onChange={value => {
-                                      setDayPlant1(value);
-                                    }}
-                                  >
-                                    <Checkbox value='plant1_monday'>Monday</Checkbox>
-                                    <Checkbox value='plant1_tuesday'>Tuesday</Checkbox>
-                                    <Checkbox value='plant1_wednesday'>Wednesday</Checkbox>
-                                    <Checkbox value='plant1_thursday'>Thursday</Checkbox>
-                                    <Checkbox value='plant1_friday'>Friday</Checkbox>
-                                    <Checkbox value='plant1_saturday'>Saturday</Checkbox>
-                                    <Checkbox value='plant1_sunday'>Sunday</Checkbox>
-                                  </CheckboxGroup>
-                                </CCardBody>
-                            </CCard>
-                          </CCol>
-                          <CCol>
-                            <CCard>
-                                <CCardHeader>PLANT 2</CCardHeader>
-                                <CCardBody>
-                                  <CheckboxGroup
-                                    name="plant2-days"
-                                    value={dayPlant2}
-                                    onChange={value => {
-                                      setDayPlant2(value);
-                                    }}
-                                  >
-                                    <Checkbox value='plant2_monday'>Monday</Checkbox>
-                                    <Checkbox value='plant2_tuesday'>Tuesday</Checkbox>
-                                    <Checkbox value='plant2_wednesday'>Wednesday</Checkbox>
-                                    <Checkbox value='plant2_thursday'>Thursday</Checkbox>
-                                    <Checkbox value='plant2_friday'>Friday</Checkbox>
-                                    <Checkbox value='plant2_saturday'>Saturday</Checkbox>
-                                    <Checkbox value='plant2_sunday'>Sunday</Checkbox>
-                                  </CheckboxGroup>
-                                </CCardBody>
-                            </CCard>
-                          </CCol>
-                        </CRow>
-                         
-                      </CModalBody>
-                      <CModalFooter>
-                          <CButton color="secondary" className='btn-close-red' onClick={() => setShowModal(false)}>
-                          Close
-                          </CButton>
-                          <CButton className='d-flex btn-add-master align-items-center gap-2' disabled={loading} onClick={()=>updateConsumptionDays()}>
-                              { loading && <CSpinner size="sm"/>}
-                              Save changes</CButton>
-                      </CModalFooter>
-                  </CModal>
-                  {/* End of Modal RATIO */}
+      {/* Start of Modal Confirmation */}
+      <CModal
+        scrollable
+        alignment='center'
+        backdrop="static"
+        visible={showModalConfirmation}
+        onClose={() => setShowModalConfirmation(false)}
+        aria-labelledby="SetupDay"
+        // style={{ zIndex: 99999}}
+      >
+        <CModalHeader>
+          <CModalTitle>Confirmation</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          You have changed the schedule, but you don&lsquo;t save it. Are you sure want to close it?
+        </CModalBody>
+        <CModalFooter>
+          <CButton 
+              color="secondary" 
+              className='btn-close-red' 
+              onClick={() => {
+                setShowModalConfirmation(false)
+                setShowModal(true)
+              }} 
+              >
+              Back
+            </CButton>
+            <CButton 
+              className='d-flex btn-add-master align-items-center gap-2'  
+              onClick={()=>{
+                setScheduleChanged(false)
+                setShowModalConfirmation(false)
+                setShowModal(false)
+                fetchScheduleByMonth()
+              }}>
+                Yes, close it
+            </CButton>
+        </CModalFooter>
+      </CModal>
+      {/* End of Modal Confirmation */}
+
+      {/* Start of Modal Consumption Setup */}
+      <CModal
+          scrollable
+          backdrop="static"
+          visible={showModal}
+          onClose={() => {
+            if(!scheduleChanged){
+              setShowModal(false)
+            }else{
+              setShowModal(false)
+              setShowModalConfirmation(true)
+            }
+          }}
+          aria-labelledby="SetupDay"
+          >
+          <CModalHeader>
+              <CModalTitle id="setupDay">Consumption Day Setup</CModalTitle>
+          </CModalHeader>
+          <CModalBody>
+            <CCard>
+              <CCardHeader className='text-center text-black text-uppercase fw-bold'>
+              <DatePicker 
+                oneTap
+                format='MMMM yyyy' 
+                value={new Date(setupDate)}
+                onChange={(e)=>{
+                  if (e!==null){
+                    setSetupDate(e.toLocaleDateString('en-CA', {
+                      month: "long",
+                      year: "numeric"
+                    }))
+                  }
+                }}
+              />
+                {/* {setupDate} */}
+              </CCardHeader>
+              <CCardBody>
+                <CTable>
+                  <CTableHead>
+                    <CTableHeaderCell>Day</CTableHeaderCell>
+                    <CTableHeaderCell>Date</CTableHeaderCell>
+                    <CTableHeaderCell>Plant 1</CTableHeaderCell>
+                    <CTableHeaderCell>Plant 2</CTableHeaderCell>
+                  </CTableHead>
+                  <CTableBody>
+                    { schedulesPlant?.map((item, index)=>{
+                      const day = new Date(item.date).getDay()
+                      
+                      const isToday = new Date().toLocaleDateString('en-CA') === item.date.split("T")[0]
+                      const isWeekend = day === 6 || day === 0
+                      const dateName = new Date(item.date).toLocaleDateString('id-ID', {
+                        dateStyle: "full"
+                      }).split(",")[0]
+                      return(
+                        <CTableRow key={index} style={{ border: isToday ? "3px solid skyblue" : ""}}>
+                          <CTableDataCell align='middle' style={{ color: isWeekend ? "red" : "black"}}>{dateName}</CTableDataCell>
+                          <CTableDataCell align='middle' style={{ color: isWeekend ? "red" : "black"}}>{item.date.split("-")[2].slice(0, 2)}</CTableDataCell>
+                          <CTableDataCell align='middle'>
+                            <Checkbox 
+                              value={item.date}
+                              checked={item.plant1}
+                              onChange={handleChangeSchedulePlant1}
+                            />
+                          </CTableDataCell>
+                          <CTableDataCell align='middle'>
+                            <Checkbox 
+                              value={item.date}
+                              checked={item.plant2}
+                              onChange={handleChangeSchedulePlant2}
+                            />
+                          </CTableDataCell>
+                        </CTableRow>
+                      )
+                    }) }
+                  </CTableBody>
+                </CTable>
+              </CCardBody>
+            </CCard>
+              
+          </CModalBody>
+          <CModalFooter>
+            <CButton 
+              color="secondary" 
+              className='btn-close-red' 
+              onClick={() => {
+                if(!scheduleChanged){
+                  setShowModal(false)
+                }else{
+                  setShowModal(false)
+                  setShowModalConfirmation(true)
+                }
+              }}
+              >
+              Close
+            </CButton>
+            <CButton className='d-flex btn-add-master align-items-center gap-2' disabled={loading} onClick={()=>handleUpdateSchedules()}>
+                { loading && <CSpinner size="sm"/>}
+                Save changes
+            </CButton>
+          </CModalFooter>
+      </CModal>
+      {/* End of Modal Consumption Setup */}
     </div>
   )
 }

@@ -251,3 +251,7 @@ text.highcharts-credits{
     color: gray;
     border: 1 px gray;
 }
+
+.rs-picker-popup.rs-picker-popup-date{
+  z-index: 999999;
+}
