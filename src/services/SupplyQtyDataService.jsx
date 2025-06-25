@@ -17,9 +17,9 @@ const useSupplyQtyDataService = () => {
         throw new Error(error.message || '')
     }
 
-    const getSupplyQtyData = async(api) => {
+    const getSupplyQtyData = async(api, plant) => {
         try {
-            const response = await axios.get(`${BACKEND_URL}/${api}`)
+            const response = await axios.get(`${BACKEND_URL}/${api}?plant=${plant}`)
             return response
         } catch (error) {
             throw error

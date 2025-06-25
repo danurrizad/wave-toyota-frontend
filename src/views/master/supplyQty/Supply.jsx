@@ -33,6 +33,7 @@ import {
     CToastBody,
     CSpinner
 } from '@coreui/react'
+import Select from "react-select"
 
 import dayjs from 'dayjs';
 import CIcon from '@coreui/icons-react';
@@ -45,6 +46,8 @@ import jsPDF from "jspdf";
 import useSupplyQtyDataService from '../../../services/SupplyQtyDataService'
 import { useAuth } from '../../../utils/context/authContext';
 import templateToast from '../../../components/ToasterComponent';
+import Pagination from '../../../components/pagination/Pagination';
+import SizePage from '../../../components/pagination/SizePage';
 
 const Supply = () => {
     const auth = useAuth()
@@ -66,6 +69,23 @@ const Supply = () => {
     const [ visibleModalUpdate, setVisibleModalUpdate ] = useState(false)
     const [formUpdateData, setFormUpdateData] = useState({})
 
+    // PAGINATION AND SEARCH
+    const [loading, setLoading] = useState(true)
+    const [currentPage, setCurrentPage] = useState(1)
+    const [itemPerPage, setItemPerPage] = useState(10)
+    const [totalPage, setTotalPage] = useState(0)
+    const [toast, addToast] = useState(0)
+    const toaster = useRef()
+
+    // FILTER 
+    const optionsPlant = [
+        { label: "P1 - PLANT 1", value: "P1 - PLANT 1" },
+        { label: "P2 - PLANT 2", value: "P2 - PLANT 2" }
+    ]
+    const [searchQuery, setSearchQuery] = useState({
+        plant: ""
+    });
+
     const handleModalUpdate = (supplyData) => {
         setVisibleModalUpdate(true)
         setFormUpdateData({
@@ -82,9 +102,11 @@ const Supply = () => {
     const getSupplyQty = async() =>{
         try {
             setLoading(true)
-            const response = await getSupplyQtyData('supply-qty')
+            const response = await getSupplyQtyData('supply-qty', searchQuery.plant)
             setSupplyQtyData(response.data.data)
             setFilteredData(response.data.data)
+            setTotalPage(Math.ceil(response.data.data.length / itemPerPage))
+            setCurrentPage(1)
         } catch (error) {
             if(error.response){
                 addToast(templateToast("Error", error.response.data.message))
@@ -118,40 +140,8 @@ const Supply = () => {
 
     useEffect(()=>{
         getSupplyQty()
-    }, [])
+    }, [searchQuery])
 
-    // PAGINATION AND SEARCH
-    const [loading, setLoading] = useState(true)
-    const [currentPage, setCurrentPage] = useState(1)
-    const [itemPerPage, setItemPerPage] = useState(10)
-    const [totalPage, setTotalPage] = useState(0)
-    const [toast, addToast] = useState(0)
-    const toaster = useRef()
-
-    // Handle search functionality
-    const [searchQuery, setSearchQuery] = useState({
-        plant: "All"
-    });
-
-    const handleSearch = () => {
-        const { plant } = searchQuery 
-
-        const filtered = supplyQtyData.filter(supply => {
-            const matchesPlant = plant === "All" || supply.plant.toLowerCase().includes(plant.toLowerCase())
-            return matchesPlant
-        })
-
-        setFilteredData(filtered)
-        setTotalPage(Math.ceil(filtered.length / itemPerPage))
-        setCurrentPage(1); // Reset to the first page
-    };
-
-    const handleClearSearch = () => {
-        setSearchQuery({plant: "All"})
-        setFilteredData(supplyQtyData)
-        setTotalPage(Math.ceil(supplyQtyData.length / itemPerPage))
-        setCurrentPage(1)
-    }
 
     const handleSetItemPerPage = (item) => {
         setItemPerPage(item)
@@ -307,11 +297,6 @@ const Supply = () => {
                                 <CTableDataCell align='top' className='px-2'>:</CTableDataCell>
                                 <CTableDataCell align='top'>{dataQR.plant}</CTableDataCell>
                             </CTableRow>
-                            {/* <CTableRow className=''>
-                                <CTableDataCell align='top'>Uom</CTableDataCell>
-                                <CTableDataCell align='top' className='px-2'>:</CTableDataCell>
-                                <CTableDataCell align='top'>{dataQR.uom}</CTableDataCell>
-                            </CTableRow> */}
                             <CTableRow className=''>
                                 <CTableDataCell align='top'>Pack</CTableDataCell>
                                 <CTableDataCell align='top' className='px-2'>:</CTableDataCell>
@@ -397,20 +382,15 @@ const Supply = () => {
                 <CCol xl={6} xs={12} >
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor="plant" className='col-form-label col-sm-2 col-xl-1' >Plant</CFormLabel>
-                        <CCol className='d-flex align-items-center gap-2 col-sm-8 col-xl-6'>
-                            <CDropdown className='dropdown-search d-flex justify-content-between'>
-                                <CDropdownToggle width={400} className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
-                                <CDropdownMenu className='cursor-pointer'>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ plant: "All"})}>All</CDropdownItem>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ plant: "P1 - Plant 1"})}>P1 - Plant 1</CDropdownItem>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({ plant: "P2 - Plant 2"})}>P2 - Plant 2</CDropdownItem>
-                                </CDropdownMenu>
-                            </CDropdown>
-                        </CCol>
-                        <CCol className="d-flex justify-content-end gap-3 col-sm-2 col-xl-2">
-                            <CButton className="btn-search" onClick={()=>handleSearch()}>Search</CButton>
-                            <CButton color="secondary" onClick={()=>handleClearSearch()}>Clear</CButton>
-                        </CCol >
+                        <Select
+                            options={optionsPlant}
+                            value={optionsPlant.find((opt)=>opt.value === searchQuery.plant) || ""}
+                            onChange={(e)=>setSearchQuery({ ...searchQuery, plant: e !== null ? e.value : ""})}
+                            isClearable
+                            placeholder="All"
+                            className='w-100'
+                        />
+                        
                     </CRow>
                 </CCol>
             </CRow>
@@ -434,7 +414,7 @@ const Supply = () => {
                             </CTableRow>
                         </CTableHead>
                         <CTableBody>
-                            { paginatedData && paginatedData.map((supply, index) => {
+                            { (paginatedData.length > 0 && !loading) && paginatedData.map((supply, index) => {
                                 return(
                                     <CTableRow key={index} style={{ verticalAlign: "middle" }}>
                                         { (auth.userData.role_name === "LANE HEAD" ||  auth.userData.role_name === "SUPER ADMIN") && (
@@ -482,69 +462,25 @@ const Supply = () => {
                     </CTable>
                 </CCol>
             </CRow>
+            
             <CRow>
                 <CCol xs={8} xl={6} className='d-flex align-items-end'>
                     <CFormLabel>Showing {totalPage === 0 ? "0" : currentPage} to {totalPage} of {paginatedData?.length} row(s)</CFormLabel>
                 </CCol>
                 <CCol xs={4} xl={6} className='d-flex align-items-center justify-content-end gap-4'>
-                    <CFormLabel htmlFor="size" className='col-form-label' >Size</CFormLabel>
-                    <CDropdown>
-                        <CDropdownToggle color="white">{itemPerPage}</CDropdownToggle>
-                        <CDropdownMenu className='cursor-pointer'>
-                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
-                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
-                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
-                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
-                        </CDropdownMenu>
-                    </CDropdown>
+                    <SizePage
+                        itemPerPage={itemPerPage}
+                        setItemPerPage={setItemPerPage}
+                        setCurrentPage={setCurrentPage}
+                    />
                 </CCol>
                 <CCol sm={12} xl={12} className='d-flex align-items-center gap-4 justify-content-center flex-column flex-xl-row py-4'>
-                        {/* Custom Pagination Component */}
-                        <CPagination className="justify-content-center">
-                        {/* Previous Button */}
-                        <CPaginationItem
-                            disabled={currentPage === 1 || filteredData.length === 0}
-                            onClick={() => currentPage > 1 && setCurrentPage(1)}
-                        >
-                            First
-                        </CPaginationItem>
-                        <CPaginationItem
-                            disabled={currentPage === 1 || filteredData.length === 0}
-                            onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
-                        >
-                            Previous
-                        </CPaginationItem>
-
-                        {/* Page Numbers */}
-                        {Array.from({ length: totalPage }, (_, i) => i + 1)
-                            .slice(
-                            Math.max(0, currentPage - 2), // Start index for slicing
-                            Math.min(totalPage, currentPage + 1) // End index for slicing
-                            )
-                            .map((page) => (
-                            <CPaginationItem
-                                key={page}
-                                active={page === currentPage}
-                                onClick={() => setCurrentPage(page)}
-                            >
-                                {page}
-                            </CPaginationItem>
-                            ))}
-
-                        {/* Next Button */}
-                        <CPaginationItem
-                            disabled={currentPage === totalPage || filteredData.length === 0}
-                            onClick={() => currentPage < totalPage && setCurrentPage(currentPage + 1)}
-                        >
-                            Next
-                        </CPaginationItem>
-                        <CPaginationItem
-                            disabled={currentPage === totalPage || filteredData.length === 0}
-                            onClick={() => currentPage < totalPage && setCurrentPage(totalPage)}
-                        >
-                            Last
-                        </CPaginationItem>
-                    </CPagination>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPage={totalPage}
+                        setCurrentPage={setCurrentPage}
+                        data={filteredData}
+                    />
                 </CCol>
             </CRow>
         </CContainer>
