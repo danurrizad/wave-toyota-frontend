@@ -29,15 +29,25 @@ import {
 } from '@coreui/react'
 
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import CIcon from '@coreui/icons-react';
 import * as icon from "@coreui/icons";
+import Select from "react-select"
 
 import useSetupDataService from './../../../services/SetupDataService';
 import { useAuth } from '../../../utils/context/authContext';
 import templateToast from '../../../components/ToasterComponent';
+import SizePage from '../../../components/pagination/SizePage';
+import Pagination from '../../../components/pagination/Pagination';
+import { useToast } from '../../../App';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const Setup = () => {
     const auth = useAuth()
+    const addToast = useToast()
     const [ setupData, setSetupData ] = useState([])
     const { getSetupData, updateSetupData } = useSetupDataService()
 
@@ -45,6 +55,7 @@ const Setup = () => {
     const [formUpdateData, setFormUpdateData] = useState({})
 
     const handleModalUpdate = (setupData) => {
+        const now = dayjs().tz('Asia/Jakarta').format()
         setVisibleModalUpdate(true)
         setFormUpdateData({
             material_no: setupData.material_no,
@@ -54,7 +65,8 @@ const Setup = () => {
             standard_supply: setupData.standard_supply,
             critical_stock: setupData.critical_stock,
             total: setupData.total,
-            updated_by: auth.user
+            updated_by: auth.user,
+            changed_date: now
         })
     }
 
@@ -64,39 +76,16 @@ const Setup = () => {
     const [itemPerPage, setItemPerPage] = useState(10)
     const [totalPage, setTotalPage] = useState(0)
     const [filteredData, setFilteredData] = useState([])
-    const [toast, addToast] = useState(0)
-    const toaster = useRef()
    
+    const optionsPlant = [
+        { label: "P1 - PLANT 1", value: "P1 - PLANT 1" },
+        { label: "P2 - PLANT 2", value: "P2 - PLANT 2" },
+    ]
 
     // Handle search functionality
     const [searchQuery, setSearchQuery] = useState({
-        plant: "All"
+        plant: ""
     });
-
-    const handleSearch = () => {
-        const { plant } = searchQuery
-        
-        const filtered = setupData.filter(setup => {
-            const matchesPlant = plant === "All" || setup.plant.toLowerCase().includes(plant.toLowerCase())
-            return matchesPlant
-        })
-
-        setFilteredData(filtered)
-        setTotalPage(Math.ceil(filtered.length / itemPerPage))
-        setCurrentPage(1); // Reset to the first page
-    };
-
-    const handleClearSearch = () => {
-        setSearchQuery({plant: "All"})
-        setFilteredData(setupData)
-        setTotalPage(Math.ceil(setupData.length / itemPerPage))
-        setCurrentPage(1)
-    }
-
-    const handleSetItemPerPage = (item) => {
-        setItemPerPage(item)
-        setCurrentPage(1)
-    }
 
 
     useEffect(() => {
@@ -106,20 +95,20 @@ const Setup = () => {
 
     const paginatedData = filteredData.slice((currentPage - 1) * itemPerPage, currentPage * itemPerPage)
 
-
-
     const getSetup = async() => {
         try {
             setLoading(true)
-            const response = await getSetupData('setup');
+            const response = await getSetupData('setup', searchQuery.plant);
+           
             setSetupData(response.data.data)
             setFilteredData(response.data.data)
+            setTotalPage(response.data.data.length / itemPerPage)
+            setCurrentPage(1)
         } catch (error) {
-            if(error.response){
-                addToast(templateToast("Error", error.response.data.message))
-            }else{
-                addToast(templateToast("Error", error.message))
-            }
+            console.error(error)
+            setFilteredData([])
+            setTotalPage(0)
+            setCurrentPage(1)
         } finally{
             setLoading(false)
         }
@@ -129,15 +118,11 @@ const Setup = () => {
         try {
             setLoading(true)
             const response = await updateSetupData('setup', form.material_no, form)
-            addToast(templateToast("Success", response.data.message))
+            addToast(response.data.message, 'success', 'sucess')
             getSetup()
             setVisibleModalUpdate(false)
         } catch (error) {
-            if(error.response){
-                addToast(templateToast("Error", error.response.data.message))
-            }else{
-                addToast(templateToast("Error", error.message))
-            }
+            console.error(error)
         } finally{
             setLoading(false)
         }
@@ -145,14 +130,12 @@ const Setup = () => {
 
     useEffect(()=>{
         getSetup()
-    }, [])
+    }, [searchQuery])
     
 
   return (
     <>
         <CContainer fluid >
-            {/* Toast */}
-            <CToaster key={setupData.material_no} className="p-3" placement="top-end" push={toast} ref={toaster} />
             
             {/* Start of Modal Update */}
             <CModal
@@ -227,19 +210,14 @@ const Setup = () => {
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor="plant" className='col-form-label col-sm-2 col-xl-1' >Plant</CFormLabel>
                         <CCol className='d-flex align-items-center gap-2 col-sm-8 col-xl-6'>
-                            <CDropdown className='dropdown-search d-flex justify-content-between'>
-                                <CDropdownToggle width={400} className='d-flex justify-content-between align-items-center'>{searchQuery.plant}</CDropdownToggle>
-                                <CDropdownMenu className='cursor-pointer'>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({plant: "All"})}>All</CDropdownItem>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({plant: "P1 - Plant 1"})}>P1 - Plant 1</CDropdownItem>
-                                    <CDropdownItem style={{textDecoration: "none"}} onClick={()=>setSearchQuery({plant: "P2 - Plant 2"})}>P2 - Plant 2</CDropdownItem>
-                                </CDropdownMenu>
-                            </CDropdown>
+                            <Select
+                                options={optionsPlant}
+                                value={optionsPlant.find((opt)=>opt.value === searchQuery.plant) || ""}
+                                onChange={(e)=>setSearchQuery({ ...searchQuery, plant: e!==null ? e.value : ""})}
+                                isClearable
+                                className='w-100'
+                            />
                         </CCol>
-                        <CCol className="d-flex justify-content-end gap-3 col-sm-2 col-xl-2">
-                            <CButton className="btn-search" onClick={()=>handleSearch()}>Search</CButton>
-                            <CButton color="secondary" onClick={()=>handleClearSearch()}>Clear</CButton>
-                        </CCol >
                     </CRow>
                 </CCol>
             </CRow>
@@ -270,10 +248,11 @@ const Setup = () => {
                                 <CTableHeaderCell scope="col">Created Date</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Changed By</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Changed Date</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Changed Time</CTableHeaderCell>
                             </CTableRow>
                         </CTableHead>
                         <CTableBody>
-                            { paginatedData && paginatedData.map((setup, index) => {
+                            { (paginatedData.length > 0 && !loading) && paginatedData.map((setup, index) => {
                                     return(
                                         <CTableRow color={setup.total < setup.standard_supply && setup.total > setup.critical_stock ? "warning" : setup.total < setup.critical_stock ? "danger" : ""} key={index} style={{ verticalAlign: "middle", backgroundColor: "black" }}>
                                             { (auth.userData.role_name === "LANE HEAD" ||  auth.userData.role_name === "SUPER ADMIN") && (
@@ -291,13 +270,14 @@ const Setup = () => {
                                             <CTableDataCell>{setup.created_by}</CTableDataCell>
                                             <CTableDataCell>{dayjs(setup.createdAt).format('YYYY-MM-DD HH:mm:ss')}</CTableDataCell>
                                             <CTableDataCell>{setup.updated_by}</CTableDataCell>
-                                            <CTableDataCell>{dayjs(setup.updatedAt).format('YYYY-MM-DD HH:mm:ss')}</CTableDataCell>
+                                            <CTableDataCell>{setup.changed_date ? new Date(setup.changed_date).toLocaleDateString('en-CA') : ""}</CTableDataCell>
+                                            <CTableDataCell>{setup.changed_date ? new Date(setup.changed_date).toLocaleTimeString('id-ID').replaceAll('.',':').slice(0, 5) : ""}</CTableDataCell>
                                         </CTableRow>
                                     )
                                 } )}
                             { paginatedData.length === 0 && !loading && 
                                 <CTableRow color="light">
-                                    <CTableDataCell color="light" colSpan={12}>
+                                    <CTableDataCell color="light" colSpan={100}>
                                         <div className=' py-2 text-not-found d-flex flex-column justify-content-center align-items-center text-black' style={{ opacity: "30%"}}>
                                             <CIcon icon={icon.cilFax} size='3xl'/>
                                             <p className='pt-3'>No data found!</p>
@@ -324,64 +304,19 @@ const Setup = () => {
                     <CFormLabel>Showing {totalPage === 0 ? "0" : currentPage} to {totalPage} of {paginatedData?.length} row(s)</CFormLabel>
                 </CCol>
                 <CCol xs={4} xl={6} className='d-flex align-items-center justify-content-end gap-4'>
-                    <CFormLabel htmlFor="size" className='col-form-label' >Size</CFormLabel>
-                    <CDropdown>
-                        <CDropdownToggle color="white">{itemPerPage}</CDropdownToggle>
-                        <CDropdownMenu className='cursor-pointer'>
-                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(10)}>10</CDropdownItem>
-                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(25)}>25</CDropdownItem>
-                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(50)}>50</CDropdownItem>
-                            <CDropdownItem style={{ textDecoration: "none" }} onClick={() => handleSetItemPerPage(100)}>100</CDropdownItem>
-                        </CDropdownMenu>
-                    </CDropdown>
+                    <SizePage
+                        itemPerPage={itemPerPage}
+                        setItemPerPage={setItemPerPage}
+                        setCurrentPage={setCurrentPage}
+                    />
                 </CCol>
                 <CCol sm={12} xl={12} className='d-flex align-items-center gap-4 justify-content-center flex-column flex-xl-row py-4'>
-                        {/* Custom Pagination Component */}
-                        <CPagination className="justify-content-center">
-                        {/* Previous Button */}
-                        <CPaginationItem
-                            disabled={currentPage === 1 || filteredData.length === 0}
-                            onClick={() => currentPage > 1 && setCurrentPage(1)}
-                        >
-                            First
-                        </CPaginationItem>
-                        <CPaginationItem
-                            disabled={currentPage === 1 || filteredData.length === 0}
-                            onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
-                        >
-                            Previous
-                        </CPaginationItem>
-
-                        {/* Page Numbers */}
-                        {Array.from({ length: totalPage }, (_, i) => i + 1)
-                            .slice(
-                            Math.max(0, currentPage - 2), // Start index for slicing
-                            Math.min(totalPage, currentPage + 1) // End index for slicing
-                            )
-                            .map((page) => (
-                            <CPaginationItem
-                                key={page}
-                                active={page === currentPage}
-                                onClick={() => setCurrentPage(page)}
-                            >
-                                {page}
-                            </CPaginationItem>
-                            ))}
-
-                        {/* Next Button */}
-                        <CPaginationItem
-                            disabled={currentPage === totalPage || filteredData.length === 0}
-                            onClick={() => currentPage < totalPage && setCurrentPage(currentPage + 1)}
-                        >
-                            Next
-                        </CPaginationItem>
-                        <CPaginationItem
-                            disabled={currentPage === totalPage || filteredData.length === 0}
-                            onClick={() => currentPage < totalPage && setCurrentPage(totalPage)}
-                        >
-                            Last
-                        </CPaginationItem>
-                    </CPagination>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPage={totalPage}
+                        setCurrentPage={setCurrentPage}
+                        data={filteredData}
+                    />
                 </CCol>
             </CRow>
         </CContainer>
