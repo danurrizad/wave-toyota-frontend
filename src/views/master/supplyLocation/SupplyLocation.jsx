@@ -381,7 +381,7 @@ const SupplyLocation = () => {
             { renderModal(showModal.type) }
             { renderModalQR() }
             <CRow>
-                <CCol>
+                <CCol xl={4} lg={6} md={6} xs={12} >
                     <CFormLabel>Plant</CFormLabel>
                     <Select
                         options={optionPlants}
@@ -404,7 +404,6 @@ const SupplyLocation = () => {
                         <CTableHead>
                             <CTableRow color="dark" style={{ verticalAlign: "middle", textAlign: "center" }}>
                                 { (auth.userData.role_name === "LANE HEAD" || auth.userData.role_name === "SUPER ADMIN") && <CTableHeaderCell colSpan={2}>Action</CTableHeaderCell>}
-                                <CTableHeaderCell>No</CTableHeaderCell>
                                 <CTableHeaderCell>Supply Location Name</CTableHeaderCell>
                                 <CTableHeaderCell>Plant</CTableHeaderCell>
                                 <CTableHeaderCell>Material No</CTableHeaderCell>
@@ -426,7 +425,6 @@ const SupplyLocation = () => {
                                                 <CButton onClick={()=>handleOpenModal('delete', item)} className='btn-icon-delete'><CIcon icon={icon.cilTrash}/></CButton>
                                             </CTableDataCell>
                                         }
-                                        <CTableDataCell>{index+1}</CTableDataCell>
                                         <CTableDataCell>{item?.location_name}</CTableDataCell>
                                         <CTableDataCell>{item?.plant}</CTableDataCell>
                                         <CTableDataCell>{item?.materials?.map((material, index)=>{

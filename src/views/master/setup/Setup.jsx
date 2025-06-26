@@ -206,18 +206,16 @@ const Setup = () => {
             {/* End of Modal Update */}
 
             <CRow>
-                <CCol xl={6} xs={12} >
+                <CCol xl={4} lg={6} md={6} xs={12} >
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor="plant" className='col-form-label col-sm-2 col-xl-1' >Plant</CFormLabel>
-                        <CCol className='d-flex align-items-center gap-2 col-sm-8 col-xl-6'>
-                            <Select
-                                options={optionsPlant}
-                                value={optionsPlant.find((opt)=>opt.value === searchQuery.plant) || ""}
-                                onChange={(e)=>setSearchQuery({ ...searchQuery, plant: e!==null ? e.value : ""})}
-                                isClearable
-                                className='w-100'
-                            />
-                        </CCol>
+                        <Select
+                            options={optionsPlant}
+                            value={optionsPlant.find((opt)=>opt.value === searchQuery.plant) || ""}
+                            onChange={(e)=>setSearchQuery({ ...searchQuery, plant: e!==null ? e.value : ""})}
+                            isClearable
+                            className='w-100'
+                        />
                     </CRow>
                 </CCol>
             </CRow>

@@ -379,7 +379,7 @@ const Supply = () => {
             {renderModalQR()}
 
             <CRow>
-                <CCol xl={6} xs={12} >
+                <CCol xl={4} lg={6} md={6} xs={12}  >
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor="plant" className='col-form-label col-sm-2 col-xl-1' >Plant</CFormLabel>
                         <Select
