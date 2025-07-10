@@ -96,6 +96,7 @@ const Supply = () => {
 
     useEffect(()=>{
         getSupplyHistoryData()
+        setCurrentPage(1)
     }, [searchQuery, period])
 
   const optionsPlant = [
@@ -222,12 +223,13 @@ const Supply = () => {
                     <CFormLabel className="col-form-label col-xxl-12">Period</CFormLabel>
                     <CCol xl={8} xs={9} md={6} sm={6}>
                         <DateRangePicker 
-                            placeholder="Select date period"
+                            placeholder="All time"
                             value={period}
                             onChange={(e)=>{
                                 setPeriod(e!==null ? e : "")
                             }}
-                            format="MMMM dd, yyyy" 
+                            format="yyyy-MM-dd" 
+                            showOneCalendar
                         />
                     </CCol>
                 </CRow>
